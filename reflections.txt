@@ -1,3 +1,8 @@
+
+How did viewing a diff between two versions of a file help you see the bug that was introduced?
+
+Looking through any large file for a single newly-introced bug can take a long time; the diff between two versions shows only the relevant changes and makes looking for problems much easier.
+
 ---
 
 How could having easy access to the entire history of a file make you a more efficient programmer in the long term?
