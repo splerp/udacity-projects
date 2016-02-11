@@ -101,7 +101,7 @@ def open_movies_page(movies, genres):
 	output_file = open('index.html', 'w')
 
 	# Retrieve HTML template from external file.
-	content_file = open('template-main.html', 'r')
+	content_file = open('template/template-main.html', 'r')
 	content = content_file.read()
 
 	# Replace the movie tiles' placeholder generated content
