@@ -16,3 +16,9 @@ Reverting unneeded changes will be much easier; If a lot of code is lost or acci
 How might using version control make you more confident to make changes that could break something?
 
 Knowing that a previous version can always be reverted to at any time makes changing the existing code a lot less risky.
+
+---
+
+Now that you have your workspace set up, what do you want to try using Git for?
+
+Using git simply for the ability to revert to previous versions, for small personal projects.
