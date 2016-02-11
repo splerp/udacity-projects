@@ -1,0 +1,9 @@
+---
+
+How could having easy access to the entire history of a file make you a more efficient programmer in the long term?
+
+If problems are discovered in a particular part of the project, looking at previous commits in that area may make it easier to find the origin of the problem more quickly.
+
+Reverting unneeded changes will be much easier; If a lot of code is lost or accidentally commited, each previous commit also works as a backup.
+
+---
