@@ -121,15 +121,22 @@ def open_movies_page(movies, genres):
 # Each of these functions returns a path to the requested movie's image.
 def getPosterImageURL(movie):
 
-	return "image/movies/" + movie.id + "/poster.png"
+	toReturn = "image/movies/" + movie.id + "/poster.png"
+	
+	return toReturn if os.path.isfile(toReturn) else "image/movies/0000 Unknown/poster.png"
 
 def getMovieBoxartImageURL(movie):
 
-	return "image/movies/" + movie.id + "/boxart.png"
+	toReturn = "image/movies/" + movie.id + "/boxart.png"
+	
+	return toReturn if os.path.isfile(toReturn) else "image/movies/0000 Unknown/boxart.png"
 
 def getMovieThumbnailImageURL(movie):
 
-	return "image/movies/" + movie.id + "/thumbnail.png"
+	toReturn = "image/movies/" + movie.id + "/thumbnail.png"
+	
+	return toReturn if os.path.isfile(toReturn) else "image/movies/0000 Unknown/thumbnail.png"
+
 
 
 
