@@ -12,3 +12,7 @@ If problems are discovered in a particular part of the project, looking at previ
 Reverting unneeded changes will be much easier; If a lot of code is lost or accidentally commited, each previous commit also works as a backup.
 
 ---
+
+How might using version control make you more confident to make changes that could break something?
+
+Knowing that a previous version can always be reverted to at any time makes changing the existing code a lot less risky.
