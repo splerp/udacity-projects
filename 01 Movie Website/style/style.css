@@ -220,6 +220,15 @@ body {
 	width:100%;
 }
 
+#trailer-description-container
+{
+	min-height:50px;
+	
+	text-align: center;
+	padding:4px;
+	padding-bottom:15px;
+}
+
 .scale-media {
 	padding-bottom: 56.25%;
 	position: relative;

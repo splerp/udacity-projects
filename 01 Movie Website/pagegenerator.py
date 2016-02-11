@@ -6,6 +6,7 @@ import re
 movie_tile_content = '''
 <div class="col-lg-4 movie-tile text-center"
 data-trailer-youtube-id="{trailer_youtube_id}"
+data-long-desc="{movie_long_desc}"
 data-toggle="modal"
 data-target="#trailer">
 	<img src="{poster_image_url}" width="220">

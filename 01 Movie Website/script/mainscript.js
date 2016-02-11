@@ -18,12 +18,16 @@ $(document).on('click', '.movie-tile', function (event) {
 	  'src': sourceUrl,
 	  'frameborder': 0
 	}));
+	
+	var longDesc = $(this).attr('data-long-desc');
+	
+	$("#trailer-description-container").text(longDesc);
 });
 
-// Start playing the video whenever the trailer modal is opened
 $(document).on('click', '#genrecontainer li', function (event) {
 	
 	var genreName = $(this).attr("data-genre");
+	var genreDescription = $(this).attr("data-description");
 	
 	console.log("test - " + genreName);
 	
