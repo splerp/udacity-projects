@@ -12,7 +12,7 @@ class movie:
 	trailer_youtube_id = "hP4WsVHTVh0"
 	
 	short_description = "Missing short description"
-	long_description = "The long description is missing from this movie. Ensure it is added in your code."
+	long_description = "The long description is missing from this movie."
 	
 	def __init__(self, *args, **kwargs):
 		

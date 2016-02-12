@@ -107,123 +107,134 @@ movies.append(movie(
 			))
 
 movies.append(movie(
-			id="0000 Unknown",
+			id="0011 ToyStory",
 			title="Toy Story",
-			rd=date(2011, 6, 14),
+			rd=date(1995, 12, 7),
 			genre="Comedy",
-			vidid="OJUIgf7lsCY",
+			vidid="4KPTXpQehio",
 			sdesc="",
 			ldesc="",
 			))
 			
 movies.append(movie(
-			id="0000 Unknown",
+			id="0012 ToyStory2",
 			title="Toy Story 2",
-			rd=date(2011, 6, 14),
+			rd=date(1999, 12, 2),
 			genre="Comedy",
-			vidid="OJUIgf7lsCY",
+			vidid="Lu0sotERXhI",
 			sdesc="",
 			ldesc="",
 			))
 
 movies.append(movie(
-			id="0000 Unknown",
+			id="0013 Whiplash",
 			title="Whiplash",
-			rd=date(2011, 6, 14),
+			rd=date(2015, 1, 8),
 			genre="Drama",
-			vidid="OJUIgf7lsCY",
+			vidid="7d_jQycdQGo",
 			sdesc="",
 			ldesc="",
 			))
 
 movies.append(movie(
-			id="0000 Unknown",
+			id="0014 Looper",
 			title="Looper",
-			rd=date(2011, 6, 14),
+			rd=date(2012, 9, 27),
 			genre="Thriller",
-			vidid="OJUIgf7lsCY",
+			vidid="2iQuhsmtfHw",
 			sdesc="",
 			ldesc="",
 			))
 
 movies.append(movie(
-			id="0000 Unknown",
+			id="0015 Gravity",
 			title="Gravity",
-			rd=date(2011, 6, 14),
+			rd=date(2013, 10, 3),
 			genre="Thriller",
-			vidid="OJUIgf7lsCY",
+			vidid="OiTiKOy59o4",
 			sdesc="",
 			ldesc="",
 			))
 
 movies.append(movie(
-			id="0000 Unknown",
+			id="0016 HarryPotterandthePhilosophersStone",
 			title="Harry Potter and the Philosopher's Stone",
-			rd=date(2011, 6, 14),
+			rd=date(2001, 11, 4),
 			genre="Drama",
-			vidid="OJUIgf7lsCY",
+			vidid="eKSB0gXl9dw",
 			sdesc="",
 			ldesc="",
 			))
 
 movies.append(movie(
-			id="0000 Unknown",
+			id="0017 TheIncredibles",
 			title="The Incredibles",
-			rd=date(2011, 6, 14),
+			rd=date(2004, 12, 26),
 			genre="Action",
-			vidid="OJUIgf7lsCY",
+			vidid="fwHlyurv-0U",
 			sdesc="",
 			ldesc="",
 			))
 
 movies.append(movie(
-			id="0000 Unknown",
+			id="0018 TheLordoftheRingsTheTwoTowers",
 			title="The Lord of the Rings: The Two Towers",
-			rd=date(2011, 6, 14),
+			rd=date(2002, 12, 19),
 			genre="Action",
-			vidid="OJUIgf7lsCY",
+			vidid="cvCktPUwkW0",
 			sdesc="",
 			ldesc="",
 			))
 
 movies.append(movie(
-			id="0000 Unknown",
+			id="0019 ChickenRun",
 			title="Chicken Run",
-			rd=date(2011, 6, 14),
+			rd=date(2000, 12, 7),
 			genre="Comedy",
-			vidid="OJUIgf7lsCY",
+			vidid="AEOfT7hUcDs",
 			sdesc="",
 			ldesc="",
 			))
 
 movies.append(movie(
-			id="0000 Unknown",
-			title="Monety Python and the Holy Grail",
-			rd=date(2011, 6, 14),
+			id="0020 MontyPythonandtheHolyGrail",
+			title="Monty Python and the Holy Grail",
+			rd=date(1975, 1, 1),
 			genre="Comedy",
-			vidid="OJUIgf7lsCY",
+			vidid="LG1PlkURjxE",
 			sdesc="",
 			ldesc="",
 			))
 
 movies.append(movie(
-			id="0000 Unknown",
-			title="101 Dalmations",
-			rd=date(2011, 6, 14),
+			id="0021 OneHundredAndOneDalmations",
+			title="One Hundred and One Dalmations",
+			rd=date(1961, 1, 25),
 			genre="Comedy",
-			vidid="OJUIgf7lsCY",
+			vidid="1Q_98VlWLF4",
 			sdesc="",
-			ldesc="\"Uhhhh, so like, there's this family right? That's really nice and stuff. Anyawy, so they get the dogs right? Like the dude has a dalmation, and falls in love a girl who also has a dalmation. Then, 99 kids somehow (probably adopted) happen. Then this really evil person, Cruella de Vil, she just happens to find 101 of them. So what are you gonna do? You gotta hunt them down. But you can't because it's a Disney film. Then she dies, probably. Then they got a better house (like, the good people).\"",
+			ldesc=("Uhhhh, so like, there's this family right? That's really nice and stuff."
+			" Anyway, so they get the dogs right? Like the dude has a dalmation, and falls"
+			" in love a girl who also has a dalmation. Then, 99 kids somehow (probably"
+			" adopted) happen. Then this really evil person, Cruella de Vil, she just"
+			" happens to find 101 of them. So what are you gonna do? You gotta hunt them"
+			" down. But you can't because it's a Disney film. Then she dies, probably."
+			" Then they got a better house (like, the good people).\""),
 			))
 
 movies.append(movie(
-			id="0000 Unknown",
+			id="0022 Up",
 			title="Up",
-			rd=date(2011, 6, 14),
+			rd=date(2009, 9, 3),
 			genre="Action",
-			vidid="OJUIgf7lsCY",
+			vidid="qas5lWp7_R0",
 			sdesc="",
-			ldesc="\"I don't really remember Up, to be honest. Only the balloons. Um... pff. What even happens in the story? He gets together with this girl, that he likes. She can't have kids, she dies, he's sad, steals a lot of balloons, attaches them to his house, runs away with his house, runs away from the police. Ends up on a mountain, with a dog, and a kid? Don't know where the kid came from, but um... dog dies, then doesn't die, kid doesn't die. Old guy isn't sad any more.\"",
+			ldesc=("I don't really remember Up, to be honest. Only the balloons. Um... pff."
+			" What even happens in the story? He gets together with this girl, that he likes."
+			" She can't have kids, she dies, he's sad, steals a lot of balloons, attaches them"
+			" to his house, runs away with his house, runs away from the police. Ends up on a"
+			" mountain, with a dog, and a kid? Don't know where the kid came from, but um... dog"
+			" dies, then doesn't die, kid doesn't die. Old guy isn't sad any more.\""),
 			))
 
 
