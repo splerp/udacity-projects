@@ -9,138 +9,146 @@ data-trailer-youtube-id="{trailer_youtube_id}"
 data-long-desc="{movie_long_desc}"
 data-toggle="modal"
 data-target="#trailer">
-	<img src="{poster_image_url}" width="220">
-	<h2>{movie_title} ({release_date})</h2>
-	<div class="shortdesc">{movie_short_desc}</div>
-	<div class="longdesc">{movie_long_desc}</div>
+    <img src="{poster_image_url}" width="220">
+    <h2>{movie_title} ({release_date})</h2>
+    <div class="shortdesc">{movie_short_desc}</div>
+    <div class="longdesc">{movie_long_desc}</div>
 </div>
 '''
 
-# Creates an HTML unordered list out of the available genres.
+
 def create_genre_list_content(genres):
-	
-	to_return = '<ul>'
-	
-	g = "All"
-	
-	to_return += '<li data-genre="' + g + '">' + g + '</li>'
-	
-	for g in genres:
-		to_return += '<li data-genre="' + g + '">' + g + '</li>'
-	
-	g = "Unknown"
-	to_return += '<li data-genre="' + g + '">' + g + '</li>'
-	
-	to_return += '</ul>'
-	return to_return
+    # Creates an HTML unordered list out of the available genres.
 
-# Creates the beginning of a group of movies ("genre-section").
+    to_return = '<ul>'
+
+    # Creates the special case "All" genre, used to display all movies.
+    name = "All"
+    to_return += '<li data-genre="All">All</li>'
+
+    for name in genres:
+        to_return += '<li data-genre="' + name + '">' + name + '</li>'
+
+    # Creates the special case "Unknown" genre, for movies without a genre.
+    to_return += '<li data-genre="Unknown">Unknown</li>'
+
+    to_return += '</ul>'
+    return to_return
+
+
 def begin_genre_content(genre):
+    # Creates the beginning of a group of movies ("genre-section").
 
-	return '''
-	<div id="genre-{genrename}" class="container genre-section">
-	<h1>{genrename}</h1>
-	'''.format(genrename=genre)
-	
+    return '''
+    <div id="genre-{genrename}" class="container genre-section">
+    <h1>{genrename}</h1>
+    '''.format(genrename=genre)
+
+
 def end_genre_content():
+    # Returns all code required to complete the genre content div.
 
-	return "</div>"
+    return "</div>"
 
 
 def create_movie_sections_content(movies, genres):
-	# The HTML content for this section of the page
+    # Create the HTML content for the entire movie list section.
 
-	genre_contents = {}
+    # Create a dict to store each genre's HTML content.
+    genre_contents = {}
 
-	genre_contents["All"] = begin_genre_content("All")
-	
-	# set up initial genre content.
-	for g in genres:
-		genre_contents[g] = begin_genre_content(g)
+    genre_contents["All"] = begin_genre_content("All")
 
-	genre_contents["Unknown"] = begin_genre_content("Unknown")
+    # Set up initial genre content for all known genres.
+    for g in genres:
+        genre_contents[g] = begin_genre_content(g)
 
-	for movie in movies:
+    genre_contents["Unknown"] = begin_genre_content("Unknown")
 
-		# Extract the youtube ID from the url
+    for movie in movies:
 
-		movie_content = movie_tile_content.format(
-						movie_title=movie.title,
-						release_date=movie.release_date.strftime('%Y'),
-						poster_image_url=getPosterImageURL(movie),
-						trailer_youtube_id=movie.trailer_youtube_id,
-						movie_short_desc=movie.short_description,
-						movie_long_desc=movie.long_description
-					)
+        # Creates the movie content by formatting the movie content variable.
+        movie_content = movie_tile_content.format(
+                        movie_title=movie.title,
+                        release_date=movie.release_date.strftime('%Y'),
+                        poster_image_url=getPosterImageURL(movie),
+                        trailer_youtube_id=movie.trailer_youtube_id,
+                        movie_short_desc=movie.short_description,
+                        movie_long_desc=movie.long_description
+                    )
 
-		# Search for the specified genre
-		found = False
-		for g in genres:
-			if(movie.genre == g):
-				# Append the tile for the movie with its content filled in
-				genre_contents["All"] += movie_content
-				genre_contents[g] += movie_content
-				found = True
-		
-		# If not found, add to "unknown" category.
-		if not found:
-			genre_contents["All"] += movie_content
-			genre_contents["Unknown"] += movie_content
+        # Search for the specified genre.
+        found = False
+        for g in genres:
+            if(movie.genre == g):
+                # Append the tile for the movie with its content filled in
+                genre_contents["All"] += movie_content
+                genre_contents[g] += movie_content
+                found = True
 
-	content = ''
+        # If not found, add to the "Unknown" category.
+        if not found:
+            genre_contents["All"] += movie_content
+            genre_contents["Unknown"] += movie_content
 
-	for key, value in genre_contents.items():
-		#print("Adding content to the content..")
-		value += end_genre_content()   
-		content += value
+    # Create a new variable to contain the final movie section HTML.
+    content = ''
 
-	return content
+    # Loop through each genre and append to the content variable.
+    for key, value in genre_contents.items():
+        value += end_genre_content()
+        content += value
+
+    return content
 
 
 def open_movies_page(movies, genres):
-	# Create or overwrite the output file
-	output_file = open('index.html', 'w')
+    # Given a movie list and genre list, this function generates an HTML
+    # file with all the relevant information shown.
 
-	# Retrieve HTML template from external file.
-	content_file = open('template/template-main.html', 'r')
-	content = content_file.read()
+    # Create or overwrite the output file.
+    output_file = open('index.html', 'w')
 
-	# Replace the movie tiles' placeholder generated content
-	rendered_content = content.format(
-		genre_list=create_genre_list_content(genres),
-		movie_sections=create_movie_sections_content(movies, genres))
+    # Retrieve HTML template from external file.
+    content_file = open('template/template-main.html', 'r')
+    content = content_file.read()
 
-	# Output the file
-	output_file.write(rendered_content)
-	output_file.close()
+    # Replace the movie tiles' placeholder generated content.
+    rendered_content = content.format(
+        genre_list=create_genre_list_content(genres),
+        movie_sections=create_movie_sections_content(movies, genres))
 
-	# open the output file in the browser (in a new tab, if possible)
-	url = os.path.abspath(output_file.name)
-	webbrowser.open('file://' + url, new=2)
+    # Save the newly generated file.
+    output_file.write(rendered_content)
+    output_file.close()
 
-# Each of these functions returns a path to the requested movie's image.
+    # open the output file in the browser (in a new tab, if possible).
+    url = os.path.abspath(output_file.name)
+    webbrowser.open('file://' + url, new=2)
+
+
 def getPosterImageURL(movie):
+    # Returns a path to the requested movie's poster image.
 
-	toReturn = "image/movies/" + movie.id + "/poster.png"
-	
-	return toReturn if os.path.isfile(toReturn) else "image/movies/0000 Unknown/poster.png"
+    valid = "image/movies/" + movie.id + "/poster.png"
+    invalid = "image/movies/0000 Unknown/poster.png"
+
+    return valid if os.path.isfile(valid) else invalid
+
 
 def getMovieBoxartImageURL(movie):
+    # Returns a path to the requested movie's boxart image.
 
-	toReturn = "image/movies/" + movie.id + "/boxart.png"
-	
-	return toReturn if os.path.isfile(toReturn) else "image/movies/0000 Unknown/boxart.png"
+    valid = "image/movies/" + movie.id + "/boxart.png"
+    invalid = "image/movies/0000 Unknown/boxart.png"
+
+    return valid if os.path.isfile(valid) else invalid
+
 
 def getMovieThumbnailImageURL(movie):
+    # Returns a path to the requested movie's thumbnail image.
 
-	toReturn = "image/movies/" + movie.id + "/thumbnail.png"
-	
-	return toReturn if os.path.isfile(toReturn) else "image/movies/0000 Unknown/thumbnail.png"
+    valid = "image/movies/" + movie.id + "/thumbnail.png"
+    invalid = "image/movies/0000 Unknown/thumbnail.png"
 
-
-
-
-
-
-
-
+    return valid if os.path.isfile(valid) else invalid
