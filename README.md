@@ -1,2 +1,2 @@
 # udacity-projects
-Repository of Udacty projects for the Full Stack Developer course.
+Repository of Udacity projects for the Full Stack Developer course.
