@@ -34,3 +34,7 @@ When a movie is added to the movies list, the id field corresponds to the folder
 This folder should include `boxart.png`, `poster.png` and `thumbnail.png`.
 
 A movie's ID is created from a unique number, followed by a space, then the movie's title condensed to only the letters and numbers.
+
+## Code base
+
+The content of `pagegenerator.py` was originally created by Udacity for the Full Stack Developer course. [link](https://github.com/adarsh0806/udacity-full-stack/tree/master/p1)
