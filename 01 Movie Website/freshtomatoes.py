@@ -1,12 +1,12 @@
 from datetime import date
-from media import movie
+from media import Movie
 import pagegenerator as gen
 
 genres = ["Romance", "Action", "Thriller", "Drama", "Comedy"]
 genres.sort()
 
 movies = list()
-movies.append(movie(
+movies.append(Movie(
             id="0001 TheLionKing",
             title="The Lion King",
             rd=date(1994, 8, 25),
@@ -17,7 +17,7 @@ movies.append(movie(
             " left right and centre.",
             ))
 
-movies.append(movie(
+movies.append(Movie(
             id="0002 TheLionKing2ReturnoftheJedi",
             title="The Lion King 2 - Return of the Jedi",
             rd=date(1998, 10, 27),
@@ -27,7 +27,7 @@ movies.append(movie(
             ldesc="Simba uses the force (just kidding)",
             ))
 
-movies.append(movie(
+movies.append(Movie(
             id="0003 StarRoarsMufasaStrikesBack",
             title="Star Roars - Mufasa Strikes Back",
             rd=date(2012, 6, 6),
@@ -38,183 +38,147 @@ movies.append(movie(
             " massacres left right and centre.",
             ))
 
-movies.append(movie(
+movies.append(Movie(
             id="0004 Inception",
             title="Inception",
             rd=date(2010, 7, 22),
             genre="Thriller",
             vidid="8hP9D6kZseM",
-            sdesc="",
-            ldesc="",
             ))
 
-movies.append(movie(
+movies.append(Movie(
             id="0005 HowToTrainYourDragon",
             title="How To Train Your Dragon",
             rd=date(2010, 3, 25),
             genre="Action",
             vidid="oKiYuIsPxYk",
-            sdesc="",
-            ldesc="",
             ))
 
-movies.append(movie(
+movies.append(Movie(
             id="0006 BridgetoTerabithia",
             title="Bridge to Terabithia",
             rd=date(2007, 2, 16),
             genre="Drama",
             vidid="3SvqEIKP4t8",
-            sdesc="",
-            ldesc="",
             ))
 
-movies.append(movie(
+movies.append(Movie(
             id="0007 ThePrincessBride",
             title="The Princess Bride",
             rd=date(1987, 12, 3),
             genre="Romance",
             vidid="njZBYfNpWoE",
-            sdesc="",
-            ldesc="",
             ))
 
-movies.append(movie(
+movies.append(Movie(
             id="0008 Megamind",
             title="Megamind",
             rd=date(2010, 12, 9),
             genre="Comedy",
             vidid="NPI0eatlo_M",
-            sdesc="",
-            ldesc="",
             ))
 
-movies.append(movie(
+movies.append(Movie(
             id="0009 Chronicle",
             title="Chronicle",
             rd=date(2012, 2, 2),
             genre="Thriller",
             vidid="UD0DshFbmxA",
-            sdesc="",
-            ldesc="",
             ))
 
-movies.append(movie(
+movies.append(Movie(
             id="0010 TheCabinintheWoods",
             title="The Cabin in the Woods",
             rd=date(2011, 6, 14),
             genre="Thriller",
             vidid="OJUIgf7lsCY",
-            sdesc="",
-            ldesc="",
             ))
 
-movies.append(movie(
+movies.append(Movie(
             id="0011 ToyStory",
             title="Toy Story",
             rd=date(1995, 12, 7),
             genre="Comedy",
             vidid="4KPTXpQehio",
-            sdesc="",
-            ldesc="",
             ))
 
-movies.append(movie(
+movies.append(Movie(
             id="0012 ToyStory2",
             title="Toy Story 2",
             rd=date(1999, 12, 2),
             genre="Comedy",
             vidid="Lu0sotERXhI",
-            sdesc="",
-            ldesc="",
             ))
 
-movies.append(movie(
+movies.append(Movie(
             id="0013 Whiplash",
             title="Whiplash",
             rd=date(2015, 1, 8),
             genre="Drama",
             vidid="7d_jQycdQGo",
-            sdesc="",
-            ldesc="",
             ))
 
-movies.append(movie(
+movies.append(Movie(
             id="0014 Looper",
             title="Looper",
             rd=date(2012, 9, 27),
             genre="Thriller",
             vidid="2iQuhsmtfHw",
-            sdesc="",
-            ldesc="",
             ))
 
-movies.append(movie(
+movies.append(Movie(
             id="0015 Gravity",
             title="Gravity",
             rd=date(2013, 10, 3),
             genre="Thriller",
             vidid="OiTiKOy59o4",
-            sdesc="",
-            ldesc="",
             ))
 
-movies.append(movie(
+movies.append(Movie(
             id="0016 HarryPotterandthePhilosophersStone",
             title="Harry Potter and the Philosopher's Stone",
             rd=date(2001, 11, 4),
-            genre="Drama",
             vidid="eKSB0gXl9dw",
-            sdesc="",
-            ldesc="",
             ))
 
-movies.append(movie(
+movies.append(Movie(
             id="0017 TheIncredibles",
             title="The Incredibles",
             rd=date(2004, 12, 26),
             genre="Action",
             vidid="fwHlyurv-0U",
-            sdesc="",
-            ldesc="",
             ))
 
-movies.append(movie(
+movies.append(Movie(
             id="0018 TheLordoftheRingsTheTwoTowers",
             title="The Lord of the Rings: The Two Towers",
             rd=date(2002, 12, 19),
             genre="Action",
             vidid="cvCktPUwkW0",
-            sdesc="",
-            ldesc="",
             ))
 
-movies.append(movie(
+movies.append(Movie(
             id="0019 ChickenRun",
             title="Chicken Run",
             rd=date(2000, 12, 7),
             genre="Comedy",
             vidid="AEOfT7hUcDs",
-            sdesc="",
-            ldesc="",
             ))
 
-movies.append(movie(
+movies.append(Movie(
             id="0020 MontyPythonandtheHolyGrail",
             title="Monty Python and the Holy Grail",
             rd=date(1975, 1, 1),
             genre="Comedy",
             vidid="LG1PlkURjxE",
-            sdesc="",
-            ldesc="",
             ))
 
-movies.append(movie(
+movies.append(Movie(
             id="0021 OneHundredAndOneDalmations",
             title="One Hundred and One Dalmations",
             rd=date(1961, 1, 25),
             genre="Comedy",
             vidid="1Q_98VlWLF4",
-            sdesc="",
             ldesc=("Uhhhh, so like, there's this family right? That's"
                    " really nice and stuff. Anyway, so they get the"
                    " dogs right?"
@@ -228,13 +192,12 @@ movies.append(movie(
                    " better house (like, the good people).\""),
             ))
 
-movies.append(movie(
+movies.append(Movie(
             id="0022 Up",
             title="Up",
             rd=date(2009, 9, 3),
             genre="Action",
             vidid="qas5lWp7_R0",
-            sdesc="",
             ldesc=("I don't really remember Up, to be honest. Only"
                    " the balloons. Um... pff. What even happens in the story?"
                    " He gets together with this girl, that he likes."
@@ -247,5 +210,11 @@ movies.append(movie(
                    " Old guy isn't sad any more.\""),
             ))
 
-# Generate the webpage from this data.
-gen.open_movies_page(movies, genres)
+
+def main():
+
+    # Generate the webpage from this data.
+    gen.open_movies_page(movies, genres)
+
+if __name__ == '__main__':
+    main()

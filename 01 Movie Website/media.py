@@ -1,7 +1,7 @@
 from datetime import date
 
 
-class movie:
+class Movie:
     # Defines a movie object to store all relevant movie information.
 
     # Default values for info, when something is not provided.
