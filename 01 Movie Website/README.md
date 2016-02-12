@@ -1,5 +1,4 @@
-# Project 1
-## Movie Website
+# Project 1 - Movie Website
 A collection of scripts that can generate a simple .html page that contains a list of movies.
 
 ## Installation
