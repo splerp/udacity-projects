@@ -47,6 +47,7 @@ body {
 
 #introduction
 {
+	padding:10px;
 	padding-top:40px;
 	padding-bottom:20px;
 	
@@ -55,7 +56,26 @@ body {
 	
 	background-color:#d2f2ff;
 
-  border-radius: 0px 0px 20px 20px;
+	border-radius: 0px 0px 20px 20px;
+}
+
+@media (max-width: 910px)
+{
+	#maincontent
+	{
+		width: 100%;
+	}
+	
+	#header
+	{
+		width:100%;
+	}
+	
+	#introduction
+	{
+		margin:0;
+		border-radius: 0px 0px 0px 0px;
+	}
 }
 
 #introduction p
@@ -149,6 +169,7 @@ body {
 	border:5px solid #1da0d6;
 	
 }
+
 .movie-tile {
 	margin-bottom: 20px;
 	
@@ -159,7 +180,6 @@ body {
 
 	background-color:#8dcde7;
 	
-	
 	color:#000;
 
 	overflow:hidden;
@@ -168,6 +188,10 @@ body {
 	
 	height:520px;
 }
+
+
+
+
 
 .movie-tile img:hover {
 	background-color: #1da0d6;

@@ -4,7 +4,7 @@ import re
 
 # A single movie entry html template
 movie_tile_content = '''
-<div class="col-lg-4 movie-tile text-center"
+<div class="col-xs-4 movie-tile text-center"
 data-trailer-youtube-id="{trailer_youtube_id}"
 data-long-desc="{movie_long_desc}"
 data-toggle="modal"
