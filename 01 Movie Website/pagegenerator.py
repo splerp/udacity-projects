@@ -26,6 +26,7 @@ def create_genre_list_content(genres):
     name = "All"
     to_return += '<li data-genre="All">All</li>'
 
+    # Creates elements for each genre passed in.
     for name in genres:
         to_return += '<li data-genre="' + name + '">' + name + '</li>'
 
@@ -57,12 +58,14 @@ def create_movie_sections_content(movies, genres):
     # Create a dict to store each genre's HTML content.
     genre_contents = {}
 
+    # Begin genre content for special case genre "All".
     genre_contents["All"] = begin_genre_content("All")
 
     # Set up initial genre content for all known genres.
     for g in genres:
         genre_contents[g] = begin_genre_content(g)
 
+    # Begin genre content for special case genre "Unknown".
     genre_contents["Unknown"] = begin_genre_content("Unknown")
 
     for movie in movies:
