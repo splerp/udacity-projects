@@ -241,7 +241,7 @@ movies = [theLionKing,
           chickenRun,
           holyGrail,
           dalmations101,
-          up,
+          up
           ]
 
 
