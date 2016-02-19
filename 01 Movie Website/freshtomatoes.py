@@ -2,9 +2,11 @@ from datetime import date
 from media import Movie
 import pagegenerator as gen
 
+# Create a list of available genres, to sort the movies by on the main page.
 genres = ["Romance", "Action", "Thriller", "Drama", "Comedy"]
 genres.sort()
 
+# Create a list of movies, with all the required information.
 movies = list()
 movies.append(Movie(
             id="0001 TheLionKing",
@@ -44,6 +46,7 @@ movies.append(Movie(
             rd=date(2010, 7, 22),
             genre="Thriller",
             vidid="8hP9D6kZseM",
+            sdesc="Young entrepreneur falls in with the wrong crowd",
             ))
 
 movies.append(Movie(
@@ -52,6 +55,7 @@ movies.append(Movie(
             rd=date(2010, 3, 25),
             genre="Action",
             vidid="oKiYuIsPxYk",
+            sdesc="A dragon doesn't have teeth",
             ))
 
 movies.append(Movie(
@@ -60,6 +64,7 @@ movies.append(Movie(
             rd=date(2007, 2, 16),
             genre="Drama",
             vidid="3SvqEIKP4t8",
+            sdesc="A Bridge goes to Terabithia",
             ))
 
 movies.append(Movie(
@@ -68,6 +73,7 @@ movies.append(Movie(
             rd=date(1987, 12, 3),
             genre="Romance",
             vidid="njZBYfNpWoE",
+            sdesc="A Princess brides.",
             ))
 
 movies.append(Movie(
@@ -116,6 +122,7 @@ movies.append(Movie(
             rd=date(2015, 1, 8),
             genre="Drama",
             vidid="7d_jQycdQGo",
+            sdesc="Constant, endless drumming",
             ))
 
 movies.append(Movie(
@@ -139,6 +146,7 @@ movies.append(Movie(
             title="Harry Potter and the Philosopher's Stone",
             rd=date(2001, 11, 4),
             vidid="eKSB0gXl9dw",
+            sdesc="Wizard's Chess strikes back",
             ))
 
 movies.append(Movie(
@@ -179,6 +187,8 @@ movies.append(Movie(
             rd=date(1961, 1, 25),
             genre="Comedy",
             vidid="1Q_98VlWLF4",
+            sdesc="Trouble in the pride as de Vil massacres"
+                  " left right and centre.",
             ldesc=("Uhhhh, so like, there's this family right? That's"
                    " really nice and stuff. Anyway, so they get the"
                    " dogs right?"
@@ -216,5 +226,6 @@ def main():
     # Generate the webpage from this data.
     gen.open_movies_page(movies, genres)
 
+# Only run this script if it was the entry point.
 if __name__ == '__main__':
     main()
