@@ -15,7 +15,7 @@ theLionKing = Movie(
     vidid="4sj1MT05lAA",
     sdesc="A lion Hakuna Matatas",
     ldesc="Trouble in the pride as Simba massacres"
-    " left right and centre.",
+    " left right and centre."
     )
 
 theLionKing2 = Movie(
@@ -25,7 +25,7 @@ theLionKing2 = Movie(
     genre="Action",
     vidid="gYbW1F_c9eM",
     sdesc="The force.",
-    ldesc="Simba uses the force (just kidding)",
+    ldesc="Simba uses the force (just kidding)"
     )
 
 theLionKing3 = Movie(
@@ -36,7 +36,7 @@ theLionKing3 = Movie(
     vidid="4raW1agJG7U",
     sdesc="Mufasa decides enough is enough",
     ldesc="Trouble in the pride as Mufasa"
-    " massacres left right and centre.",
+    " massacres left right and centre."
     )
 
 inception = Movie(
@@ -45,7 +45,7 @@ inception = Movie(
     rd=date(2010, 7, 22),
     genre="Thriller",
     vidid="8hP9D6kZseM",
-    sdesc="Young entrepreneur falls in with the wrong crowd",
+    sdesc="Young entrepreneur falls in with the wrong crowd"
     )
 
 howToTrainYourDragon = Movie(
@@ -54,7 +54,7 @@ howToTrainYourDragon = Movie(
     rd=date(2010, 3, 25),
     genre="Action",
     vidid="oKiYuIsPxYk",
-    sdesc="A dragon doesn't have teeth",
+    sdesc="A dragon doesn't have teeth"
     )
 
 bridgeToTerabithia = Movie(
@@ -63,7 +63,7 @@ bridgeToTerabithia = Movie(
     rd=date(2007, 2, 16),
     genre="Drama",
     vidid="3SvqEIKP4t8",
-    sdesc="A Bridge goes to Terabithia",
+    sdesc="A Bridge goes to Terabithia"
     )
 
 thePrincessBride = Movie(
@@ -72,7 +72,7 @@ thePrincessBride = Movie(
     rd=date(1987, 12, 3),
     genre="Romance",
     vidid="njZBYfNpWoE",
-    sdesc="A Princess brides.",
+    sdesc="A Princess brides."
     )
 
 megamind = Movie(
@@ -80,7 +80,7 @@ megamind = Movie(
     title="Megamind",
     rd=date(2010, 12, 9),
     genre="Comedy",
-    vidid="NPI0eatlo_M",
+    vidid="NPI0eatlo_M"
     )
 
 chronicle = Movie(
@@ -88,7 +88,7 @@ chronicle = Movie(
     title="Chronicle",
     rd=date(2012, 2, 2),
     genre="Thriller",
-    vidid="UD0DshFbmxA",
+    vidid="UD0DshFbmxA"
     )
 
 theCabinInTheWoods = Movie(
@@ -96,7 +96,7 @@ theCabinInTheWoods = Movie(
     title="The Cabin in the Woods",
     rd=date(2011, 6, 14),
     genre="Thriller",
-    vidid="OJUIgf7lsCY",
+    vidid="OJUIgf7lsCY"
     )
 
 toyStory = Movie(
@@ -104,7 +104,7 @@ toyStory = Movie(
     title="Toy Story",
     rd=date(1995, 12, 7),
     genre="Comedy",
-    vidid="4KPTXpQehio",
+    vidid="4KPTXpQehio"
     )
 
 toyStory2 = Movie(
@@ -112,7 +112,7 @@ toyStory2 = Movie(
     title="Toy Story 2",
     rd=date(1999, 12, 2),
     genre="Comedy",
-    vidid="Lu0sotERXhI",
+    vidid="Lu0sotERXhI"
     )
 
 whiplash = Movie(
@@ -121,7 +121,7 @@ whiplash = Movie(
     rd=date(2015, 1, 8),
     genre="Drama",
     vidid="7d_jQycdQGo",
-    sdesc="Constant, endless drumming",
+    sdesc="Constant, endless drumming"
     )
 
 looper = Movie(
@@ -129,7 +129,7 @@ looper = Movie(
     title="Looper",
     rd=date(2012, 9, 27),
     genre="Thriller",
-    vidid="2iQuhsmtfHw",
+    vidid="2iQuhsmtfHw"
     )
 
 gravity = Movie(
@@ -137,7 +137,7 @@ gravity = Movie(
     title="Gravity",
     rd=date(2013, 10, 3),
     genre="Thriller",
-    vidid="OiTiKOy59o4",
+    vidid="OiTiKOy59o4"
     )
 
 harryPotter1 = Movie(
@@ -145,7 +145,7 @@ harryPotter1 = Movie(
     title="Harry Potter and the Philosopher's Stone",
     rd=date(2001, 11, 4),
     vidid="eKSB0gXl9dw",
-    sdesc="Wizard's Chess strikes back",
+    sdesc="Wizard's Chess strikes back"
     )
 
 incredibles = Movie(
@@ -153,7 +153,7 @@ incredibles = Movie(
     title="The Incredibles",
     rd=date(2004, 12, 26),
     genre="Action",
-    vidid="fwHlyurv-0U",
+    vidid="fwHlyurv-0U"
     )
 
 lotr2 = Movie(
@@ -161,7 +161,7 @@ lotr2 = Movie(
     title="The Lord of the Rings: The Two Towers",
     rd=date(2002, 12, 19),
     genre="Action",
-    vidid="cvCktPUwkW0",
+    vidid="cvCktPUwkW0"
     )
 
 chickenRun = Movie(
@@ -169,7 +169,7 @@ chickenRun = Movie(
     title="Chicken Run",
     rd=date(2000, 12, 7),
     genre="Comedy",
-    vidid="AEOfT7hUcDs",
+    vidid="AEOfT7hUcDs"
     )
 
 holyGrail = Movie(
@@ -177,7 +177,7 @@ holyGrail = Movie(
     title="Monty Python and the Holy Grail",
     rd=date(1975, 1, 1),
     genre="Comedy",
-    vidid="LG1PlkURjxE",
+    vidid="LG1PlkURjxE"
     )
 
 dalmations101 = Movie(
@@ -198,7 +198,7 @@ dalmations101 = Movie(
            " what are you gonna"
            " do? You gotta hunt them down. But you can't because it's"
            " a Disney film. Then she dies, probably. Then they got a"
-           " better house (like, the good people).\""),
+           " better house (like, the good people).\"")
     )
 
 up = Movie(
@@ -216,7 +216,7 @@ up = Movie(
            " with a dog, and a kid? Don't know where"
            " the kid came from,"
            " but um... dog dies, then doesn't die, kid doesn't die."
-           " Old guy isn't sad any more.\""),
+           " Old guy isn't sad any more.\"")
     )
 
 # Create a list of movies, from the movies defined above.
