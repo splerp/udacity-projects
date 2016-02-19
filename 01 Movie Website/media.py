@@ -7,14 +7,14 @@ class Movie:
     # Default values for info, when something is not provided.
     id = "0000 Unknown"
 
-    title = "unknown title"
+    title = ""
     release_date = date(1, 1, 1)
     genre = "Unknown"
 
     trailer_youtube_id = "hP4WsVHTVh0"
 
-    short_description = "Missing short description"
-    long_description = "The long description is missing for this movie."
+    short_description = ""
+    long_description = ""
 
     # Handles receiving all values and assigning them to the correct variables.
     def __init__(self, *args, **kwargs):
