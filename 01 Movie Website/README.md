@@ -10,7 +10,7 @@ To run the python scripts, a version of python 3.0 must be installed. [link](htt
 
 1. Clone this repository, or download `freshtomatoes.py`, `media.py` and `pagegenerator.py`.
 2. Open command prompt to the directory they are located in.
-3. run the command "py freshtomatoes.py"
+3. run the command "py freshtomatoes.py" or "python freshtomatoes.py"
 4. A page should open displaying the newly generated webpage.
 
 ## Modifying the file generation
