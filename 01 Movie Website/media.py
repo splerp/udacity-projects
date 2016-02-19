@@ -16,8 +16,10 @@ class Movie:
     short_description = ""
     long_description = ""
 
-    # Handles receiving all values and assigning them to the correct variables.
     def __init__(self, *args, **kwargs):
+        """ Handles receiving all values and assigning them to the
+        correct variables.
+        """
 
         if('id' in kwargs):
             self.id = kwargs['id']
@@ -37,7 +39,8 @@ class Movie:
         if('ldesc' in kwargs):
             self.long_description = kwargs['ldesc']
 
-    # Creates a text version of the movie, showing the title and release year.
     def to_string(self):
-
+        """Creates a text version of the movie, showing the title and
+        release year.
+        """
         return "" + self.title + " (" + self.release_date.strftime('%Y') + ")"

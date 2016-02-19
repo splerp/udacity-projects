@@ -18,7 +18,8 @@ data-target="#trailer">
 
 
 def create_genre_list_content(genres):
-    # Creates an HTML unordered list out of the available genres.
+    """Creates an HTML unordered list out of the available genres.
+    """
 
     to_return = '<ul>'
 
@@ -38,7 +39,8 @@ def create_genre_list_content(genres):
 
 
 def begin_genre_content(genre):
-    # Creates the beginning of a group of movies ("genre-section").
+    """Creates the beginning of a group of movies ("genre-section").
+    """
 
     return '''
     <div id="genre-{genrename}" class="container genre-section">
@@ -47,13 +49,15 @@ def begin_genre_content(genre):
 
 
 def end_genre_content():
-    # Returns all code required to complete the genre content div.
+    """Returns all code required to complete the genre content div.
+    """
 
     return "</div>"
 
 
 def create_movie_sections_content(movies, genres):
-    # Create the HTML content for the entire movie list section.
+    """Create the HTML content for the entire movie list section.
+    """
 
     # Create a dict to store each genre's HTML content.
     genre_contents = {}
@@ -106,8 +110,9 @@ def create_movie_sections_content(movies, genres):
 
 
 def open_movies_page(movies, genres):
-    # Given a movie list and genre list, this function generates an HTML
-    # file with all the relevant information shown.
+    """Given a movie list and genre list, this function generates an HTML
+    file with all the relevant information shown.
+    """
 
     # Create or overwrite the output file.
     output_file = open('index.html', 'w')
@@ -131,7 +136,8 @@ def open_movies_page(movies, genres):
 
 
 def getPosterImageURL(movie):
-    # Returns a path to the requested movie's poster image.
+    """Returns a path to the requested movie's poster image.
+    """
 
     valid = "image/movies/" + movie.id + "/poster.png"
     invalid = "image/movies/0000 Unknown/poster.png"
@@ -140,7 +146,8 @@ def getPosterImageURL(movie):
 
 
 def getMovieBoxartImageURL(movie):
-    # Returns a path to the requested movie's boxart image.
+    """Returns a path to the requested movie's boxart image.
+    """
 
     valid = "image/movies/" + movie.id + "/boxart.png"
     invalid = "image/movies/0000 Unknown/boxart.png"
@@ -149,7 +156,8 @@ def getMovieBoxartImageURL(movie):
 
 
 def getMovieThumbnailImageURL(movie):
-    # Returns a path to the requested movie's thumbnail image.
+    """Returns a path to the requested movie's thumbnail image.
+    """
 
     valid = "image/movies/" + movie.id + "/thumbnail.png"
     invalid = "image/movies/0000 Unknown/thumbnail.png"

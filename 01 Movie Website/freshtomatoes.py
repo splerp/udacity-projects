@@ -222,6 +222,10 @@ movies.append(Movie(
 
 
 def main():
+    """The entry point for the freshtomatoes website generator.
+
+    Simply calls the "generate HTML page" function in another class.
+    """
 
     # Generate the webpage from this data.
     gen.open_movies_page(movies, genres)
