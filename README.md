@@ -1,7 +1,7 @@
 # udacity-projects
 Repository of Udacity projects for the Full Stack Developer course.
 
-### [Project 1: Movie Trailer Website]("01 Movie Website/")
+### [Project 1: Movie Trailer Website](01 Movie Website/)
 
 ### Project 2: Tournament Results
 
