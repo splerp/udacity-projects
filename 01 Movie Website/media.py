@@ -2,7 +2,11 @@ from datetime import date
 
 
 class Movie:
-    # Defines a movie object to store all relevant movie information.
+    """Defines a movie object to store all relevant movie information.
+
+    Stores a unique ID, a title, release date, genre,
+    youtube video ID, and short and long descriptions.
+    """
 
     # Default values for info, when something is not provided.
     id = "0000 Unknown"
