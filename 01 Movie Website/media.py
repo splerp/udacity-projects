@@ -2,7 +2,8 @@ from datetime import date
 
 
 class Movie:
-    """Defines a movie object to store all relevant movie information.
+    """
+    Defines a movie object to store all relevant movie information.
 
     Stores a unique ID, a title, release date, genre,
     youtube video ID, and short and long descriptions.
@@ -21,7 +22,8 @@ class Movie:
     long_description = ""
 
     def __init__(self, *args, **kwargs):
-        """ Handles receiving all values and assigning them to the
+        """
+        Handles receiving all values and assigning them to the
         correct variables.
         """
 
@@ -44,7 +46,8 @@ class Movie:
             self.long_description = kwargs['ldesc']
 
     def to_string(self):
-        """Creates a text version of the movie, showing the title and
+        """
+        Creates a text version of the movie, showing the title and
         release year.
         """
         return "" + self.title + " (" + self.release_date.strftime('%Y') + ")"
