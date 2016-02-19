@@ -8,7 +8,7 @@ To run the python scripts, a version of python 3.0 must be installed. [link](htt
 
 #### Running the script (Windows)
 
-1. Clone this repository, or ownload `freshtomatoes.py`, `media.py` and `pagegenerator.py`.
+1. Clone this repository, or download `freshtomatoes.py`, `media.py` and `pagegenerator.py`.
 2. Open command prompt to the directory they are located in.
 3. run the command "py freshtomatoes.py"
 4. A page should open displaying the newly generated webpage.
@@ -36,4 +36,4 @@ A movie's ID is created from a unique number, followed by a space, then the movi
 
 ## Code base
 
-The content of `pagegenerator.py` was originally created by Udacity for the Full Stack Developer course. [link](https://github.com/adarsh0806/udacity-full-stack/tree/master/p1)
+The content of `pagegenerator.py` was originally created by Udacity for the Full Stack Developer course. ([link](https://github.com/adarsh0806/udacity-full-stack/tree/master/p1))
