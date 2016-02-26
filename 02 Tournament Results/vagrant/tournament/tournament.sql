@@ -8,81 +8,60 @@
 
 -- Remove all previous instances.
 DROP TABLE IF EXISTS tournamentMatch;
+DROP TABLE IF EXISTS tournamentPlayer;
 DROP TABLE IF EXISTS tournament;
 DROP TABLE IF EXISTS player;
 
---DROP DATABASE tournaments;
+DROP TABLE IF EXISTS swissResult;
 
 
--- Update with new stuff.
---CREATE DATABASE tournaments;
+CREATE TABLE tournament (
+tournamentID serial PRIMARY KEY,
+name varchar(50) UNIQUE NOT NULL,
+dateCreated timestamp DEFAULT current_timestamp,
+imagesDirectory varchar(50));
 
-CREATE TABLE tournament ( tournamentID serial PRIMARY KEY,
-						name varchar(50) UNIQUE NOT NULL,
-						dateCreated timestamp DEFAULT current_timestamp,
-						imagesDirectory varchar(50));
+--
 
-CREATE TABLE player ( playerID serial PRIMARY KEY,
-					name varchar(50) UNIQUE NOT NULL,
-					imagesDirectory varchar(50));
+CREATE TABLE player (
+playerID serial PRIMARY KEY,
+name varchar(50) UNIQUE NOT NULL,
+imagesDirectory varchar(50));
 
-CREATE TABLE tournamentMatch ( tournamentMatchID serial PRIMARY KEY,
-							tournamentID int REFERENCES tournament (tournamentID),
-							playerWinnerID int REFERENCES player (playerID),
-							playerLoserID int REFERENCES player (playerID),
-							datePlayed timestamp DEFAULT current_timestamp
-							);
-							
-INSERT INTO tournament (name, imagesDirectory)
-	values
-	(
-		'First Tourn',
-		'images/asd'
-	),
-	(
-		'Tournament 2',
-		'images/asd'
-	);
+--
 
-INSERT INTO player (name, imagesDirectory)
-	values
-	(
-		'Player 1',
-		'images/player/p1'
-	),
-	(
-		'Best player',
-		'images/player/p2'
-	);
+CREATE TABLE tournamentPlayer (
+tournamentPlayerID serial PRIMARY KEY,
+tournamentID int REFERENCES tournament (tournamentID),
+playerID int REFERENCES player (playerID)
+);
 
-INSERT INTO tournamentMatch (tournamentID, playerWinnerID, playerLoserID)
-	values
-	(
-		1,
-		1,
-		2
-	),
-	(
-		1,
-		1,
-		2
-	);
+--
+
+CREATE TABLE swissResult (
+description varchar(20) PRIMARY KEY,
+pointValue1 int,
+pointValue2 int
+);
+
+--
+
+CREATE TABLE tournamentMatch (
+tournamentMatchID serial PRIMARY KEY,
+tournamentID int REFERENCES tournament (tournamentID),
+tournamentPlayer1ID int REFERENCES tournamentPlayer (tournamentPlayerID),
+tournamentPlayer2ID int REFERENCES tournamentPlayer (tournamentPlayerID),
+matchResult varchar(20) REFERENCES swissResult(description), 
+datePlayed timestamp DEFAULT current_timestamp
+);
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+INSERT INTO swissResult (description, pointValue1, pointValue2)
+values
+('Player1 Win', 3, 0),
+('Player2 Win', 0, 3),
+('Draw', 1, 1),
+('Cancelled', 0, 0)
+;
 
 
