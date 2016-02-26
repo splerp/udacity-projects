@@ -6,6 +6,85 @@
 import psycopg2
 
 
+'''
+deleteMatches(tournID)
+deletePlayers(tournID) - remove the tournamentPlayers for this tournament
+countPlayers(tournID) - all players in a particular tournament
+registerPlayer(tournID) - add tournamentPlayers for this tournament
+playerStandings(tournID)
+reportMatch(tournID, winner, loser)
+swissPairings(tournID)
+'''
+
+def playMatch(tournID, p1ID, p2ID, matchResult):
+    
+    conn = connect()
+    c = conn.cursor()
+    
+    SQL = "INSERT INTO tournamentMatch (tournamentID, tournamentPlayer1ID, tournamentPlayer2ID, matchResult) VALUES (%s, %s, %s, %s)"
+    data = (tournID, p1ID, p2ID, matchResult)
+    c.execute(SQL, data)
+    
+    conn.commit()
+    conn.close()
+    
+
+def clearAllData():
+    
+    conn = connect()
+    c = conn.cursor()
+    
+    #c.execute("TRUNCATE player CASCADE")
+    #c.execute("TRUNCATE tournament CASCADE")
+    c.execute("TRUNCATE tournamentMatch CASCADE")
+    c.execute("TRUNCATE tournamentPlayer CASCADE")
+    
+    conn.commit()
+    conn.close()
+    
+    
+
+def addNewTournament(name):
+    
+    conn = connect()
+    c = conn.cursor()
+    
+    SQL = "INSERT INTO tournament (tournamentName) values (%s)"
+    data = (name, )
+    c.execute(SQL, data)
+    
+    conn.commit()
+    conn.close()
+    
+    
+
+# Creates a new player for use in the system.
+def addNewPlayer(name, age, gender, nationality):
+    
+    conn = connect()
+    c = conn.cursor()
+    
+    SQL = "INSERT INTO player (playerName, age, gender, nationality) values (%s, %s, %s, %s)"
+    data = (name, age, gender, nationality)
+    c.execute(SQL, data)
+    
+    conn.commit()
+    conn.close()
+
+def removePlayer(name):
+
+    conn = connect()
+    c = conn.cursor()
+    
+    SQL = "DELETE FROM player WHERE playerName=%s;"
+    data = (name)
+    c.execute(SQL, data)
+    
+    conn.commit()
+    conn.close()
+
+
+
 def connect():
     """Connect to the PostgreSQL database.  Returns a database connection."""
     return psycopg2.connect("dbname=tournaments")
@@ -34,6 +113,42 @@ def deletePlayers():
     conn.commit()
     conn.close()
 
+def getPlayerIDFromName(name):
+    
+    conn = connect()
+    c = conn.cursor()
+    
+    SQL = "SELECT playerID FROM player WHERE playerName=%s"
+    data = (name, )
+    c.execute(SQL, data)
+    
+    toReturn = c.fetchone()
+    
+    conn.commit()
+    conn.close()
+    
+    
+    print("Searched for playerID. Got: " + str(toReturn) + ".")
+    return toReturn[0]
+
+    
+def getTournamentIDFromName(name):
+    
+    conn = connect()
+    c = conn.cursor()
+    
+    SQL = "SELECT tournamentID FROM tournament WHERE tournamentName=%s"
+    data = (name, )
+    c.execute(SQL, data)
+    
+    toReturn = c.fetchone()
+    
+    conn.commit()
+    conn.close()
+    
+    
+    print("Searched for tournID. Got: " + str(toReturn) + ".")
+    return toReturn[0]
 
 def countPlayers():
     """Returns the number of players currently registered."""
@@ -45,7 +160,7 @@ def countPlayers():
     return c.rowcount
 
 
-def registerPlayer(name):
+def registerPlayer(tournID, playerID):
     """Adds a player to the tournament database.
   
     The database assigns a unique serial id number for the player.  (This
@@ -55,18 +170,57 @@ def registerPlayer(name):
       name: the player's full name (need not be unique).
     """
     
+    # First: If this player does not exist, add them to the Player table.
+    # Then, continue and add a tournamentPlayer entry.
+    
     conn = connect()
     c = conn.cursor()
     
-    SQL = "INSERT INTO player (name, imagesDirectory) values (%s,'img/player/1')"
-    data = (name, )
+    SQL = "INSERT INTO tournamentPlayer (tournamentID, playerID) values (%s,%s)"
+    data = (tournID, playerID)
     c.execute(SQL, data)
     
     conn.commit()
     conn.close()
 
+def playerRankingsView(tournID):
+    
+    conn = connect()
+    c = conn.cursor()
+    
+    SQL = """
+    SELECT player.playerID, player.playerName, sum(NumGames) AS GamesPlayed, sum(Points) AS TotalPoints
+    FROM
+    player INNER JOIN 
+    (
+    SELECT tournamentMatch.tournamentID, tournamentPlayer1ID AS playerID, playerName, SUM(pointValue1) AS Points, count(*) AS NumGames
+        FROM tournamentMatch 
+        LEFT JOIN tournamentPlayer ON tournamentPlayer.playerID = tournamentMatch.tournamentPlayer1ID
+        LEFT JOIN player ON tournamentPlayer.playerID = player.playerID
+        INNER JOIN swissResult ON tournamentMatch.matchResult = swissResult.description
+        WHERE tournamentMatch.tournamentID = %s
+        GROUP BY tournamentPlayer1ID, tournamentMatch.tournamentID, player.playerName
+    UNION
+    SELECT tournamentMatch.tournamentID, tournamentPlayer2ID, playerName, SUM(pointValue2), count(*) AS NumGames
+        FROM tournamentMatch
+        LEFT JOIN tournamentPlayer ON tournamentPlayer.playerID = tournamentMatch.tournamentPlayer2ID
+        LEFT JOIN player ON tournamentPlayer.playerID = player.playerID
+        INNER JOIN swissResult ON tournamentMatch.matchResult = swissResult.description
+        WHERE tournamentMatch.tournamentID = %s
+        GROUP BY tournamentPlayer2ID, tournamentMatch.tournamentID, player.playerName
 
-def playerStandings():
+    ) AS innersql
+    ON innersql.playerID = player.playerID
+    GROUP BY innersql.playerID, player.playerID;
+    """
+    data = (tournID, tournID)
+    c.execute(SQL, data)
+    
+    allResults = c.fetchall()
+    return allResults
+    
+    
+def playerStandings(tournID):
     """Returns a list of the players and their win records, sorted by wins.
 
     The first entry in the list should be the player in first place, or a player
@@ -90,11 +244,17 @@ def playerStandings():
     c.execute("SELECT playerID, name from player;")
     allPlayers = c.fetchall()
     
+    SQL = "SELECT playerID, tournamentID, player.name, tournament.name "
+    "FROM tournamentPlayer "
+    "INNER JOIN player ON player.playerID = tournamentPlayer.playerID "
+    "INNER JOIN tournament ON tournament.tournamentID = tournamentPlayer.tournamentID "
+    "ORDER BY tournamentID, player.name;"
+    
     playerStandingsList = []
     
     # For each player, find the matches they played in.
     for id, name in allPlayers:
-        print("FOund a player: " + str(id) + " - " + name)
+        print("Found a player: " + str(id) + " - " + name)
         
         # Get total matches played
         SQL = "SELECT * FROM tournamentMatch WHERE playerWinnerID = %s OR playerLoserID = %s;"

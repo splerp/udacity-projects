@@ -17,7 +17,7 @@ DROP TABLE IF EXISTS swissResult;
 
 CREATE TABLE tournament (
 tournamentID serial PRIMARY KEY,
-name varchar(50) UNIQUE NOT NULL,
+tournamentName varchar(50) UNIQUE NOT NULL,
 dateCreated timestamp DEFAULT current_timestamp,
 imagesDirectory varchar(50));
 
@@ -25,7 +25,10 @@ imagesDirectory varchar(50));
 
 CREATE TABLE player (
 playerID serial PRIMARY KEY,
-name varchar(50) UNIQUE NOT NULL,
+playerName varchar(50) UNIQUE NOT NULL,
+age int,
+gender varchar(1),
+nationality varchar(3),
 imagesDirectory varchar(50));
 
 --
@@ -49,8 +52,8 @@ pointValue2 int
 CREATE TABLE tournamentMatch (
 tournamentMatchID serial PRIMARY KEY,
 tournamentID int REFERENCES tournament (tournamentID),
-tournamentPlayer1ID int REFERENCES tournamentPlayer (tournamentPlayerID),
-tournamentPlayer2ID int REFERENCES tournamentPlayer (tournamentPlayerID),
+tournamentPlayer1ID int REFERENCES player (playerID),
+tournamentPlayer2ID int REFERENCES player (playerID),
 matchResult varchar(20) REFERENCES swissResult(description), 
 datePlayed timestamp DEFAULT current_timestamp
 );
@@ -58,10 +61,10 @@ datePlayed timestamp DEFAULT current_timestamp
 
 INSERT INTO swissResult (description, pointValue1, pointValue2)
 values
-('Player1 Win', 3, 0),
-('Player2 Win', 0, 3),
-('Draw', 1, 1),
-('Cancelled', 0, 0)
+('p1 wins', 3, 0),
+('p2 wins', 0, 3),
+('draw', 1, 1),
+('cancelled', 0, 0)
 ;
 
 
