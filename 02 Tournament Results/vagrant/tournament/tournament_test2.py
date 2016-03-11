@@ -8,11 +8,169 @@
 
 from tournament import *
 
-def createSomePlayers():
+"""def testPlayerOpponentMatchWins():
+    clearAllData()
     
-    # Clear all players.
-    # Clear all tournaments.
+    t1ID = addNewTournament("4 player exciting stuff")
     
+    p1ID = addNewPlayer("Mango", 25, "M", "AUS")
+    p2ID = addNewPlayer("Potato", 28, "F", "EU")
+    p3ID = addNewPlayer("Chair", 27, "M", "NA")
+    p4ID = addNewPlayer("Dog", 9, "M", "AUS")
+    
+    registerPlayerByID(p1ID, t1ID)
+    registerPlayerByID(p2ID, t1ID)
+    registerPlayerByID(p3ID, t1ID)
+    registerPlayerByID(p4ID, t1ID)"""
+
+def testPlayerStandings():
+    
+    clearAllData()
+    
+    t1ID = addNewTournament("4 player exciting stuff")
+    
+    p1ID = addNewPlayer("Mango", 25, "M", "AUS")
+    p2ID = addNewPlayer("Potato", 28, "F", "EU")
+    p3ID = addNewPlayer("Chair", 27, "M", "NA")
+    p4ID = addNewPlayer("Dog", 9, "M", "AUS")
+    
+    registerPlayerByID(p1ID, t1ID)
+    registerPlayerByID(p2ID, t1ID)
+    registerPlayerByID(p3ID, t1ID)
+    registerPlayerByID(p4ID, t1ID)
+    
+    # Should all be 0.
+    print (getOpponentMatchWins(t1ID, p1ID))
+    print (getOpponentMatchWins(t1ID, p2ID))
+    print (getOpponentMatchWins(t1ID, p3ID))
+    print (getOpponentMatchWins(t1ID, p4ID))
+    
+    playMatch(t1ID, p1ID, p2ID, "p1 wins")
+    playMatch(t1ID, p1ID, p3ID, "p1 wins")
+    playMatch(t1ID, p1ID, p4ID, "p1 wins")
+    
+    playMatch(t1ID, p2ID, p4ID, "p1 wins")
+    
+    playMatch(t1ID, p3ID, p2ID, "p1 wins")
+    playMatch(t1ID, p3ID, p4ID, "p1 wins")
+    
+    print "asda"
+    
+    print (getOpponentMatchWins(t1ID, p1ID))
+    print (getOpponentMatchWins(t1ID, p2ID))
+    print (getOpponentMatchWins(t1ID, p3ID))
+    print (getOpponentMatchWins(t1ID, p4ID))
+    
+
+def testTournaments():
+
+    clearAllData()
+
+    compareEqual("Tournament count", countTournaments(), 0)
+
+    # Check that tournaments can be added.
+    t1ID = addNewTournament("Chess Championships 2016")
+    t2ID = addNewTournament("CS:GO - IEM Katowice 2016")
+    t3ID = addNewTournament("TF2 6s Beta Test #3")
+
+    compareEqual("Tournament count", countTournaments(), 3)
+
+    # Check that players can be added to a tournament.
+    p1ID = addNewPlayer("Mango", 25, "M", "AUS")
+    p2ID = addNewPlayer("Potato", 28, "F", "EU")
+    p3ID = addNewPlayer("Chair", 27, "M", "NA")
+    p4ID = addNewPlayer("Dog", 9, "M", "AUS")
+
+    registerPlayerByID(p1ID, t1ID)
+    registerPlayerByID(p2ID, t1ID)
+    
+    registerPlayerByID(p1ID, t2ID)
+    registerPlayerByID(p2ID, t2ID)
+    registerPlayerByID(p3ID, t2ID)
+    registerPlayerByID(p4ID, t2ID)
+
+    registerPlayerByID(p2ID, t3ID)
+    registerPlayerByID(p3ID, t3ID)
+    registerPlayerByID(p4ID, t3ID)
+
+    compareEqual("Tourn 1 player count", countPlayersInTournament(t1ID), 2)
+    compareEqual("Tourn 2 player count", countPlayersInTournament(t2ID), 4)
+
+    # Check that players are matched up correctly
+    playMatch(t2ID, p1ID, p2ID, "p1 wins")
+    playMatch(t2ID, p3ID, p4ID, "p2 wins")
+    playMatch(t2ID, p3ID, p2ID, "p2 wins")
+
+    playMatch(t3ID, p2ID, p4ID, "p1 wins")
+    playMatch(t3ID, p2ID, p4ID, "p1 wins")
+    playMatch(t3ID, p2ID, p4ID, "p1 wins")
+    playMatch(t3ID, p3ID, p4ID, "p1 wins")
+    playMatch(t3ID, p2ID, p4ID, "draw")
+    playMatch(t3ID, p2ID, p4ID, "draw")
+
+    standingsTourn1 = playerStandingsForTournament(t1ID)
+    standingsTourn2 = playerStandingsForTournament(t2ID)
+    standingsTourn3 = playerStandingsForTournament(t3ID)
+
+    # No matches were played in tourn 1, so check that everything is 0.
+    for(playerID, playerName, playerAge, playerGender, playerNationality, tournID, wins, draws, losses, totalGames, opponentWins) in standingsTourn1:
+
+        compareEqual("Player {} total games played".format(playerID), totalGames, 0)
+        compareEqual("Player {} number of wins".format(playerID), wins, 0)
+        compareEqual("Player {} number of losses".format(playerID), losses, 0)
+        compareEqual("Player {} number of draws".format(playerID), draws, 0)
+
+    # Check that wins, losses, and games played are set correctly.
+    for(playerID, playerName, playerAge, playerGender, playerNationality, tournID, wins, draws, losses, totalGames, opponentWins) in standingsTourn2:
+        
+        if playerID == p1ID or playerID == p4ID:
+            compareEqual("Player {} total games played".format(playerID), totalGames, 1)
+            compareEqual("Player {} number of wins".format(playerID), wins, 1)
+            compareEqual("Player {} number of losses".format(playerID), losses, 0)
+
+        elif playerID == p2ID:
+            compareEqual("Player {} total games played".format(playerID), totalGames, 2)
+            compareEqual("Player {} number of wins".format(playerID), wins, 1)
+            compareEqual("Player {} number of losses".format(playerID), losses, 1)
+
+        elif playerID == p3ID:
+            compareEqual("Player {} total games played".format(playerID), totalGames, 2)
+            compareEqual("Player {} number of wins".format(playerID), wins, 0)
+            compareEqual("Player {} number of losses".format(playerID), losses, 2)
+
+   
+    """
+    for(playerID, playerName, playerAge, playerGender, playerNationality, tournID, wins, draws, losses, totalGames) in standingsTourn3:
+
+        compareEqual("Player {} total games played".format(playerID), totalGames, 4)
+
+        if playerID == p2ID:
+            compareEqual("Player {} number of wins".format(playerID), wins, 2)
+            compareEqual("Player {} number of losses".format(playerID), losses, 0)
+            compareEqual("Player {} number of draws".format(playerID), draws, 2)
+
+        else:
+            compareEqual("Player {} number of wins".format(playerID), wins, 0)
+            compareEqual("Player {} number of losses".format(playerID), losses, 2)
+            compareEqual("Player {} number of draws".format(playerID), draws, 2)
+    """
+    
+    print("All tournament tests passed.")
+        
+
+def compareEqual(valueName, value, expectedValue):
+    if(value != expectedValue):
+        raise ValueError("{} should be equal to {} (actual: {}).".format(valueName, expectedValue, value))
+
+def testPlayers():
+
+    clearAllData()
+
+    tName = "Dota 2 Historical 1st edition"
+    tName2 = "Unpopular tournament (still fun though)"
+    tName3 = "TF2 Highlander Competition 2025 B.C."
+    
+    # Initial player / tournament data.
     addNewPlayer("Paul", 17, "M", "AUS")
     addNewPlayer("Carl", 19, "M", "AUS")
     addNewPlayer("Asdf", 3015, "M", "AUS")
@@ -22,60 +180,65 @@ def createSomePlayers():
     addNewPlayer("Pebbles", 6, "M", "AUS")
     addNewPlayer("Goat", 12, "M", "AUS")
     
-    addNewTournament("Dota 2 Historical 1st edition")
-    
-
-def testPlayers():
-
-    clearAllData()
-
-    tName = "Dota 2 Historical 1st edition"
-    
+    addNewTournament(tName)
     tID = getTournamentIDFromName(tName)
-
+    
+    addNewTournament(tName2)
+    t2ID = getTournamentIDFromName(tName2)
+    
+    addNewTournament(tName3)
+    t3ID = getTournamentIDFromName(tName3)
+    
     p1ID = getPlayerIDFromName("Paul")
-    p2ID = getPlayerIDFromName("Mark")
-    p3ID = getPlayerIDFromName("Jenny")
-    p4ID = getPlayerIDFromName("Pebbles")
-    p5ID = getPlayerIDFromName("Goat")
-    p6ID = getPlayerIDFromName("Carl")
+    p2ID = getPlayerIDFromName("Carl")
+    p3ID = getPlayerIDFromName("Asdf")
+    p4ID = getPlayerIDFromName("Mark")
+    p5ID = getPlayerIDFromName("Jenny")
+    p6ID = getPlayerIDFromName("Git")
     
-    registerPlayer(tID, p1ID)
-    registerPlayer(tID, p2ID)
-    registerPlayer(tID, p3ID)
-    registerPlayer(tID, p4ID)
-    registerPlayer(tID, p5ID)
-    registerPlayer(tID, p6ID)
+    registerPlayerByID(p1ID, tID)
+    registerPlayerByID(p2ID, tID)
+    registerPlayerByID(p3ID, tID)
+    registerPlayerByID(p4ID, tID)
+    registerPlayerByID(p5ID, tID)
+    registerPlayerByID(p6ID, tID)
+    
+    registerPlayerByID(p1ID, t2ID)
+    registerPlayerByID(p2ID, t2ID)
+    registerPlayerByID(p4ID, t2ID)
+    
+    registerPlayerByID(p2ID, t3ID)
+    registerPlayerByID(p4ID, t3ID)
+    
+    player1TournID = getPlayerTournID(tID, p1ID)
+    player2TournID = getPlayerTournID(tID, p2ID)
+    player3TournID = getPlayerTournID(tID, p3ID)
+    player4TournID = getPlayerTournID(tID, p4ID)
+    player5TournID = getPlayerTournID(tID, p5ID)
     
     playMatch(tID, p1ID, p2ID, "p1 wins")
     playMatch(tID, p1ID, p2ID, "p1 wins")
+    playMatch(tID, p2ID, p1ID, "p2 wins")
     playMatch(tID, p3ID, p2ID, "draw")
     playMatch(tID, p3ID, p1ID, "draw")
     playMatch(tID, p3ID, p5ID, "p1 wins")
+    playMatch(tID, p5ID, p4ID, "p2 wins")
     
-    tmp = playerRankingsView(tID)
+    playMatch(t2ID, p2ID, p1ID, "p2 wins")
     
-    tmp = sorted(tmp, key=lambda player: player[3], reverse=True) # sort by total points
+    playMatch(t3ID, p2ID, p4ID, "p1 wins")
+    playMatch(t3ID, p2ID, p4ID, "p1 wins")
+    playMatch(t3ID, p2ID, p4ID, "draw")
+    playMatch(t3ID, p2ID, p4ID, "cancelled")
     
-    print("----\nTournament: " + tName)
-    for playerInfo in tmp:
-        
-        name = playerInfo[1]
-        numGames = playerInfo[2]
-        totalPoints = playerInfo[3]
-        
-        numGames = 0 if numGames == None else numGames
-        totalPoints = 0 if totalPoints == None else totalPoints
-
-        print("" + name + ": " + str(totalPoints) + " points (" + str(numGames) + " games)")
-    
-    print("----\n")
-    
-    print(tmp)
+    print("All player tests passed.")
     
 
 
 if __name__ == '__main__':
     #createSomePlayers()
     testPlayers()
-    print "Success!  All tests pass!"
+    testTournaments()
+    testPlayerStandings()
+    #testPlayerOpponentMatchWins()
+    print("--All tests passed--")
