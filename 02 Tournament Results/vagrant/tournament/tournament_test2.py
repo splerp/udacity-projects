@@ -6,6 +6,7 @@
 # These additional tests are for the added functionality for each of the
 # implemented additional features.
 
+import random
 from tournament import *
 
 def testPlayerOpponentMatchWins():
@@ -32,42 +33,76 @@ def testPlayerOpponentMatchWins():
     registerPlayerByID(p5ID, t1ID)
     registerPlayerByID(p6ID, t1ID)
     registerPlayerByID(p7ID, t1ID)
-    #registerPlayerByID(p8ID, t1ID)
+    registerPlayerByID(p8ID, t1ID)
 
     # Round 1
-    #playMatch(t1ID, p1ID, p8ID, "p1 wins")
+    playMatch(t1ID, p1ID, p8ID, "p1 wins")
     playMatch(t1ID, p2ID, p7ID, "p1 wins")
     playMatch(t1ID, p3ID, p4ID, "p1 wins")
     playMatch(t1ID, p5ID, p6ID, "p1 wins")
 
-    swissPairings1, byePlayer1 = swissPairingsForTournament(t1ID)
-    #printSwissPairings(t1ID, swissPairings1, byePlayer1)
+    swissPairings, byePlayer = swissPairingsForTournament(t1ID)
     
     # Round 2
     playMatch(t1ID, p7ID, p1ID, "p1 wins")
     playMatch(t1ID, p4ID, p2ID, "p1 wins")
     playMatch(t1ID, p3ID, p5ID, "p1 wins")
-    #playMatch(t1ID, p6ID, p8ID, "p1 wins")
+    playMatch(t1ID, p6ID, p8ID, "p1 wins")
     
-    swissPairings1, byePlayer1 = swissPairingsForTournament(t1ID)
-    #printSwissPairings(t1ID, swissPairings1, byePlayer1)
+    swissPairings, byePlayer = swissPairingsForTournament(t1ID)
     
     # Round 3
     playMatch(t1ID, p1ID, p5ID, "p1 wins")
     playMatch(t1ID, p2ID, p6ID, "p1 wins")
     playMatch(t1ID, p4ID, p3ID, "p1 wins")
-    #playMatch(t1ID, p7ID, p8ID, "p1 wins")
+    playMatch(t1ID, p7ID, p8ID, "p1 wins")
 
-    swissPairings1, byePlayer1 = swissPairingsForTournament(t1ID)
-    printSwissPairings(t1ID, swissPairings1, byePlayer1)
+    swissPairings, byePlayer = swissPairingsForTournament(t1ID)
 
     print("All player opponent match wins passed.")
+
+def testPlayerOpponentMatchWinsWithByeRounds():
+
+    clearAllData()
+
+    # Check that tournaments can be added.
+    t1ID = addNewTournament("8 player swiss pairing test")
+
+    # Check that players can be added to a tournament.
+    p1ID = addNewPlayer("Mango", 25, "M", "AUS")
+    p2ID = addNewPlayer("Potato", 28, "F", "EU")
+    p3ID = addNewPlayer("Chair", 27, "M", "NA")
+    p4ID = addNewPlayer("Dog", 9, "M", "AUS")
+    p5ID = addNewPlayer("Lempika", 25, "M", "JP")
+    p6ID = addNewPlayer("Meringue", 28, "F", "AUS")
+    p7ID = addNewPlayer("Lamp", 27, "M", "AUS")
+    
+    registerPlayerByID(p1ID, t1ID)
+    registerPlayerByID(p2ID, t1ID)
+    registerPlayerByID(p3ID, t1ID)
+    registerPlayerByID(p4ID, t1ID)
+    registerPlayerByID(p5ID, t1ID)
+    registerPlayerByID(p6ID, t1ID)
+    registerPlayerByID(p7ID, t1ID)
+
+    for roundNumber in range(5):
+        swissPairings1, byePlayer1 = swissPairingsForTournament(t1ID)
+
+        for (spPlayerID1, spPlayerName1, spPlayerID2, spPlayerName2) in swissPairings1:
+            playMatch(t1ID, spPlayerID1, spPlayerID2, random.choice(["p1 wins", "p2 wins", "draw"])) # RND this
+
+    # No player should have more than one bye round.
+    allPlayerInfo = playerStandingsForTournament(t1ID)
+    for player in allPlayerInfo:
+        compareLessThan("Player {} bye rounds".format(player[0]), player[5], 2)
+
+    print("All player opponent match wins with bye rounds passed.")
 
 def testPlayerStandings():
     
     clearAllData()
     
-    t1ID = addNewTournament("4 player exciting stuff")
+    t1ID = addNewTournament("4 player exciting-stuff tournament")
     
     p1ID = addNewPlayer("Mango", 25, "M", "AUS")
     p2ID = addNewPlayer("Potato", 28, "F", "EU")
@@ -269,5 +304,6 @@ if __name__ == '__main__':
     testTournaments()
     testPlayerStandings()
     testPlayerOpponentMatchWins()
+    testPlayerOpponentMatchWinsWithByeRounds()
     viewAllPlayers()
     print("--All tests passed--")

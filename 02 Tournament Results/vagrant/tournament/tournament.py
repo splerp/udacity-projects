@@ -63,6 +63,20 @@ def countPlayers():
 
     return c.fetchone()[0]
 
+def addByeRound(tournID, playerID):
+    """Add a bye round to player in a particular tournament."""
+
+    conn = connect()
+    c = conn.cursor()
+    
+    SQL = "UPDATE tournamentPlayer SET byeRounds=byeRounds+1 WHERE tournamentID=%s AND playerID=%s;"
+    data = (tournID, playerID)
+    c.execute(SQL, data)
+    
+    conn.commit()
+    conn.close()
+
+
 def getPlayerIDFromName(name):
     
     conn = connect()
@@ -245,14 +259,13 @@ def clearAllData():
     
 def swissPairingsForTournament(tournID):
 
-    # Returns a sorted list of player standings.
-    playerStandingsList = playerStandingsForTournament(tournID)
+    """Returns a sorted list of player standings (taking bye rounds into account)."""
+    playerStandingsList = playerStandingsForTournamentByeRoundOrdering(tournID)
+
     byePlayer = None
-    
     swissPairingsList = []
     
     totalPlayers = len(playerStandingsList)
-    #print("Total players: " + str(totalPlayers))
     
     i = 0
     while i < totalPlayers:
@@ -267,10 +280,11 @@ def swissPairingsForTournament(tournID):
             
         else:
             # Give a BYE to playerStandingsList[i]
-            
+            p1 = playerStandingsList[i]
+
             # Set return value
             byePlayer = p1
-            pass
+            addByeRound(tournID, p1[0])
             
         i += 2
         
@@ -365,6 +379,33 @@ def playerStandingsForTournament(tournID):
     # Get each player's details.
 
     return allPlayers
+
+
+def playerStandingsForTournamentByeRoundOrdering(tournID):
+
+    # Alternative ordering. Order by bye rounds (people with least
+    # number of bye rounds will always be at the bottom). Then, order
+    # by wins and opponentMatchWins - in reverse order. For example,
+    # 3 players with a BYE and 3 without. If wins and OMW are not reverse
+    # ordered, the lowest-scoring player with 1 bye will be matched with
+    # the top-scoring player with 0 byes. Reverse order avoids this.
+
+     # Open DB.
+    conn = connect()
+    c = conn.cursor()
+    query = ("SELECT playerID, playerName, age, gender, nationality,"
+    " byeRounds, tournamentID, wins, draws, losses, totalGames, opponentMatchWins"
+    " FROM playerAllTournsInfo WHERE tournamentID = %s"
+    " ORDER BY byeRounds DESC, wins, opponentMatchWins;")
+    data = (tournID, )
+
+    c.execute(query, data)
+    allPlayers = c.fetchall()
+
+    # Get each player's details.
+
+    return allPlayers
+
 
 def printSwissPairings(tournID, swissPairings, byePlayer):
     
