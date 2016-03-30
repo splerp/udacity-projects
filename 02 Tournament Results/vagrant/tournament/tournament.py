@@ -59,9 +59,9 @@ def countPlayers():
 
     conn = connect()
     c = conn.cursor()
-    c.execute("SELECT * FROM player")
+    c.execute("SELECT count(*) FROM player")
 
-    return c.rowcount
+    return c.fetchone()[0]
 
 def getPlayerIDFromName(name):
     
@@ -119,11 +119,11 @@ def countPlayersInTournament(tournID):
     conn = connect()
     c = conn.cursor()
 
-    SQL = "SELECT * FROM tournamentPlayer WHERE tournamentID = %s"
+    SQL = "SELECT count(*) FROM tournamentPlayer WHERE tournamentID = %s"
     data = (tournID,)
     c.execute(SQL, data)
 
-    return c.rowcount
+    return c.fetchone()[0]
 
 # Totals the wins of all the players this player has faced.
 def getOpponentMatchWins(tournID, playerID):
@@ -186,9 +186,9 @@ def countTournaments():
 
     conn = connect()
     c = conn.cursor()
-    c.execute("SELECT * FROM tournament")
+    c.execute("SELECT count(*) FROM tournament")
 
-    return c.rowcount
+    return c.fetchone()[0]
 ###
 # MATCHES
 ###
@@ -303,11 +303,10 @@ def swissPairings():
     # Get each player's details.
     c.execute("SELECT playerID, playerName from player;")
     allPlayers = c.fetchall()
-    
+    totalPlayers = len(allPlayers)
+
     swissPairingsList = []
-    
-    totalPlayers = c.rowcount
-    
+
     i = 0
     while i < totalPlayers:
         
