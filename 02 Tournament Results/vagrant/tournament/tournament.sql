@@ -45,7 +45,8 @@ nationality varchar(3));
 CREATE TABLE tournamentPlayer (
 tournamentPlayerID serial PRIMARY KEY,
 tournamentID int REFERENCES tournament (tournamentID),
-playerID int REFERENCES player (playerID)
+playerID int REFERENCES player (playerID),
+byeRounds int DEFAULT 0
 );
 
 --
@@ -189,7 +190,7 @@ ORDER BY tournamentPlayer.tournamentID, tournamentPlayer.playerID
 
 -- Combination of player details, and the game stats (wins, losses etc.)
 CREATE VIEW playerAllTournsInfo AS 
-SELECT player.playerID, player.playerName, player.age, player.gender, player.nationality, tournamentPlayer.tournamentID, 
+SELECT player.playerID, player.playerName, player.age, player.gender, player.nationality, tournamentPlayer.byeRounds, tournamentPlayer.tournamentID, 
 	sum(COALESCE(winTotal, 0)) as wins, sum(COALESCE(drawTotal, 0)) as draws, sum(COALESCE(loseTotal, 0)) as losses, sum(COALESCE(totalGames, 0)) as totalGames, sum(COALESCE(opponentTotalWins, 0)) as opponentMatchWins
 FROM player 
 INNER JOIN tournamentPlayer 
@@ -209,7 +210,7 @@ LEFT JOIN individualTournamentPlayerGamesPlayed
 LEFT JOIN opponentMatchWins 
     ON tournamentPlayer.tournamentID = opponentMatchWins.tournamentID 
     AND player.playerID = opponentMatchWins.playerID 
-GROUP BY player.playerID, tournamentPlayer.tournamentID
+GROUP BY player.playerID, tournamentPlayer.tournamentID, tournamentPlayer.byeRounds
 ORDER BY tournamentPlayer.tournamentID, player.playerID
 ;
 

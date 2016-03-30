@@ -354,7 +354,7 @@ def playerStandingsForTournament(tournID):
     conn = connect()
     c = conn.cursor()
     query = ("SELECT playerID, playerName, age, gender, nationality,"
-    " tournamentID, wins, draws, losses, totalGames, opponentMatchWins"
+    " byeRounds, tournamentID, wins, draws, losses, totalGames, opponentMatchWins"
     " FROM playerAllTournsInfo WHERE tournamentID = %s"
     " ORDER BY wins DESC, opponentMatchWins DESC;")
     data = (tournID, )
@@ -455,7 +455,7 @@ def playerStandings():
     # Simply calls the new playerStandings function, passing in the
     # legacy tournament as the specified tournament.
     newResult = playerStandingsForTournament(tournID)
-    legacyResult = [(result[0], result[1], result[6], result[9]) for result in newResult]
+    legacyResult = [(result[0], result[1], result[7], result[10]) for result in newResult]
 
     return legacyResult
 
