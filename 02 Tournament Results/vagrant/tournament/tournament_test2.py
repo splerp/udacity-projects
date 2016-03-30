@@ -153,7 +153,7 @@ def testTournaments():
     standingsTourn3 = playerStandingsForTournament(t3ID)
 
     # No matches were played in tourn 1, so check that everything is 0.
-    for(playerID, playerName, playerAge, playerGender, playerNationality, tournID, wins, draws, losses, totalGames, opponentWins) in standingsTourn1:
+    for(playerID, playerName, playerAge, playerGender, playerNationality, playerByeRounds, tournID, wins, draws, losses, totalGames, opponentWins) in standingsTourn1:
 
         compareEqual("Player {} total games played".format(playerID), totalGames, 0)
         compareEqual("Player {} number of wins".format(playerID), wins, 0)
@@ -161,7 +161,7 @@ def testTournaments():
         compareEqual("Player {} number of draws".format(playerID), draws, 0)
 
     # Check that wins, losses, and games played are set correctly.
-    for(playerID, playerName, playerAge, playerGender, playerNationality, tournID, wins, draws, losses, totalGames, opponentWins) in standingsTourn2:
+    for(playerID, playerName, playerAge, playerGender, playerNationality, playerByeRounds,tournID, wins, draws, losses, totalGames, opponentWins) in standingsTourn2:
         
         if playerID == p1ID or playerID == p4ID:
             compareEqual("Player {} total games played".format(playerID), totalGames, 1)
