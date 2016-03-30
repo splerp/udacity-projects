@@ -202,6 +202,11 @@ def compareEqual(valueName, value, expectedValue):
     if(value != expectedValue):
         raise ValueError("{} should be equal to {} (actual: {}).".format(valueName, expectedValue, value))
 
+def compareLessThan(valueName, value, expectedValue):
+    if(value >= expectedValue):
+        raise ValueError("{} should be less than {} (actual: {}).".format(valueName, expectedValue, value))
+
+
 def testPlayers():
 
     clearAllData()
