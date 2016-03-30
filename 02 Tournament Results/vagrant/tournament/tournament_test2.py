@@ -3,8 +3,8 @@
 # Test cases for tournament.py
 # These tests are not exhaustive, but they should cover the majority of cases.
 #
-# If you do add any of the extra credit options, be sure to add/modify these test cases
-# as appropriate to account for your module's added functionality.
+# These additional tests are for the added functionality for each of the
+# implemented additional features.
 
 from tournament import *
 
@@ -80,10 +80,10 @@ def testPlayerStandings():
     registerPlayerByID(p4ID, t1ID)
     
     # Should all be 0.
-    print (getOpponentMatchWins(t1ID, p1ID))
-    print (getOpponentMatchWins(t1ID, p2ID))
-    print (getOpponentMatchWins(t1ID, p3ID))
-    print (getOpponentMatchWins(t1ID, p4ID))
+    compareEqual("Player {} opponent match wins".format(p1ID), getOpponentMatchWins(t1ID, p1ID), 0)
+    compareEqual("Player {} opponent match wins".format(p2ID), getOpponentMatchWins(t1ID, p2ID), 0)
+    compareEqual("Player {} opponent match wins".format(p3ID), getOpponentMatchWins(t1ID, p3ID), 0)
+    compareEqual("Player {} opponent match wins".format(p4ID), getOpponentMatchWins(t1ID, p4ID), 0)
     
     playMatch(t1ID, p1ID, p2ID, "p1 wins")
     playMatch(t1ID, p1ID, p3ID, "p1 wins")
@@ -94,12 +94,12 @@ def testPlayerStandings():
     playMatch(t1ID, p3ID, p2ID, "p1 wins")
     playMatch(t1ID, p3ID, p4ID, "p1 wins")
     
-    print "asda"
-    
-    print (getOpponentMatchWins(t1ID, p1ID))
-    print (getOpponentMatchWins(t1ID, p2ID))
-    print (getOpponentMatchWins(t1ID, p3ID))
-    print (getOpponentMatchWins(t1ID, p4ID))
+    compareEqual("Player {} opponent match wins".format(p1ID), getOpponentMatchWins(t1ID, p1ID), 3)
+    compareEqual("Player {} opponent match wins".format(p2ID), getOpponentMatchWins(t1ID, p2ID), 5)
+    compareEqual("Player {} opponent match wins".format(p3ID), getOpponentMatchWins(t1ID, p3ID), 4)
+    compareEqual("Player {} opponent match wins".format(p4ID), getOpponentMatchWins(t1ID, p4ID), 6)
+
+    print("All player standings tests passed.")
     
 
 def testTournaments():

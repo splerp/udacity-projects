@@ -2,19 +2,8 @@
 # 
 # tournament.py -- implementation of a Swiss-system tournament
 #
-
+import argparse
 import psycopg2
-
-
-'''
-deleteMatches(tournID)
-deletePlayers(tournID) - remove the tournamentPlayers for this tournament
-countPlayers(tournID) - all players in a particular tournament
-registerPlayer(tournID) - add tournamentPlayers for this tournament
-playerStandings(tournID)
-reportMatch(tournID, winner, loser)
-swissPairings(tournID)
-'''
 
 ###
 # PLAYERS
@@ -337,20 +326,45 @@ def swissPairings():
     return swissPairingsList
 
 def playerStandingsForTournament(tournID):
-    
+    """Returns a list of the players and their win records, sorted by wins.
+    Included as legacy support for old tournament tests.
+
+    The first entry in the list should be the player in first place, or a player
+    tied for first place if there is currently a tie.
+
+    Args:
+      tournID: the tournament the plyer standings should be taken for.
+
+    Returns:
+      A list of tuples, each of which contains:
+        playerID: the player's unique id (assigned by the database)
+        playerName: the player's full name (as registered)
+        age: the age of the player
+        gender: the gender of the player
+        nationality: the nationality of the player
+        
+        tournamentID: the tournament as specified
+        wins: the number of matches the player has won
+        draws: the number of matches the player has drawn
+        losses: the number of matches the player has lost
+        totalGames: the number of matches the player has played
+        opponentMatchWins: the number of matches the player's opponents have won
+    """
+
      # Open DB.
     conn = connect()
     c = conn.cursor()
-    query = ("SELECT playerID, playerName, age, gender, nationality, "
-    "tournamentID, wins, draws, losses, totalGames, opponentMatchWins "
-    "FROM playerAllTournsInfo WHERE tournamentID = %s;")
+    query = ("SELECT playerID, playerName, age, gender, nationality,"
+    " tournamentID, wins, draws, losses, totalGames, opponentMatchWins"
+    " FROM playerAllTournsInfo WHERE tournamentID = %s"
+    " ORDER BY wins DESC, opponentMatchWins DESC;")
     data = (tournID, )
-        
+
     c.execute(query, data)
     allPlayers = c.fetchall()
-    
+
     # Get each player's details.
-    
+
     return allPlayers
 
 def printSwissPairings(tournID, swissPairings, byePlayer):
@@ -377,41 +391,46 @@ def printSwissPairings(tournID, swissPairings, byePlayer):
 ## Legacy functions (to enable original tournament tests for older schema version)
 #######
 
+# Legacy function
 def registerPlayer(playerName):
-    """Adds a player to the tournament database.
-  
-    The database assigns a unique serial id number for the player.
+    """Adds a player to the tournament database. Included as legacy support for
+    older tournament tests.
+
     Args:
       name: the player's full name (need not be unique).
     """
-    
+
     tournName = "Tournament for legacy tests"
-    
-    
+
+    # Connect to database
     conn = connect()
     c = conn.cursor()
-    
+
+    # Insert a new player with this name
     SQL = "INSERT INTO player (playerName) values (%s);"
     data = (playerName, )
     c.execute(SQL, data)
-    
+
+    # If the legacy tournament doesn't exist, 
     if getTournamentIDFromName(tournName) == None:
         SQL = "INSERT INTO tournament (tournamentName) values (%s);"
         data = (tournName, )
         c.execute(SQL, data)
-    
+
+    # Commit current changes.
     conn.commit()
-    
-    ###
-    
+
+    # Retrieve the newly created player, and legacy tournament.
     playerID = getPlayerIDFromName(playerName)
     tournID = getTournamentIDFromName(tournName)
-    
-    # Insert the player into the newly created tournament.
-    SQL = "INSERT INTO tournamentPlayer (tournamentID, playerID) values (%s, %s);"
+
+    # Insert the player into the tournament.
+    SQL = ("INSERT INTO tournamentPlayer (tournamentID, playerID)"
+           " values (%s, %s);")
     data = (tournID, playerID)
     c.execute(SQL, data)
-    
+
+    # Close database connection
     conn.commit()
     conn.close()
 
@@ -419,6 +438,7 @@ def registerPlayer(playerName):
 # Legacy function
 def playerStandings():
     """Returns a list of the players and their win records, sorted by wins.
+    Included as legacy support for old tournament tests.
 
     The first entry in the list should be the player in first place, or a player
     tied for first place if there is currently a tie.
@@ -430,26 +450,27 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
-    
+
     tournID = getTournamentIDFromName("Tournament for legacy tests")
-    
-    #ID, name, wins, matches
-    
+
+    # Simply calls the new playerStandings function, passing in the
+    # legacy tournament as the specified tournament.
     newResult = playerStandingsForTournament(tournID)
     legacyResult = [(result[0], result[1], result[6], result[9]) for result in newResult]
-    
+
     return legacyResult
-    
+
 # Legacy function
 def reportMatch(winner, loser):
-    """Records the outcome of a single match between two players.
+    """Records the outcome of a single match between two players. Included as
+    legacy support for old tournament tests.
 
     Args:
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
-    
+
     tournID = getTournamentIDFromName("Tournament for legacy tests")
-    
+
     playMatch(tournID, winner, loser, "p1 wins")
     
