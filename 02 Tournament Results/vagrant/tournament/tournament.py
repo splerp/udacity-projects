@@ -381,7 +381,7 @@ def printSwissPairings(tournID, swissPairings, byePlayer):
         
     if byePlayer is not None:
         
-        print("Bye player: {0}".format(byePlayer[1]))
+        print("Bye player: {0} ({1})".format(byePlayer[1], byePlayer[0]))
 
     print("------------------------")
     print("")

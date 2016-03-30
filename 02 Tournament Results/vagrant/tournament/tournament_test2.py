@@ -177,23 +177,6 @@ def testTournaments():
             compareEqual("Player {} total games played".format(playerID), totalGames, 2)
             compareEqual("Player {} number of wins".format(playerID), wins, 0)
             compareEqual("Player {} number of losses".format(playerID), losses, 2)
-
-   
-    """
-    for(playerID, playerName, playerAge, playerGender, playerNationality, tournID, wins, draws, losses, totalGames) in standingsTourn3:
-
-        compareEqual("Player {} total games played".format(playerID), totalGames, 4)
-
-        if playerID == p2ID:
-            compareEqual("Player {} number of wins".format(playerID), wins, 2)
-            compareEqual("Player {} number of losses".format(playerID), losses, 0)
-            compareEqual("Player {} number of draws".format(playerID), draws, 2)
-
-        else:
-            compareEqual("Player {} number of wins".format(playerID), wins, 0)
-            compareEqual("Player {} number of losses".format(playerID), losses, 2)
-            compareEqual("Player {} number of draws".format(playerID), draws, 2)
-    """
     
     print("All tournament tests passed.")
         

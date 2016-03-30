@@ -2,9 +2,6 @@
 --
 -- Put your SQL 'create table' statements in this file; also 'create view'
 -- statements if you choose to use it.
---
--- You can write comments in this file by starting them with two dashes, like
--- these lines here.
 
 DROP VIEW IF EXISTS playerTotalInfo;
 DROP VIEW IF EXISTS playerAllTournsInfo;
@@ -16,7 +13,6 @@ DROP VIEW IF EXISTS individualTournamentPlayerWins;
 DROP VIEW IF EXISTS individualTournamentPlayerDraws;
 DROP VIEW IF EXISTS individualTournamentPlayerLosses;
 DROP VIEW IF EXISTS individualTournamentPlayerGamesPlayed;
-
 
 -- Remove all previous instances.
 DROP TABLE IF EXISTS tournamentMatch;
