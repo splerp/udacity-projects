@@ -53,6 +53,15 @@ pointValue1 int,
 pointValue2 int
 );
 
+INSERT INTO swissResult (description, pointValue1, pointValue2)
+values
+('p1 wins', 3, 0),
+('p2 wins', 0, 3),
+('draw', 1, 1),
+('unfinished', 1, 1),
+('unplayed', 0, 0)
+;
+
 --
 
 CREATE TABLE tournamentMatch (
@@ -63,15 +72,6 @@ tournamentPlayer2ID int REFERENCES tournamentPlayer (tournamentPlayerID),
 matchResult varchar(20) REFERENCES swissResult(description), 
 datePlayed timestamp DEFAULT current_timestamp
 );
-
-
-INSERT INTO swissResult (description, pointValue1, pointValue2)
-values
-('p1 wins', 3, 0),
-('p2 wins', 0, 3),
-('draw', 1, 1),
-('cancelled', 0, 0)
-;
 
 -- Wins view
 CREATE VIEW individualTournamentPlayerWins AS

@@ -257,7 +257,7 @@ def testPlayers():
     playMatch(t3ID, p2ID, p4ID, "p1 wins")
     playMatch(t3ID, p2ID, p4ID, "p1 wins")
     playMatch(t3ID, p2ID, p4ID, "draw")
-    playMatch(t3ID, p2ID, p4ID, "cancelled")
+    playMatch(t3ID, p2ID, p4ID, "unfinished")
     
     print("All player tests passed.")
     
