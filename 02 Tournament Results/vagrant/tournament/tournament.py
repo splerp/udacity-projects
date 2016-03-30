@@ -48,7 +48,7 @@ def removePlayer(name):
     c = conn.cursor()
     
     SQL = "DELETE FROM player WHERE playerName=%s;"
-    data = (name)
+    data = (name, )
     c.execute(SQL, data)
     
     conn.commit()
