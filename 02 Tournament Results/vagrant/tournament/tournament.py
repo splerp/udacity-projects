@@ -252,11 +252,44 @@ def clearAllData():
     conn.commit()
     conn.close()
 
+##########################
+    
 def swissPairingsForTournament(tournID):
-    pass
+
+    # Returns a sorted list of player standings.
+    playerStandingsList = playerStandingsForTournament(tournID)
+    byePlayer = None
+    
+    swissPairingsList = []
+    
+    totalPlayers = len(playerStandingsList)
+    #print("Total players: " + str(totalPlayers))
+    
+    i = 0
+    while i < totalPlayers:
+        if i+1 < totalPlayers:
+            
+            p1 = playerStandingsList[i]
+            p2 = playerStandingsList[i+1]
+            
+            # Append the player's ID and name to the swiss pairings list.
+            swissPairingsList.append((p1[0], p1[1], p2[0], p2[1]))
+            #print("Pairing {0} (wins {1} opp {4}) with {2} (wins {3} opp {5})".format(p1[1], p1[6], p2[1], p2[6], p1[10], p2[10]))
+            
+        else:
+            # Give a BYE to playerStandingsList[i]
+            
+            # Set return value
+            byePlayer = p1
+            pass
+            
+        i += 2
+        
+    return swissPairingsList, byePlayer
  
 def swissPairings():
     """Returns a list of pairs of players for the next round of a match.
+    Legacy function for older tournament tests.
   
     Assuming that there are an even number of players registered, each player
     appears exactly once in the pairings.  Each player is paired with another
@@ -271,8 +304,8 @@ def swissPairings():
         name2: the second player's name
     """
     
+    # Returns a sorted list of player standings.
     playerStandingsList = playerStandings()
-    sortedPlayers = sorted(playerStandingsList, key=lambda player: player[2]) # sort by num wins
     
     # Open DB.
     conn = connect()
@@ -289,8 +322,8 @@ def swissPairings():
     i = 0
     while i < totalPlayers:
         
-        p1 = sortedPlayers[i]
-        p2 = sortedPlayers[i+1]
+        p1 = playerStandingsList[i]
+        p2 = playerStandingsList[i+1]
         
         swissPairingsList.append((p1[0], p1[1], p2[0], p2[1]))
         
@@ -320,7 +353,25 @@ def playerStandingsForTournament(tournID):
     
     return allPlayers
 
+def printSwissPairings(tournID, swissPairings, byePlayer):
+    
+    print("")
+    print("------------------------")
+    print("Recommended pairings for tournament {0}:".format(tournID))
+    
+    for pair in swissPairings:
+        #0 - pID1
+        #1 - pName1
+        #2 - pID2
+        #3 - pName2
+        print("{0} ({1}) VS {2} ({3})".format(pair[1], pair[0], pair[3], pair[2]))
+        
+    if byePlayer is not None:
+        
+        print("Bye player: {0}".format(byePlayer[1]))
 
+    print("------------------------")
+    print("")
 
 #######
 ## Legacy functions (to enable original tournament tests for older schema version)
