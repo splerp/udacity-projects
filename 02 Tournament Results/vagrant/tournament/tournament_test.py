@@ -6,7 +6,8 @@
 # If you do add any of the extra credit options, be sure to add/modify these test cases
 # as appropriate to account for your module's added functionality.
 
-from tournament import *
+#from tournament import *
+from tournament_legacy import *
 
 def testCount():
     """
@@ -105,7 +106,7 @@ def testReportMatches():
 
 def testPairings():
     """
-    Test that pairings are generated properly both before and after match reporting.
+    Test that pairings are generated properly bothbefore and after match reporting.
     """
     deleteMatches()
     deletePlayers()

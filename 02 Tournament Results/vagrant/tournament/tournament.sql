@@ -1,8 +1,6 @@
 -- Table definitions for the tournament project.
---
--- Put your SQL 'create table' statements in this file; also 'create view'
--- statements if you choose to use it.
 
+-- Remove all previous instances.
 DROP VIEW IF EXISTS playerTotalInfo;
 DROP VIEW IF EXISTS playerAllTournsInfo;
 
@@ -14,21 +12,19 @@ DROP VIEW IF EXISTS individualTournamentPlayerDraws;
 DROP VIEW IF EXISTS individualTournamentPlayerLosses;
 DROP VIEW IF EXISTS individualTournamentPlayerGamesPlayed;
 
--- Remove all previous instances.
 DROP TABLE IF EXISTS tournamentMatch;
 DROP TABLE IF EXISTS tournamentPlayer;
 DROP TABLE IF EXISTS tournament;
 DROP TABLE IF EXISTS player;
 DROP TABLE IF EXISTS swissResult;
 
-
+-- Tournament table
 CREATE TABLE tournament (
 tournamentID serial PRIMARY KEY,
 tournamentName varchar(50) UNIQUE NOT NULL,
 dateCreated timestamp DEFAULT current_timestamp);
 
---
-
+-- Player table
 CREATE TABLE player (
 playerID serial PRIMARY KEY,
 playerName varchar(50) UNIQUE NOT NULL,
@@ -36,8 +32,7 @@ age int,
 gender varchar(1),
 nationality varchar(3));
 
---
-
+-- TournamentPlayer table (many-to-many relationship)
 CREATE TABLE tournamentPlayer (
 tournamentPlayerID serial PRIMARY KEY,
 tournamentID int REFERENCES tournament (tournamentID),
@@ -45,14 +40,14 @@ playerID int REFERENCES player (playerID),
 byeRounds int DEFAULT 0
 );
 
---
-
+-- Swiss Result table
 CREATE TABLE swissResult (
 description varchar(20) PRIMARY KEY,
 pointValue1 int,
 pointValue2 int
 );
 
+-- Add fixtures for possible swiss results
 INSERT INTO swissResult (description, pointValue1, pointValue2)
 values
 ('p1 wins', 3, 0),
@@ -62,8 +57,7 @@ values
 ('unplayed', 0, 0)
 ;
 
---
-
+-- TournamentMatch table
 CREATE TABLE tournamentMatch (
 tournamentMatchID serial PRIMARY KEY,
 tournamentID int REFERENCES tournament (tournamentID),
@@ -73,7 +67,7 @@ matchResult varchar(20) REFERENCES swissResult(description),
 datePlayed timestamp DEFAULT current_timestamp
 );
 
--- Wins view
+-- Wins view (how many wins each player has)
 CREATE VIEW individualTournamentPlayerWins AS
 SELECT tmp.tournamentID, player.playerID, sum(total) AS winTotal FROM
 (
@@ -95,7 +89,7 @@ INNER JOIN player ON player.playerID = tournamentPlayer.playerID
 GROUP BY player.playerID, tmp.tournamentID
 ;
 
--- Losses view
+-- Losses view (how many losses each player has)
 CREATE VIEW individualTournamentPlayerLosses AS
 SELECT tmp.tournamentID, player.playerID, sum(total) AS loseTotal FROM
 (
@@ -117,7 +111,7 @@ INNER JOIN player ON player.playerID = tournamentPlayer.playerID
 GROUP BY player.playerID, tmp.tournamentID
 ;
 
--- Draws view
+-- Draws view (how many draws each player has)
 CREATE VIEW individualTournamentPlayerDraws AS
 SELECT tmp.tournamentID, player.playerID, sum(total) AS drawTotal FROM
 (
@@ -139,7 +133,7 @@ INNER JOIN player ON player.playerID = tournamentPlayer.playerID
 GROUP BY player.playerID, tmp.tournamentID
 ;
 
--- Total games played view
+-- Total games played view (for each player)
 CREATE VIEW individualTournamentPlayerGamesPlayed AS
 SELECT tmp.tournamentID, player.playerID, sum(total) AS totalGames FROM
 (
@@ -157,6 +151,7 @@ INNER JOIN player ON player.playerID = tournamentPlayer.playerID
 GROUP BY player.playerID, tmp.tournamentID
 ;
 
+-- View that contains all the opponents each player has versed
 CREATE VIEW playerOpponents AS
 SELECT player.playerID, tmp.tournamentID, tmp.tournamentPlayerID, tmp.opponentTournamentPlayerID FROM
 (
@@ -170,6 +165,7 @@ GROUP BY tmp.tournamentPlayerID, tmp.tournamentID, tmp.opponentTournamentPlayerI
 ORDER BY tmp.tournamentID, tmp.tournamentPlayerID
 ;
 
+-- View containing the total number of wins each player's opponents have received
 CREATE VIEW opponentMatchWins AS
 SELECT tournamentPlayer.tournamentID, tournamentPlayer.playerID, SUM(COALESCE(wins, 0)) as opponentTotalWins FROM playerOpponents 
 LEFT JOIN tournamentPlayer ON playerOpponents.opponentTournamentPlayerID = tournamentPlayer.tournamentPlayerID 
@@ -211,7 +207,7 @@ ORDER BY tournamentPlayer.tournamentID, player.playerID
 ;
 
 -- Gets a "grand total" view which combines the wins, losses etc. for all tournaments.
--- Do not SELECT tournamentID - want to combine columns where this value would be different.
+-- Does not SELECT tournamentID - want to combine columns where this value would be different.
 CREATE VIEW playerTotalInfo AS 
 SELECT playerID, playerName, age, gender, nationality,
 	sum(wins) as wins, sum(draws) as draws, sum(losses) as losses, sum(totalGames) as totalGames
