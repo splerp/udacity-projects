@@ -19,7 +19,7 @@ Vagrant must be installed to run the vagrant virtual machine. [[link](https://ww
 #### Creating the database
 1. In the virtual machine in Git Bash, run the `psql` command
 2. While in psql, type the command `CREATE DATABASE Tournaments;` to create the database
-3. Type `\c Tournaments` to connect to the database
+3. Type `\c Tournaments` to connect to the newly created database
 4. Type `\i tournament.sql` to run the migrations and fixtures to complete setting up the database
 
 #### Running the scripts
@@ -31,10 +31,10 @@ Vagrant must be installed to run the vagrant virtual machine. [[link](https://ww
 The tournament database structure aims to be as simple as possible, while providing more complicated views when more detailed information is required.
 
 #### Tournament table
-Stores information about each tournament registered in the system.
+Stores information about each tournament registered in the database.
 
 #### Player table
-Stores information about each player registered in the system.
+Stores information about each player registered in the database.
 
 #### TournamentPlayer table
 When a player signs up for a particular tournament, a new TournamentPlayer entry is created. This table also keeps track of the number of bye rounds a player has had for this tournament.
@@ -46,7 +46,7 @@ Each entry represents a different game that two players have played between each
 The swiss result table contains all the different possible outcomes of the match, and how much each player scores depending on that result.
 
 ## Database views
-The database defines views for more complicated data visualisation. The most important views are:
+The database also defines views for more complicated data visualisation. The most important views are:
 
 #### OpponentMatchWins view
 Returns a table that, for each player in each tournament, displays how many matches all of their opponents combined have won.
