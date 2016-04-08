@@ -27,6 +27,17 @@ Vagrant must be installed to run the vagrant virtual machine. [[link](https://ww
 2. To use the tests for the initial database schema, run `python tournament_test.py`
 3. To use the tests for the extended database schema, run `python tournamnet_test2.py`
 
+## Initial database schema
+- Players can be registered for a single tournament
+- The number of wins for each player can be calculated
+- The swiss pairings for the tournament (based on player wins) can be calculated
+
+## Extended database schema
+- Multiple tournaments are supported, so any player can register for any number of them
+- If there is an uneven number of players, a bye round is given to one player. Steps are taken to ensure players each receive a minimal number of bye rounds
+- As well as winning and losing, players can draw in a match
+- When two players have an equal number of wins, they will be ordered depending on the number of opponent match wins (OMW). This is the sum of wins for each of this particular player's opponents
+
 ## Database Structure
 The tournament database structure aims to be as simple as possible, while providing more complicated views when more detailed information is required.
 
