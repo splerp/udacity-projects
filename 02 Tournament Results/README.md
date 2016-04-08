@@ -17,18 +17,18 @@ Vagrant must be installed to run the vagrant virtual machine. [[link](https://ww
 
 ## Usage
 #### Creating the database
-1. In the virtual machine in Git Bash, run the "psql" command
-2. While in psql, type the command "CREATE DATABASE Tournaments;" to create the database
-3. Type "\c Tournaments" to connect to the database
-4. Type "\i tournament.sql" to run the migrations and fixtures to complete setting up the database
+1. In the virtual machine in Git Bash, run the `psql` command
+2. While in psql, type the command `CREATE DATABASE Tournaments;` to create the database
+3. Type `\c Tournaments` to connect to the database
+4. Type `\i tournament.sql` to run the migrations and fixtures to complete setting up the database
 
 #### Running the scripts
-1. In the virtual machine, navigate to /vagrant/tournament ("cd /vagrant/tournament")
-2. To use the tests for the initial database schema, run "python tournament_test.py"
-3. To use the tests for the extended database schema, run "python tournamnet_test2.py"
+1. In the virtual machine, navigate to /vagrant/tournament (`cd /vagrant/tournament`)
+2. To use the tests for the initial database schema, run `python tournament_test.py`
+3. To use the tests for the extended database schema, run `python tournamnet_test2.py`
 
 ## Database Structure
-The tournament database and code backend is capable of many things:
+The tournament database structure aims to be as simple as possible, while providing more complicated views when more detailed information is required.
 
 #### Tournament table
 Stores information about each tournament registered in the system.
@@ -63,4 +63,4 @@ Combines each player's information with their number of wins, draws, losses, and
 
 ## Code base
 
-The content of `tournament.py`, `tournament_test.py` and `tournament.sql` was originally created by Udacity for the Full Stack Developer course. ([link](https://github.com/adarsh0806/udacity-full-stack/tree/master/p2)
+The content of `tournament.py`, `tournament_test.py` and `tournament.sql` was originally created by Udacity for the Full Stack Developer course. [[link](https://github.com/adarsh0806/udacity-full-stack/tree/master/p2)]
