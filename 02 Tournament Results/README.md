@@ -3,9 +3,11 @@ A collection of scripts to generate and test a database that stores players, tou
 
 ## Installation
 #### Prerequisites
-To use the bash environment, Git should be installed. [link](https://git-scm.com/)
-VirtualBox must be installed to create the virtual machine. [link](https://www.virtualbox.org/)
-Vagrant must be installed to run the vagrant virtual machine. [link](https://www.vagrantup.com/)
+To use the bash environment, Git should be installed. [[link](https://git-scm.com/)]
+
+VirtualBox must be installed to create the virtual machine. [[link](https://www.virtualbox.org/)]
+
+Vagrant must be installed to run the vagrant virtual machine. [[link](https://www.vagrantup.com/)]
 
 #### Starting the vagrant machine (Windows)
 1. Navigate to the directory which contains "VagrantFile" (base directory)
