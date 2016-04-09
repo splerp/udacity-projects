@@ -5,14 +5,18 @@ import psycopg2
 
 
 def connect():
-    """Connect to the PostgreSQL database.  Returns a database connection."""
-    return psycopg2.connect("dbname=tournaments")
+    """
+    Connect to the PostgreSQL database.  Returns a database
+    connection and a cursor.
+    """
+    connection = psycopg2.connect("dbname=tournaments")
+    cursor = connection.cursor()
+    return connection, cursor
 
 
 def clearAllData():
     """ Removes all existing data (excluding the swiss result values)"""
-    conn = connect()
-    c = conn.cursor()
+    conn, c = connect()
 
     c.execute("TRUNCATE player CASCADE")
     c.execute("TRUNCATE tournament CASCADE")
@@ -26,8 +30,7 @@ def clearAllData():
 def addNewPlayer(name, age, gender, nationality):
     """Creates a new player for use in the system."""
 
-    conn = connect()
-    c = conn.cursor()
+    conn, c = connect()
 
     SQL = ("INSERT INTO player (playerName, age, gender, nationality)"
            "values (%s, %s, %s, %s)")
@@ -50,8 +53,7 @@ def addNewPlayer(name, age, gender, nationality):
 def removePlayer(name):
     """Given a player's name, delete that player."""
 
-    conn = connect()
-    c = conn.cursor()
+    conn, c = connect()
 
     SQL = "DELETE FROM player WHERE playerName=%s;"
     data = (name, )
@@ -64,8 +66,7 @@ def removePlayer(name):
 def addByeRound(tournID, playerID):
     """Add a bye round to player in a particular tournament."""
 
-    conn = connect()
-    c = conn.cursor()
+    conn, c = connect()
 
     SQL = ("UPDATE tournamentPlayer SET byeRounds=byeRounds+1"
            " WHERE tournamentID=%s AND playerID=%s;")
@@ -82,8 +83,7 @@ def getPlayerTournID(tournID, playerID):
     the many-to-many (PlayerTournament) that they are associated with.
     """
 
-    conn = connect()
-    c = conn.cursor()
+    conn, c = connect()
 
     SQL = ("SELECT tournamentPlayerID FROM tournamentPlayer"
            " WHERE tournamentID = %s AND playerID = %s")
@@ -101,8 +101,7 @@ def getPlayerTournID(tournID, playerID):
 def registerPlayerByID(playerID, tournID):
     """Create a new PlayerTournament from a player ID and tournament ID."""
 
-    conn = connect()
-    c = conn.cursor()
+    conn, c = connect()
 
     SQL = ("INSERT INTO tournamentPlayer (tournamentID, playerID)"
            "values (%s,%s)")
@@ -116,8 +115,7 @@ def registerPlayerByID(playerID, tournID):
 def getTournamentIDFromName(name):
     """Return the tournament ID that matches the given name."""
 
-    conn = connect()
-    c = conn.cursor()
+    conn, c = connect()
 
     SQL = "SELECT tournamentID FROM tournament WHERE tournamentName=%s"
     data = (name, )
@@ -134,8 +132,7 @@ def getTournamentIDFromName(name):
 def countPlayersInTournament(tournID):
     """Returns the number of tournaments currently registered."""
 
-    conn = connect()
-    c = conn.cursor()
+    conn, c = connect()
 
     SQL = "SELECT count(*) FROM tournamentPlayer WHERE tournamentID = %s"
     data = (tournID,)
@@ -147,8 +144,7 @@ def countPlayersInTournament(tournID):
 def getOpponentMatchWins(tournID, playerID):
     """Totals the wins of all the players this player has faced."""
 
-    conn = connect()
-    c = conn.cursor()
+    conn, c = connect()
 
     SQL = ("SELECT opponentTotalWins FROM opponentMatchWins"
            " WHERE tournamentID = %s AND playerID = %s")
@@ -163,8 +159,7 @@ def getOpponentMatchWins(tournID, playerID):
 def viewAllPlayers():
     """Retrive each player's basic information"""
 
-    conn = connect()
-    c = conn.cursor()
+    conn, c = connect()
 
     SQL = "SELECT playerID, playerName, age, gender, nationality FROM player;"
     c.execute(SQL)
@@ -178,8 +173,7 @@ def addNewTournament(name):
     the newly created tournament ID.
     """
 
-    conn = connect()
-    c = conn.cursor()
+    conn, c = connect()
 
     SQL = "INSERT INTO tournament (tournamentName) values (%s)"
     data = (name, )
@@ -201,8 +195,7 @@ def addNewTournament(name):
 def countTournaments():
     """Returns the number of tournaments currently in the system."""
 
-    conn = connect()
-    c = conn.cursor()
+    conn, c = connect()
     c.execute("SELECT count(*) FROM tournament")
 
     return c.fetchone()[0]
@@ -219,8 +212,7 @@ def playMatch(tournID, p1ID, p2ID, matchResult):
     pt1ID = getPlayerTournID(tournID, p1ID)
     pt2ID = getPlayerTournID(tournID, p2ID)
 
-    conn = connect()
-    c = conn.cursor()
+    conn, c = connect()
 
     SQL = ("INSERT INTO tournamentMatch (tournamentID, tournamentPlayer1ID,"
            " tournamentPlayer2ID, matchResult) VALUES (%s, %s, %s, %s)")
@@ -260,8 +252,7 @@ def playerStandingsForTournament(tournID):
     """
 
     # Open DB.
-    conn = connect()
-    c = conn.cursor()
+    conn, c = connect()
     query = ("SELECT playerID, playerName, age, gender,"
              " nationality, byeRounds, tournamentID, wins,"
              " draws, losses, totalGames, opponentMatchWins"
@@ -323,8 +314,7 @@ def playerStandingsForTournamentByeRoundOrdering(tournID):
     """
 
     # Open DB and retrieve information from the playerAllTournsInfo view.
-    conn = connect()
-    c = conn.cursor()
+    conn, c = connect()
     query = ("SELECT playerID, playerName, age, gender,"
              " nationality, byeRounds, tournamentID, wins,"
              " draws, losses, totalGames, opponentMatchWins"

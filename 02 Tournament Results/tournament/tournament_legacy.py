@@ -18,8 +18,7 @@ def registerPlayer(playerName):
     tournName = "Tournament for legacy tests"
 
     # Connect to database
-    conn = main.connect()
-    c = conn.cursor()
+    conn, c = main.connect()
 
     # Insert a new player with this name
     SQL = "INSERT INTO player (playerName) values (%s);"
@@ -54,8 +53,7 @@ def getPlayerIDFromName(name):
     """Return the player ID for the name specified."""
 
     # Connect to the database.
-    conn = main.connect()
-    c = conn.cursor()
+    conn, c = main.connect()
 
     # Select the player that matches the name.
     SQL = "SELECT playerID FROM player WHERE playerName=%s"
@@ -118,8 +116,7 @@ def reportMatch(winner, loser):
 def deleteMatches():
     """Remove all the match records from the database."""
 
-    conn = main.connect()
-    c = conn.cursor()
+    conn, c = main.connect()
 
     c.execute("TRUNCATE tournamentMatch")
 
@@ -130,8 +127,7 @@ def deleteMatches():
 def countPlayers():
     """Returns the number of players currently registered."""
 
-    conn = main.connect()
-    c = conn.cursor()
+    conn, c = main.connect()
     c.execute("SELECT count(*) FROM player")
 
     return c.fetchone()[0]
@@ -140,8 +136,7 @@ def countPlayers():
 def deletePlayers():
     """Remove all the player records from the database."""
 
-    conn = main.connect()
-    c = conn.cursor()
+    conn, c = main.connect()
 
     c.execute("TRUNCATE player CASCADE")
 
@@ -171,8 +166,7 @@ def swissPairings():
     playerStandingsList = playerStandings()
 
     # Open DB.
-    conn = main.connect()
-    c = conn.cursor()
+    conn, c = main.connect()
 
     # Get each player's details.
     c.execute("SELECT playerID, playerName from player;")
