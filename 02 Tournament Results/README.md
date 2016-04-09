@@ -18,9 +18,7 @@ Vagrant must be installed to run the vagrant virtual machine. [[link](https://ww
 ## Usage
 #### Creating the database
 1. In the virtual machine in Git Bash, run the `psql` command
-2. While in psql, type the command `CREATE DATABASE Tournaments;` to create the database
-3. Type `\c Tournaments` to connect to the newly created database
-4. Type `\i tournament.sql` to run the migrations and fixtures to complete setting up the database
+2. Type `\i tournament.sql` to run the migrations and fixtures to create the database with all required tables, fixtures, and views.
 
 #### Running the scripts
 1. In the virtual machine, navigate to /vagrant/tournament (`cd /vagrant/tournament`)

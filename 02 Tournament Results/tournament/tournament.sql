@@ -1,22 +1,10 @@
--- Table definitions for the tournament project.
+-- Database and table definitions for the tournament project.
 
--- Remove all previous instances.
-DROP VIEW IF EXISTS playerTotalInfo;
-DROP VIEW IF EXISTS playerAllTournsInfo;
+-- Create and connect to database.
+DROP DATABASE IF EXISTS tournaments;
+CREATE DATABASE tournaments;
 
-DROP VIEW IF EXISTS opponentMatchWins;
-DROP VIEW IF EXISTS playerOpponents;
-
-DROP VIEW IF EXISTS individualTournamentPlayerWins;
-DROP VIEW IF EXISTS individualTournamentPlayerDraws;
-DROP VIEW IF EXISTS individualTournamentPlayerLosses;
-DROP VIEW IF EXISTS individualTournamentPlayerGamesPlayed;
-
-DROP TABLE IF EXISTS tournamentMatch;
-DROP TABLE IF EXISTS tournamentPlayer;
-DROP TABLE IF EXISTS tournament;
-DROP TABLE IF EXISTS player;
-DROP TABLE IF EXISTS swissResult;
+\c tournaments
 
 -- Tournament table
 CREATE TABLE tournament (
@@ -214,4 +202,5 @@ SELECT playerID, playerName, age, gender, nationality,
 FROM playerAllTournsInfo 
 GROUP BY playerID, playerName, age, gender, nationality;
 
-
+-- Disconnect from this database.
+\c vagrant
