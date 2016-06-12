@@ -7,8 +7,11 @@ from src.route import Handler
 
 class IndexHandler(Handler):
     def get(self):
-        self.render("base.html")
+        self.render("shopping.html")
         
 app = webapp2.WSGIApplication([
     ('/', IndexHandler)
 ], debug=True)
+
+
+33 27
