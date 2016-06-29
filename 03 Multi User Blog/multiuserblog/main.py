@@ -9,8 +9,17 @@ from src.route import Handler
 
 class IndexHandler(Handler):
     def get(self):
-        items = self.request.get_all("food")
-        self.render("shopping.html", items=items)
+        self.render("landing.html")
+
+class BlogHandler(Handler):
+    def get(self):
+        self.render("landing.html")
+
+class MembersHandler(Handler):
+    def get(self):
+    
+        users = db.GqlQuery("SELECT * FROM SiteUser ORDER BY username")
+        self.render("members.html", users = users)
 
 class FizzbuzzHandler(Handler):
     def get(self):
@@ -27,8 +36,8 @@ class LoginHandler(Handler):
 class RegisterHandler(Handler):
     def get(self):
         
-        users = db.GqlQuery("SELECT * FROM SiteUser ORDER BY username")
-        self.render("register.html", users = users)
+        
+        self.render("register.html")
         
     def post(self):
     
@@ -43,13 +52,14 @@ class RegisterHandler(Handler):
                 email = email)
             user.put()
             
-        users = db.GqlQuery("SELECT * FROM SiteUser ORDER BY username")
-        self.render("register.html", users = users, error_messages = error_messages)
+        self.render("register.html", error_messages = error_messages)
         
 app = webapp2.WSGIApplication([
     ('/', IndexHandler),
     ('/fizzbuzz', FizzbuzzHandler),
     ('/register', RegisterHandler),
+    ('/blog', BlogHandler),
+    ('/members', MembersHandler),
     ('/login', LoginHandler)
 ], debug=True)
 
