@@ -11,7 +11,33 @@
 
   <link rel="stylesheet" href="/style/base.css?v=1.0">
   <link href='https://fonts.googleapis.com/css?family=Neuton' rel='stylesheet' type='text/css'>
-
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+  
+  <script>
+	// Navigation positioning.
+	$(document).ready(function()
+	{
+		var header = $("header");
+		var headerBottomPos = header.position().top + header.outerHeight(true);
+		var navPanel = $("nav ul");
+		
+		$(window).scroll(function (event) {
+			var scrollPos = $(window).scrollTop();
+			
+			// Update position type.
+			if(scrollPos > headerBottomPos)
+			{
+				navPanel.get(0).style.position = "fixed";
+			}
+			else
+			{
+				navPanel.get(0).style.position = "relative";
+			}
+		});
+	})
+  </script>
+  
+  
   <!--[if lt IE 9]>
     <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
@@ -25,6 +51,7 @@
 		<h2>Website Extravanaza</h2>
 		<h3 id="userBar"><a href="login">Login here!</a></h3>
 	  </header>
+	  <nav><ul><a href="."><li>Home</li></a><a href="blog"><li>Blog</li></a><a href="members"><li>Member List</li></a><a href="login"><li>Log In</li></a></ul></nav>
 	  <section id="main-content">
 		{% block content %}{% endblock %}
 	  </section>
