@@ -28,25 +28,23 @@ class RegisterHandler(Handler):
     def get(self):
         
         users = db.GqlQuery("SELECT * FROM SiteUser ORDER BY username")
-        self.render("register.html", users=users)
+        self.render("register.html", users = users)
         
     def post(self):
     
-        error_messages = validate_register(
-            self.request.get("register-name"),
-            self.request.get("register-pass1"),
-            self.request.get("register-pass2"),
-            self.request.get("register-email"))
+        name, pass1, pass2, email = self.getThese("register-name", "register-pass1", "register-pass2", "register-email");
+    
+        error_messages = validate_register(name, pass1, pass2, email)
         
         if len(error_messages) == 0:
             user = SiteUser(
-                username = self.request.get("register-name"),
-                password = self.request.get("register-pass1"),
-                email = self.request.get("register-email"))
+                username = name,
+                password = pass1,
+                email = email)
             user.put()
             
         users = db.GqlQuery("SELECT * FROM SiteUser ORDER BY username")
-        self.render("register.html", users=users, error_messages = error_messages)
+        self.render("register.html", users = users, error_messages = error_messages)
         
 app = webapp2.WSGIApplication([
     ('/', IndexHandler),

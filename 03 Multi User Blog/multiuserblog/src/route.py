@@ -19,4 +19,11 @@ class Handler(webapp2.RequestHandler):
     
     def write(self, *a, **kw):
         self.response.out.write(*a, **kw)
-
+        
+    def getThese(self, *names):
+        
+        values = []
+        for name in names:
+            values.append(self.request.get(name))
+        
+        return tuple(values)
