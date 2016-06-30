@@ -13,7 +13,35 @@ class IndexHandler(Handler):
 
 class BlogHandler(Handler):
     def get(self):
-        self.render("landing.html")
+    
+        tmp = BlogPost(
+            blog_post_id = 1,
+            title = "Test 1",
+            owner = "tester",
+            contents = "asdniaw oaw djioaw djawodawjdaiwdoaiw djaw dijaw d aoi daw oji dawojida wdja woidja wiodjaiw doawjd iawd ja  d oaw j ji jawd j")
+        tmp.put()
+    
+        blog_posts = db.GqlQuery("SELECT * FROM BlogPost ORDER BY date_posted")
+        self.render("blog.html", blog_posts=blog_posts)
+
+class NewEntryHandler(Handler):
+    def get(self):
+        self.render("newentry.html")
+
+class PostHandler(Handler):
+    def get(self):
+    
+        tmp = BlogPost(
+            blog_post_id = 1,
+            title = "Test 1",
+            owner = "tester",
+            contents = "asdniaw oaw djioaw djawodawjdaiwdoaiw djaw dijaw d aoi daw oji dawojida wdja woidja wiodjaiw doawjd iawd ja  d oaw j ji jawd j")
+        tmp.put()
+        
+        #id = self.request.get("id") if self.request.get("id") is not null else 1;
+        id = 1;
+    
+        self.render("post.html", post = db.GqlQuery("SELECT * FROM BlogPost WHERE blog_post_id = " + "1")[0])
 
 class MembersHandler(Handler):
     def get(self):
@@ -35,7 +63,6 @@ class LoginHandler(Handler):
 
 class RegisterHandler(Handler):
     def get(self):
-        
         
         self.render("register.html")
         
@@ -59,6 +86,8 @@ app = webapp2.WSGIApplication([
     ('/fizzbuzz', FizzbuzzHandler),
     ('/register', RegisterHandler),
     ('/blog', BlogHandler),
+    ('/newentry', NewEntryHandler),
+    ('/post', PostHandler),
     ('/members', MembersHandler),
     ('/login', LoginHandler)
 ], debug=True)
@@ -72,6 +101,15 @@ class SiteUser(db.Model):
     email = db.StringProperty()
     description = db.TextProperty()
     joindate = db.DateTimeProperty(auto_now_add = True)
+
+# A DB entity
+class BlogPost(db.Model):
+    blog_post_id = db.IntegerProperty()
+    title = db.StringProperty(required = True)
+    owner = db.StringProperty(required = True)
+    contents = db.TextProperty(required = True)
+    likes = db.IntegerProperty()
+    date_posted = db.DateTimeProperty(auto_now_add = True)
 
 
 months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]

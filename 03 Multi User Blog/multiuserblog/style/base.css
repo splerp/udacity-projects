@@ -119,6 +119,15 @@ footer
 	
 }
 
+#addNewEntry
+{
+	background-color:#ddd;
+	width:320px;
+	height:100px;
+	
+	text-align;center;
+}
+
 #outer-container
 {
 	max-width:800px;

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<a href="newentry"><div id="addNewEntry">
++ Add new entry
+</div></a>
+
+<h2>Blog Entries</h2>
+
+{% for blog_post in blog_posts %}
+	<div class="user">
+		<div class="user-title">{{blog_post.title}} ({{blog_post.contents}})</div>
+	</div>
+{% endfor %}
+
+{% endblock %}
+

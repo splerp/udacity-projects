@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Edit entry {{post.blog_post_id}} ({{post.title}})</h2>
+
+<textarea>
+{{post.contents}}
+</textarea>
+
+{% endblock %}
+
