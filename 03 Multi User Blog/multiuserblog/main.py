@@ -60,6 +60,24 @@ class FizzbuzzHandler(Handler):
     def get(self):
         self.render("fizzbuzz.html")
 
+class AdminHandler(Handler):
+    def get(self):
+        self.render("admin.html")
+        
+    def post(self):
+        delete_users, delete_posts = self.getThese("delete_users", "delete_posts")
+        
+        if delete_users is not None:
+            users = db.GqlQuery("SELECT * FROM SiteUser")
+            for user in users:
+                user.delete()
+            
+        if delete_posts is not None:
+            posts = db.GqlQuery("SELECT * FROM BlogPost")
+            for post in posts:
+                post.delete()
+        
+        self.render("admin.html")
 
 #######################
 # User Authentication #
@@ -168,6 +186,7 @@ def attempt_user_login(username, password):
 
 app = webapp2.WSGIApplication([
     ('/', IndexHandler),
+    ('/admin', AdminHandler),
     ('/fizzbuzz', FizzbuzzHandler),
     ('/register', RegisterHandler),
     ('/blog', BlogHandler),
