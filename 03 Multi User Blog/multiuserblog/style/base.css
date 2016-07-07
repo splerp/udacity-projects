@@ -121,6 +121,8 @@ footer
 
 #addNewEntry
 {
+	display:block;
+	
 	background-color:#ddd;
 	width:320px;
 	height:100px;
@@ -170,7 +172,7 @@ footer
 
 label
 {
-	display:block;
+	display:inline-block;
 	width:300px;
 	
 	margin-bottom:15px;
@@ -178,12 +180,33 @@ label
 
 label input
 {
-	width:100%;
+	/*width:100%;*/
 }
 
+input[type="radio"]
+{
+	clear:both;
+	background-color:red;
+}
 
+.blogpost
+{
+	width:500px;
+	background-color:#ddd;
+	margin-bottom:12px;
+}
 
+.blogpost-title
+{
+	background-color:#444;
+	
+}
 
+.blogpost-title h1
+{
+	padding:5px;
+	color:#fff;
+}
 
 
 

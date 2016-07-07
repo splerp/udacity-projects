@@ -4,22 +4,25 @@ import jinja2
 
 from google.appengine.ext import db
 
-import src.security
+import src.security as security
 from src.route import Handler
+from src.data import SiteUser, BlogPost
+import src.data as data
+import src.dbextensions as dbExtensions
+
+### Cookies
+# self.response.headers.add_header('Set-Cookie', 'user_name=%s' % "Override.")
+# user_name = self.request.cookies.get('user_name', 'Guest') + " asd."
 
 class IndexHandler(Handler):
     def get(self):
-        self.render("landing.html")
+        
+        user_name = self.request.cookies.get('user_name', 'Guest')
+        
+        self.render("landing.html", user_name=user_name)
 
 class BlogHandler(Handler):
     def get(self):
-    
-        tmp = BlogPost(
-            blog_post_id = 1,
-            title = "Test 1",
-            owner = "tester",
-            contents = "asdniaw oaw djioaw djawodawjdaiwdoaiw djaw dijaw d aoi daw oji dawojida wdja woidja wiodjaiw doawjd iawd ja  d oaw j ji jawd j")
-        tmp.put()
     
         blog_posts = db.GqlQuery("SELECT * FROM BlogPost ORDER BY date_posted")
         self.render("blog.html", blog_posts=blog_posts)
@@ -27,21 +30,25 @@ class BlogHandler(Handler):
 class NewEntryHandler(Handler):
     def get(self):
         self.render("newentry.html")
-
-class PostHandler(Handler):
-    def get(self):
-    
-        tmp = BlogPost(
-            blog_post_id = 1,
-            title = "Test 1",
-            owner = "tester",
-            contents = "asdniaw oaw djioaw djawodawjdaiwdoaiw djaw dijaw d aoi daw oji dawojida wdja woidja wiodjaiw doawjd iawd ja  d oaw j ji jawd j")
-        tmp.put()
         
-        #id = self.request.get("id") if self.request.get("id") is not null else 1;
-        id = 1;
+    def post(self):
+        title, contents = self.getThese("entry_title", "entry_contents")
+        user_name = self.request.cookies.get('user_name', 'Guest')
+        
+        post = BlogPost(
+            title = title,
+            owner = user_name,
+            contents = contents)
+        post.put()
+        
+        self.render("newentry.html")
+
+class BlogEntryHandler(Handler):
+    def get(self, post_id):
     
-        self.render("post.html", post = db.GqlQuery("SELECT * FROM BlogPost WHERE blog_post_id = " + "1")[0])
+        #id = self.request.get("id") if self.request.get("id") is not null else 1;
+    
+        self.render("post.html", post = db.GqlQuery("SELECT * FROM BlogPost WHERE blog_post_id = " + str(post_id))[0])
 
 class MembersHandler(Handler):
     def get(self):
@@ -53,14 +60,40 @@ class FizzbuzzHandler(Handler):
     def get(self):
         self.render("fizzbuzz.html")
 
+
+#######################
+# User Authentication #
+
 class LoginHandler(Handler):
     def get(self):
         self.render("login.html")
         
     def post(self):
-        error_messages = ["No", "no", "none of that"]
+        
+        name, password = self.getThese("login-name", "login-password");
+        
+        error_messages = validate_login(name, password)
+        
+        if len(error_messages) == 0:
+        
+            error_messages, result = attempt_user_login(name, password)
+            
+            if result:
+            
+                # Set current user cookie.
+                self.response.headers.add_header('Set-Cookie', str('user_name=%s' % security.make_cookie_value(name.lower())))
+                
+                self.redirect("/")
+                
+        
         self.render("login.html", error_messages = error_messages)
 
+class LogoutHandler(Handler):
+    def get(self):
+        
+        self.response.delete_cookie('user_name')
+        self.redirect("/")
+        
 class RegisterHandler(Handler):
     def get(self):
         
@@ -74,64 +107,16 @@ class RegisterHandler(Handler):
         
         if len(error_messages) == 0:
             user = SiteUser(
-                username = name,
-                password = pass1,
+                username = name.lower(),
+                password = security.make_pw_hash(name, pass1, security.make_salt()),
                 email = email)
             user.put()
             
         self.render("register.html", error_messages = error_messages)
         
-app = webapp2.WSGIApplication([
-    ('/', IndexHandler),
-    ('/fizzbuzz', FizzbuzzHandler),
-    ('/register', RegisterHandler),
-    ('/blog', BlogHandler),
-    ('/newentry', NewEntryHandler),
-    ('/post', PostHandler),
-    ('/members', MembersHandler),
-    ('/login', LoginHandler)
-], debug=True)
 
-#Integer, Float, String, Date, Time, DateTime, Email, Link, PostalAddress
-
-# A DB entity
-class SiteUser(db.Model):
-    username = db.StringProperty(required = True)
-    password = db.StringProperty(required = True)
-    email = db.StringProperty()
-    description = db.TextProperty()
-    joindate = db.DateTimeProperty(auto_now_add = True)
-
-# A DB entity
-class BlogPost(db.Model):
-    blog_post_id = db.IntegerProperty()
-    title = db.StringProperty(required = True)
-    owner = db.StringProperty(required = True)
-    contents = db.TextProperty(required = True)
-    likes = db.IntegerProperty()
-    date_posted = db.DateTimeProperty(auto_now_add = True)
-
-
-months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-month_abbvs = dict((m[:3].lower(), m) for m in months)
-
-def valid_day(day):
-    if day and day.isdigit():
-        day = int(day)
-        if day > 0 and day <= 31:
-            return day
-
-def valid_month(month):
-    if month:
-        short_month = month[:3].lower()
-        return month_abbvs.get(short_month)
-
-def valid_year(year):
-    if year and year.isdigit():
-        year = int(year)
-        if year > 1900 and year < 2020:
-            return year
-
+#############################
+# Authentication Validation #
 
 def validate_register(username, password, password2, email):
     
@@ -144,12 +129,54 @@ def validate_register(username, password, password2, email):
 
     if password != password2:
         errors.append("Passwords must match.")
-        
-    if(email == "dog"):
-        errors.append("no")
     
     return errors
     
+def validate_login(username, password):
+    
+    errors = []
+    
+    if len(username) == 0:
+        errors.append("Username is required.")
+        
+    if len(password) == 0:
+        errors.append("Password is required.")
+    
+    return errors
+
+ 
+def attempt_user_login(username, password):
+    
+    errors = []
+    valid = False
+    
+    user = dbExtensions.get_user_from_username(username)
+    
+    if user is None:
+        errors.append("No user matches this username")
+    else:
+        if security.valid_pw(username, password, user.password):
+            valid = True
+        else:
+            errors.append("No user matches this username or password.")
+            
+    return errors, valid
+
+
+###################
+# Routing Details #
+
+app = webapp2.WSGIApplication([
+    ('/', IndexHandler),
+    ('/fizzbuzz', FizzbuzzHandler),
+    ('/register', RegisterHandler),
+    ('/blog', BlogHandler),
+    ('/blog/(\d+)', BlogEntryHandler),
+    ('/newentry', NewEntryHandler),
+    ('/members', MembersHandler),
+    ('/login', LoginHandler),
+    ('/logout', LogoutHandler)
+], debug=True)
 
 
 
@@ -171,6 +198,11 @@ def validate_register(username, password, password2, email):
 
 
 
+
+    
+   
+  
+ 
 
 
 

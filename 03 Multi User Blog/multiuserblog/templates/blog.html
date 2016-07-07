@@ -1,16 +1,15 @@
-{% extends "base.html" %}
+ {% extends "base.html" %}
 
 {% block content %}
 
-<a href="newentry"><div id="addNewEntry">
-+ Add new entry
-</div></a>
+<a id="addNewEntry" href="newentry">+ Add new entry</a>
 
 <h2>Blog Entries</h2>
 
 {% for blog_post in blog_posts %}
-	<div class="user">
-		<div class="user-title">{{blog_post.title}} ({{blog_post.contents}})</div>
+	<div class="blogpost">
+		<div class="blogpost-title"><h1>{{blog_post.title}}</h1></div>
+		{{blog_post.contents}}
 	</div>
 {% endfor %}
 
