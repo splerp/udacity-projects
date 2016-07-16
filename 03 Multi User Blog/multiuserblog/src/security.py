@@ -20,10 +20,14 @@ SECRET = 'imsosecret' # Make it a long string of random chars stored in another 
 def hash_str(s):
     return hmac.new(SECRET, s).hexdigest()
 
-def make_cookie_value(value):
+def make_cookie_data(value):
     return "%s|%s" % (value, hash_str(value))
     
-def cookie_is_valid(cookie_value):
-    actual_data = cookie_value.split("|")[0]
-    if cookie_value == make_cookie_value(actual_data):
-        return actual_data
+def cookie_is_valid(cookie):
+    value = cookie.split("|")[0]
+    if cookie == make_cookie_data(value):
+        return value
+
+def cookie_value(cookie):
+    return cookie.split("|")[0]
+    
