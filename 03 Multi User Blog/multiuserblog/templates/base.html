@@ -46,15 +46,21 @@
 <body>
   <div id="outer-container">
 	  <header>
-	    <img src="content/main-icon.jpg" width="20%" alt="Website Icon" />
+	    <img src="/content/main-icon.jpg" width="20%" alt="Website Icon" />
 		<h1>B Phelps</h1>
 		<h2>Website Extravanaza</h2>
-		<h3 id="userBar"><a href="login">Login here!</a></h3>
+		
+		<h3 id="userBar">
+			{% if user_name is defined %}Welcome, {{ user_name }}!
+			{% else %}<a href="login">Login here!</a>{% endif %}
+		</h3>
 	  </header>
-	  <nav><ul><a href="."><li>Home</li></a><a href="blog"><li>Blog</li></a><a href="members"><li>Member List</li></a><a href="login"><li>Log In</li></a></ul></nav>
-	  <section id="main-content">
-		{% block content %}{% endblock %}
-	  </section>
+	  <div id="main-flex-area">
+		  <section id="main-content">
+			{% block content %}{% endblock %}
+		  </section>
+		  <nav><ul><a href="/"><li>Home</li></a><a href="/blog"><li>Blog</li></a><a href="/members"><li>Member List</li></a></ul></nav>
+	  </div>
 	  <footer></footer>
   </div>
 </body>

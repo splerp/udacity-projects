@@ -22,30 +22,47 @@ class BlogHandler(Handler):
     def get(self):
     
         blog_posts = db.GqlQuery("SELECT * FROM BlogPost ORDER BY date_posted")
-        self.render("blog.html", blog_posts=blog_posts)
+        
+        self.render("blog.html", blog_posts = blog_posts)
+
+class BlogEntryHandler(Handler):
+    def get(self, post_k):
+    
+        self.render("post.html", post = db.get(post_k))
 
 class NewEntryHandler(Handler):
     def get(self):
-        self.render("newentry.html")
+        self.render("entry_new.html")
         
     def post(self):
-        title, contents = self.getThese("entry_title", "entry_contents")
-        user_name = self.request.cookies.get('user_name', 'Guest')
+        title, summary, contents = self.getThese("entry_title", "entry_summary", "entry_contents")
+        user_name = self.request.cookies.get('user_name', None)
+        
         
         post = BlogPost(
             title = title,
             owner = user_name,
-            contents = contents)
+            contents = contents,
+            summary = summary)
         post.put()
         
-        self.render("newentry.html")
+        self.render("entry_new.html", new_id = post.key())
 
-class BlogEntryHandler(Handler):
-    def get(self, post_id):
+class EditEntryHandler(Handler):
+    def get(self, post_k):
+        self.render("entry_edit.html", post = db.get(post_k))
+        
+    def post(self, post_k):
     
-        #id = self.request.get("id") if self.request.get("id") is not null else 1;
+        post = db.get(post_k)
     
-        self.render("post.html", post = db.GqlQuery("SELECT * FROM BlogPost WHERE blog_post_id = " + str(post_id))[0])
+        title, contents = self.getThese("entry_title", "entry_contents")
+        
+        post.title = title
+        post.contents = contents
+        post.put()
+        
+        self.render("entry_new.html", post = db.get(post_k))
 
 class MembersHandler(Handler):
     def get(self):
@@ -187,8 +204,9 @@ app = webapp2.WSGIApplication([
     ('/fizzbuzz', FizzbuzzHandler),
     ('/register', RegisterHandler),
     ('/blog', BlogHandler),
-    ('/blog/(\d+)', BlogEntryHandler),
-    ('/newentry', NewEntryHandler),
+    ('/blog/add', NewEntryHandler),
+    ('/blog/edit/(.+)', EditEntryHandler),
+    ('/blog/(.+)', BlogEntryHandler),
     ('/members', MembersHandler),
     ('/login', LoginHandler),
     ('/logout', LogoutHandler)
