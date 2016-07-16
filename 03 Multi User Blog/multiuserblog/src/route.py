@@ -15,6 +15,10 @@ class Handler(webapp2.RequestHandler):
         return t.render(params, name=self.request.get("name"))
         
     def render(self, template, **kw):
+    
+        # Append data that should be available on all pages.
+        kw['user_name'] = security.cookie_value(self.request.cookies.get('user_name', None))
+    
         self.write(self.render_str(template, **kw))
     
     def write(self, *a, **kw):
