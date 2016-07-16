@@ -23,7 +23,7 @@ header
 header img
 {
 	float:left;
-	width:115px;
+	width:105px;
 }
 
 
@@ -63,20 +63,79 @@ header h3 a:hover
 	color:#000;
 }
 
+footer
+{
+	
+}
+
+#addNewEntry
+{
+	display:block;
+	
+	background-color:#ddd;
+	width:320px;
+	height:100px;
+	
+	text-align;center;
+}
+
+#outer-container
+{
+	max-width:800px;
+	
+	margin:auto;
+	
+	margin-top:40px;
+	margin-bottom:100px;
+	
+	
+}
+
+#main-flex-area
+{
+	display:flex;
+}
+
+#main-content
+{
+	border-top:4px solid #338360;
+	padding-top:10px;
+	
+	
+	flex:1;
+}
+
+#main-content h2
+{
+	color:#7d97ad;
+	
+	margin-bottom:0;
+	
+	
+}
+
 nav
 {
+	/*position:relative;
 	position:relative;
 	width:0;
+	width:0;*/
 	
-	left:15px;
+	position:relative;
+	width:140px;
 	
-	
-	float:right;
 }
 
 nav ul {
 	
 	position:relative;
+	
+	/*position:fixed;
+	
+	position:relative;
+	top:10px;
+	right:150px;
+	width:140px;*/
 	top:10px;
 	
 	width:140px;
@@ -85,6 +144,7 @@ nav ul {
 	list-style-type:none;
 	padding:0;
 	margin:0;
+	margin-left:10px;
 }
 
 nav li {
@@ -113,46 +173,6 @@ nav li a {
 	text-decoration: none;
 }
 
-
-footer
-{
-	
-}
-
-#addNewEntry
-{
-	display:block;
-	
-	background-color:#ddd;
-	width:320px;
-	height:100px;
-	
-	text-align;center;
-}
-
-#outer-container
-{
-	max-width:800px;
-	
-	margin:auto;
-	
-	margin-top:40px;
-	margin-bottom:100px;
-}
-
-#main-content
-{
-	border-top:4px solid #338360;
-	padding-top:10px;
-}
-
-#main-content h2
-{
-	color:#7d97ad;
-	
-	margin-bottom:0;
-}
-
 #errorBox
 {
 	background-color:rgba(255, 0, 0, 0.5);
@@ -170,17 +190,14 @@ footer
 	color:black;
 }
 
-label
+.input-group
 {
-	display:inline-block;
-	width:300px;
-	
-	margin-bottom:15px;
+	width:100%;
 }
 
-label input
+textarea
 {
-	/*width:100%;*/
+	resize:vertical;
 }
 
 input[type="radio"]
@@ -191,9 +208,10 @@ input[type="radio"]
 
 .blogpost
 {
-	width:500px;
 	background-color:#ddd;
 	margin-bottom:12px;
+	
+	vertical-align:text-top;
 }
 
 .blogpost-title
@@ -202,10 +220,45 @@ input[type="radio"]
 	
 }
 
+.blogpost-content
+{
+	display:flex;
+	
+}
+
+.blogpost-image
+{
+	width:120px;
+	height:120px;
+	
+	margin-right:10px;
+	background-color:white;
+	
+	
+}
+
+.blogpost-text
+{
+	flex:1;
+}
+
+
+
 .blogpost-title h1
 {
 	padding:5px;
 	color:#fff;
+	
+	display:inline-block;
+	
+	margin:0;
+}
+
+
+.blogpost-title a
+{
+	
+	color:#ccc;
 }
 
 

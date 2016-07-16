@@ -2,11 +2,11 @@
 
 {% block content %}
 
-<h2>{{post.title}}</h2>
+<h2>Edit entry {{post.blog_post_id}} ({{post.title}})</h2>
 
-<div id="post-contents">
+<textarea>
 {{post.contents}}
-</div>
+</textarea>
 
 {% endblock %}
 
