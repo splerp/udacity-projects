@@ -1,4 +1,3 @@
-
 import webapp2
 import jinja2
 
@@ -17,9 +16,7 @@ import src.dbextensions as dbExtensions
 class IndexHandler(Handler):
     def get(self):
         
-        user_name = self.request.cookies.get('user_name', 'Guest')
-        
-        self.render("landing.html", user_name=user_name)
+        self.render("landing.html")
 
 class BlogHandler(Handler):
     def get(self):
