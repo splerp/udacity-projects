@@ -199,8 +199,33 @@ input[type="radio"]
 .blogpost .post-heading
 {
 	flex:1;
+}
+
+.blogpost .post-heading *
+{
 	font-size:16pt;
 	font-weight:bold;
+}
+
+.blogpost .subtitle
+{
+	display:inline-block;
+	float:left;
+	font-size:10pt;
+	margin-top:-12px;
+	
+	font-weight:normal;
+}
+
+.post-controls
+{
+	display:flex;
+	align-items: center;
+}
+
+.post-controls > *
+{
+	margin-right:5px;
 }
 
 /*

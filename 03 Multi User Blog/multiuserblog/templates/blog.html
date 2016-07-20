@@ -28,13 +28,15 @@
 		<div class="panel panel-default">
 		  <div class="panel-heading">
 			<div class="post-heading">
-				{{blog_post.title}}
+				<a href="/blog/{{blog_post.key()}}">{{blog_post.title}}</a><br />
+				<div class="subtitle">1245 points</div>
 			</div>
-			<div class="post-controls">
+			{% if user_name != None %}
+				<div class="post-controls">
 				<a href="/blog/edit/{{blog_post.key()}}">(edit)</a>
-				 | 
+				<span class="divider">|</span>
 				<a href="/blog/delete/{{blog_post.key()}}">(delete)</a>
-				 | 
+				<span class="divider">|</span>
 				<button class="btn btn-default like-post" post-key="{{blog_post.key()}}">
 					<span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>
 				</button>
@@ -42,6 +44,8 @@
 					<span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span>
 				</button>
 			</div>
+			{% endif %}
+			
 		  </div>
 		  <div class="panel-body">
 			<div class="blogpost-image"></div>
