@@ -26,20 +26,17 @@
 			<label for="entry_title">Title</label>
 			<input class="form-control" type="text" name="entry_title"></input>
 		</div>
-	</div>
-	<div class="col-lg-12">
 		<div class="input-group">
-			<label for="entry_summary">contents</label>
+			<label for="entry_summary">Summary</label>
 			<input class="form-control" type="text" name="entry_summary"></input>
 		</div>
-	</div>
-	<div class="col-lg-12">
 		<div class="input-group">
-			<label for="entry_contents">contents</label>
-			<textarea class="form-control" name="entry_contents"></textarea>
+			<label for="entry_contents">Contents</label>
+			<textarea class="form-control" name="entry_contents" rows="10"></textarea>
 		</div>
+		<button type="submit" class="btn btn-primary">Post</button>
 	</div>
-	<button type="submit">Post</button>
+	
 </form>
-{% endblock %}
 
+{% endblock %}
