@@ -78,32 +78,10 @@ import json
 
 class LikePostHandler(Handler):
 
-    def get(self, post_k):
-        
-        # Will be returning JSON.
-        self.response.headers['Content-Type'] = 'application/json'   
-        
-        # Find entry for current user.
-        user_name = get_current_username(self.request.cookies)
-        query = db.GqlQuery("SELECT * FROM SiteUser WHERE username = :1", user_name)
-        user_k = query.get().key()
-        
-        # Find reaction type.
-        reaction_type = self.getThese("reaction_type")
-        
-        # Create new reaction entry.
-        post_reaction = BlogPostReaction(
-            blog_post = db.get(post_k),
-            site_user = user.key(),
-            reaction_type = reaction_type)
-        post_reaction.put()
-        post_reaction_k = post_reaction.key()
-        
-        # Generate data to return and return it.
-        obj = {'success': True} 
-        self.response.out.write(json.dumps(obj))
-
     def post(self, post_k):
+        
+        reaction_already_exists = False
+        deleted = False
         
         # Will be returning JSON.
         self.response.headers['Content-Type'] = 'application/json'   
@@ -116,16 +94,67 @@ class LikePostHandler(Handler):
         # Find reaction type.
         (reaction_type, ) = self.getThese("reaction_type")
         
-        # Create new reaction entry.
-        post_reaction = BlogPostReaction(
-            blog_post = db.get(post_k),
-            site_user = user_k,
-            reaction_type = reaction_type)
-        post_reaction.put()
-        post_reaction_k = post_reaction.key()
+        
+        query = db.GqlQuery("SELECT * FROM BlogPostReaction WHERE blog_post = :1 AND site_user = :2",
+            db.get(post_k),
+            db.get(user_k))
+        
+        old_reaction = query.get()
+        
+        # Check if this value should be removed instead.
+        if reaction_type == "":
+            if old_reaction is not None:
+                old_reaction.delete()
+                reaction_already_exists = True
+                deleted = True
+        else:
+            if old_reaction is not None:
+                old_reaction.reaction_type = reaction_type
+                old_reaction.put()
+                reaction_already_exists = True
+            else:
+                # Create new reaction entry.
+                post_reaction = BlogPostReaction(
+                    blog_post = db.get(post_k),
+                    site_user = db.get(user_k),
+                    reaction_type = reaction_type)
+                post_reaction.put()
+                reaction_already_exists = False
         
         # Generate data to return and return it.
-        obj = {'success': True} 
+        obj = {'success': True,
+               'alreadyExists': reaction_already_exists,  # Added vote, or removed vote.
+               'deleted': deleted}
+
+        self.response.out.write(json.dumps(obj))
+        
+class LikePostCheckHandler(Handler):
+
+    def post(self, post_k):
+        
+        # Will be returning JSON.
+        self.response.headers['Content-Type'] = 'application/json'   
+        
+        # Find entry for current user.
+        user_name = get_current_username(self.request.cookies)
+        query = db.GqlQuery("SELECT * FROM SiteUser WHERE username = :1", user_name)
+        user_k = query.get().key()
+        
+        
+        query = db.GqlQuery("SELECT * FROM BlogPostReaction WHERE blog_post = :1 AND site_user = :2",
+            db.get(post_k),
+            db.get(user_k))
+        
+        old_reaction = query.get()
+        
+        current_value = ""
+        if old_reaction is not None:
+            current_value = old_reaction.reaction_type
+        
+        # Generate data to return and return it.
+        obj = {'success': True,
+               'value': current_value}
+
         self.response.out.write(json.dumps(obj))
         
 
@@ -305,7 +334,8 @@ app = webapp2.WSGIApplication([
     ('/members', MembersHandler),
     ('/login', LoginHandler),
     ('/logout', LogoutHandler),
-    ('/likepost/(.+)', LikePostHandler)
+    ('/likepost/(.+)', LikePostHandler),
+    ('/likepostcheck/(.+)', LikePostCheckHandler)
 ], debug=True)
 
 

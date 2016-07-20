@@ -25,24 +25,31 @@
 			<div class="blogpost-text">{{blog_post.summary}}</div>
 		</div>-->
 		
-		<div class="panel panel-default">
+		<div class="panel panel-default blog-post" post-key="{{blog_post.key()}}">
 		  <div class="panel-heading">
 			<div class="post-heading">
 				<a href="/blog/{{blog_post.key()}}">{{blog_post.title}}</a><br />
-				<div class="subtitle">1245 points</div>
+				<div class="subtitle">
+					<span class="points">
+						{{blog_post.reactions.filter('reaction_type =', 'like').count() - blog_post.reactions.filter('reaction_type =', 'dislike').count()}}
+					</span>
+					 points
+				</div>
 			</div>
 			{% if user_name != None %}
 				<div class="post-controls">
-				<a href="/blog/edit/{{blog_post.key()}}">(edit)</a>
-				<span class="divider">|</span>
-				<a href="/blog/delete/{{blog_post.key()}}">(delete)</a>
-				<span class="divider">|</span>
-				<button class="btn btn-default like-post" post-key="{{blog_post.key()}}">
-					<span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>
-				</button>
-				<button class="btn btn-default like-post" post-key="{{blog_post.key()}}">
-					<span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span>
-				</button>
+				
+				<a href="/blog/edit/{{blog_post.key()}}">(edit)</a><span class="divider">|</span>
+				<a href="/blog/delete/{{blog_post.key()}}">(delete)</a><span class="divider">|</span>
+				
+				<span class="button-group">
+					<button class="btn btn-default like-post">
+						<span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>
+					</button>
+					<button class="btn btn-default dislike-post">
+						<span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span>
+					</button>
+				</span>
 			</div>
 			{% endif %}
 			
@@ -59,8 +66,143 @@
 {% endfor %}
 
 <script>
+
+	function initialiseButtonStates()
+	{
+		var groups = $(".blog-post");
+		groups.each(function(index)
+		{
+			var group = $(this);
+			var key = group.attr("post-key");
+		
+			// Set button default values.
+			$.post( "/likepostcheck/" + key, function(responseData) {
+			if(responseData.success)
+			{
+				if(responseData.value == "like")
+				{
+					group.find(".like-post")
+						.removeClass("btn-default")
+						.addClass("btn-success");
+				}
+				if(responseData.value == "dislike")
+				{
+					group.find(".dislike-post")
+						.removeClass("btn-default")
+						.addClass("btn-warning");
+				}
+			}
+			else
+			{
+				console.log("Could not react to post...");
+			}});
+			
+			// Add button listeners.
+			$(this).find(".like-post").click(function() {
+				handleButtonClick(group, $(this), "like", "btn-success");
+			});
+			
+			$(this).find(".dislike-post").click(function() {
+				handleButtonClick(group, $(this), "dislike", "btn-warning");
+			});
+		});
+	}
+
+	function addToPoints(domElement, amount)
+	{
+		domElement.html(parseInt(domElement.html(),10)  + amount);
+	}
+	
 	// Add click handler for like buttons.
-	$(".like-post").click(function() {
+	function handleButtonClick(group, button, reactionName, selectedClass)
+	{
+		// Get key from page.
+		var key = group.attr("post-key");
+		var buttonPressed = button;
+		var pointsDiv = group.find(".points");
+	
+		// Remove existing classes from other button.
+		button.parent().find("button").each(function(){
+			if($(this).get(0) !== button.get(0))
+			{
+				if($(this).hasClass("btn-success"))
+				{
+					addToPoints(pointsDiv, -1);
+				}
+				if($(this).hasClass("btn-warning"))
+				{
+					addToPoints(pointsDiv, 1);
+				}
+				$(this)
+					.removeClass("btn-success")
+					.removeClass("btn-warning")
+					.addClass("btn-default");
+			}
+		});
+		
+		
+		
+		if(buttonPressed.hasClass(selectedClass))
+		{
+			// The button is already selected - unset the value.
+			// Post the blog post reaction.
+			$.post( "/likepost/" + key, { reaction_type: "" }, function(responseData) {
+				if(responseData.success)
+				{
+					// Update the count locally.
+					if(selectedClass == "btn-success")
+					{
+						console.log("Current found " + pointsDiv + " - " + pointsDiv.get(0));
+						addToPoints(pointsDiv, -1);
+					}
+					else
+					{
+						addToPoints(pointsDiv, 1);
+					}
+				
+					buttonPressed.removeClass(selectedClass);
+					buttonPressed.addClass("btn-default");
+				}
+				else
+				{
+					console.log("Could not delete reaction...");
+				}
+				
+			});
+		}
+		else
+		{
+			// Post the blog post reaction.
+			$.post( "/likepost/" + key, { reaction_type: reactionName }, function(responseData) {
+				if(responseData.success)
+				{
+					// Update the count locally.
+					if(selectedClass == "btn-success")
+					{
+						addToPoints(pointsDiv, 1);
+					}
+					else
+					{
+						addToPoints(pointsDiv, -1);
+					}
+				
+					buttonPressed.removeClass("btn-default");
+					buttonPressed.addClass(selectedClass);
+				}
+				else
+				{
+					console.log("Could not react to post...");
+				}});
+		}
+		
+		
+	}
+
+	initialiseButtonStates();
+	
+	
+	// Add click handler for like buttons.
+	/*$(".like-post").click(function() {
 		
 		// Get key from page.
 		var key = $(this).attr("post-key");
@@ -72,7 +214,69 @@
 			buttonPressed.removeClass("btn-default");
 			buttonPressed.addClass("btn-warning");
 		});
-	});
+	});*/
 	
 </script>
 {% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
