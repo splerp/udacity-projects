@@ -110,7 +110,8 @@ footer
 {
 	color:#7d97ad;
 	
-	margin-bottom:0;
+	margin-top:0;
+	margin-bottom:5px;
 	
 	
 }
@@ -217,23 +218,28 @@ input[type="radio"]
 	font-weight:normal;
 }
 
-.post-controls
+.blogpost .blogpost-text
+{
+	font-style: italic;
+}
+
+.blogpost .post-controls
 {
 	display:flex;
 	align-items: center;
 }
 
-.post-controls > *
+.blogpost .post-controls > *
 {
 	margin-right:5px;
 }
 
-.blogpost .btn-success *
+.blogpost .blogpost .btn-success *
 {
 	color:white;
 }
 
-.blogpost .btn-danger *
+.blogpost .blogpost .btn-danger *
 {
 	color:white;
 }
