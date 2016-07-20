@@ -102,8 +102,8 @@ footer
 	border-top:4px solid #338360;
 	padding-top:10px;
 	
-	
 	flex:1;
+	overflow:hidden;
 }
 
 #main-content h2
@@ -112,8 +112,6 @@ footer
 	
 	margin-top:0;
 	margin-bottom:5px;
-	
-	
 }
 
 nav
@@ -242,6 +240,11 @@ input[type="radio"]
 .blogpost .blogpost .btn-danger *
 {
 	color:white;
+}
+
+#post-contents
+{
+	word-wrap:break-word;
 }
 
 /*
