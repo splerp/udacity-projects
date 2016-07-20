@@ -2,9 +2,13 @@
 
 {% block content %}
 
+{% if new_id != None %}
+	<div class="alert alert-success" role="alert">Successfully signed up! <a href="/login">Log in here</a>.</div>
+{% endif %}
+
 {% if error_messages %}
-	<div id="errorBox">
-		<h2>There were problems with your request:</h2>
+	<div class="alert alert-danger">
+		There were problems with your request:
 		<ul>
 		{% for item in error_messages %}
 			<li>{{item}}</li>
@@ -12,18 +16,42 @@
 		</ul>
 	</div>
 {% endif %}
+
 <h2>Register</h2>
 	
-<form action="" method="post">
+<form method="post">
 
-    <label for="register-name">Username<input id="register-name" type="text" name="register-name"></label><br />
+	<div class="col-lg-12">
+		<div class="input-group">
+			<label for="register-name">Username</label>
+			<input class="form-control" id="register-name" type="text" name="register-name" value="{{ form_user_name }}"></input>
+		</div>
+	</div>
 	
-	<label for="register-pass1">Password<input id="register-pass1" type="password" name="register-pass1"></label><br />
-	<label for="register-pass2">Password<input id="register-pass2" type="password" name="register-pass2"></label><br />
+	<div class="col-lg-12">
+		<div class="input-group">
+			<label for="register-pass1">Password</label>
+			<input class="form-control" id="register-pass1" type="password" name="register-pass1"></input>
+		</div>
+	</div>
 	
-	<label for="register-email">Email<input id="register-email" type="text" name="register-email"></label><br />
+	<div class="col-lg-12">
+		<div class="input-group">
+			<label for="register-pass2">Password (again)</label>
+			<input class="form-control" id="register-pass2" type="password" name="register-pass2"></input>
+		</div>
+	</div>
 	
-    <button>Register</button>
+	<div class="col-lg-12">
+		<div class="input-group">
+			<label for="register-email">Email</label>
+			<input class="form-control" id="register-email" type="text" name="register-email" value="{{ form_email }}"></input>
+		</div>
+	</div>
+	
+	<div class="col-lg-12">
+		<button class="btn btn-primary">Register</button>
+	</div>
 	
 </form>
 

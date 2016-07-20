@@ -2,8 +2,19 @@
 
 {% block content %}
 
-{% if new_id is defined %}
+{% if new_id != None %}
 	<div class="alert alert-success" role="alert">New blog entry added! <a href="/blog/{{ new_id }}">View the new post here</a>.</div>
+{% endif %}
+
+{% if error_messages %}
+	<div class="alert alert-danger">
+		There were problems with your request:
+		<ul>
+		{% for item in error_messages %}
+			<li>{{item}}</li>
+		{% endfor %}
+		</ul>
+	</div>
 {% endif %}
 
 <h2>Add entry</h2>

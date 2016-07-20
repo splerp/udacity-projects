@@ -5,7 +5,9 @@
 <h2>Welcome!</h2>
 <p>This is a multi user blog website testing test</p>
 
+{% if user_name != None %}
 <p>User is {{user_name}}.</p>
+{% endif %}
 
 {% endblock %}
 

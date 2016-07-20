@@ -2,12 +2,18 @@
 {
 	color:#2d3c49;
 	font-family: 'Neuton', serif;
+	font-size:13pt;
 }
 
 a
 {
 	text-decoration:none;
 	font-weight:bold;
+}
+
+a:hover
+{
+	text-decoration:none;
 }
 
 p
@@ -18,6 +24,11 @@ p
 header
 {
 	
+}
+
+h3 
+{
+	padding-top:0;
 }
 
 header img
@@ -47,7 +58,7 @@ header h3
 {
 	
 	font-size:12pt;
-	text-align:right;
+	text-align:left;
 	
 	margin:0;
 }
@@ -61,22 +72,12 @@ header h3 a
 header h3 a:hover
 {
 	color:#000;
+	text-decoration:none;
 }
 
 footer
 {
 	
-}
-
-#addNewEntry
-{
-	display:block;
-	
-	background-color:#ddd;
-	width:320px;
-	height:100px;
-	
-	text-align;center;
 }
 
 #outer-container
@@ -173,26 +174,10 @@ nav li a {
 	text-decoration: none;
 }
 
-#errorBox
-{
-	background-color:rgba(255, 0, 0, 0.5);
-	border-radius:10px;
-	
-	padding:10px;
-	
-	opacity:1;
-	
-	width:420px;
-}
-
-#errorBox h2
-{
-	color:black;
-}
-
 .input-group
 {
 	width:100%;
+	margin-bottom:12px;
 }
 
 textarea
@@ -205,6 +190,20 @@ input[type="radio"]
 	clear:both;
 	background-color:red;
 }
+
+.blogpost .panel-heading
+{
+	display:flex;
+}
+
+.blogpost .post-heading
+{
+	flex:1;
+	font-size:16pt;
+	font-weight:bold;
+}
+
+/*
 
 .blogpost
 {
@@ -260,7 +259,7 @@ input[type="radio"]
 	
 	color:#ccc;
 }
-
+*/
 
 
 

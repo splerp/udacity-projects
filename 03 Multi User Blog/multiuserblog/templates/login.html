@@ -2,10 +2,9 @@
 
 {% block content %}
 
-
 {% if error_messages %}
-	<div id="errorBox">
-		<h2>There were problems with your request:</h2>
+	<div class="alert alert-danger">
+		There were problems with your request:
 		<ul>
 		{% for item in error_messages %}
 			<li>{{item}}</li>
@@ -16,12 +15,25 @@
 
 <h2>Log in</h2>
 	
-<form action="" method="post">
+<form method="post">
 
-    <label for="login-name">Username<input id="login-name" type="text" name="login-name"></label><br />
-	<label for="login-password">Password<input id="login-password" type="password" name="login-password"></label><br />
+	<div class="col-lg-12">
+		<div class="input-group">
+			<label for="login-name">Username</label>
+			<input class="form-control" id="login-name" type="text" name="login-name" value="{{ form_user_name }}"></input>
+		</div>
+	</div>
 	
-    <button>Log In</button>
+	<div class="col-lg-12">
+		<div class="input-group">
+			<label for="login-password">Password</label>
+			<input class="form-control" id="login-password" type="password" name="login-password"></input>
+		</div>
+	</div>
+	
+	<div class="col-lg-12">
+		<button class="btn btn-primary">Log In</button>
+	</div>
 	
 </form>
 
