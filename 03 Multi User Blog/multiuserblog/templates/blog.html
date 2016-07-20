@@ -67,6 +67,9 @@
 
 <script>
 
+	var likeButtonClass = "btn-success";
+	var dislikeButtonClass = "btn-danger";
+
 	function initialiseButtonStates()
 	{
 		var groups = $(".blog-post");
@@ -89,7 +92,7 @@
 				{
 					group.find(".dislike-post")
 						.removeClass("btn-default")
-						.addClass("btn-warning");
+						.addClass(dislikeButtonClass);
 				}
 			}
 			else
@@ -99,11 +102,11 @@
 			
 			// Add button listeners.
 			$(this).find(".like-post").click(function() {
-				handleButtonClick(group, $(this), "like", "btn-success");
+				handleButtonClick(group, $(this), "like", likeButtonClass);
 			});
 			
 			$(this).find(".dislike-post").click(function() {
-				handleButtonClick(group, $(this), "dislike", "btn-warning");
+				handleButtonClick(group, $(this), "dislike", dislikeButtonClass);
 			});
 		});
 	}
@@ -125,17 +128,17 @@
 		button.parent().find("button").each(function(){
 			if($(this).get(0) !== button.get(0))
 			{
-				if($(this).hasClass("btn-success"))
+				if($(this).hasClass(likeButtonClass))
 				{
 					addToPoints(pointsDiv, -1);
 				}
-				if($(this).hasClass("btn-warning"))
+				if($(this).hasClass(dislikeButtonClass))
 				{
 					addToPoints(pointsDiv, 1);
 				}
 				$(this)
-					.removeClass("btn-success")
-					.removeClass("btn-warning")
+					.removeClass(likeButtonClass)
+					.removeClass(dislikeButtonClass)
 					.addClass("btn-default");
 			}
 		});
@@ -150,7 +153,7 @@
 				if(responseData.success)
 				{
 					// Update the count locally.
-					if(selectedClass == "btn-success")
+					if(selectedClass == likeButtonClass)
 					{
 						console.log("Current found " + pointsDiv + " - " + pointsDiv.get(0));
 						addToPoints(pointsDiv, -1);
@@ -177,7 +180,7 @@
 				if(responseData.success)
 				{
 					// Update the count locally.
-					if(selectedClass == "btn-success")
+					if(selectedClass == likeButtonClass)
 					{
 						addToPoints(pointsDiv, 1);
 					}
@@ -212,7 +215,7 @@
 		$.post( "/likepost/" + key, { reaction_type: "like", time: "2pm" }, function(responseData) {
 			console.log("Result: " + responseData);
 			buttonPressed.removeClass("btn-default");
-			buttonPressed.addClass("btn-warning");
+			buttonPressed.addClass(dislikeButtonClass);
 		});
 	});*/
 	

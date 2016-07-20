@@ -228,6 +228,16 @@ input[type="radio"]
 	margin-right:5px;
 }
 
+.blogpost .btn-success *
+{
+	color:white;
+}
+
+.blogpost .btn-danger *
+{
+	color:white;
+}
+
 /*
 
 .blogpost
