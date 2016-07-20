@@ -16,6 +16,12 @@ import src.dbextensions as dbExtensions
 def get_current_username(cookies):
     return security.cookie_value(cookies.get('user_name', None))
 
+
+def get_user_entity_from_username(user_name):
+    query = db.GqlQuery("SELECT * FROM SiteUser WHERE username = :1", user_name)
+    return query.get()
+
+
 class IndexHandler(Handler):
     def get(self):
         
@@ -42,6 +48,8 @@ class NewEntryHandler(Handler):
         title, summary, contents = self.getThese("entry_title", "entry_summary", "entry_contents")
         
         user_name = get_current_username(self.request.cookies)
+        user = get_user_entity_from_username(user_name)
+        
         error_messages = validate_blog_post(title, summary, contents, user_name)
         
         new_id = None
@@ -50,7 +58,7 @@ class NewEntryHandler(Handler):
             
             post = BlogPost(
                 title = title,
-                owner = user_name,
+                owner = user,
                 contents = contents,
                 summary = summary)
             post.put()
@@ -64,15 +72,30 @@ class EditEntryHandler(Handler):
         
     def post(self, post_k):
     
+        submitted = False
         post = db.get(post_k)
     
-        title, contents = self.getThese("entry_title", "entry_contents")
+        title, summary, contents = self.getThese("entry-title", "entry-summary", "entry-contents")
         
-        post.title = title
-        post.contents = contents
-        post.put()
+        # Find entry for current user.
+        user_name = get_current_username(self.request.cookies)
+        current_user = get_user_entity_from_username(user_name)
         
-        self.render("entry_new.html", True, post = db.get(post_k))
+        error_messages = []
+        
+        if post.owner.key() == current_user.key():
+        
+            error_messages = validate_blog_post(title, summary, contents, user_name)
+            
+            if len(error_messages) == 0:
+                post.title = title
+                post.contents = contents
+                post.put()
+                submitted = True
+        else:
+            error_messages.append("You cannot edit someone else's blog post!")
+        
+        self.render("entry_edit.html", True, submitted = submitted, post = post, error_messages = error_messages)
 
 import json
 
@@ -87,13 +110,10 @@ class LikePostHandler(Handler):
         self.response.headers['Content-Type'] = 'application/json'   
         
         # Find entry for current user.
-        user_name = get_current_username(self.request.cookies)
-        query = db.GqlQuery("SELECT * FROM SiteUser WHERE username = :1", user_name)
-        user_k = query.get().key()
+        user_k = get_user_entity_from_username(get_current_username(self.request.cookies)).key()
         
         # Find reaction type.
         (reaction_type, ) = self.getThese("reaction_type")
-        
         
         query = db.GqlQuery("SELECT * FROM BlogPostReaction WHERE blog_post = :1 AND site_user = :2",
             db.get(post_k),
@@ -136,10 +156,7 @@ class LikePostCheckHandler(Handler):
         self.response.headers['Content-Type'] = 'application/json'   
         
         # Find entry for current user.
-        user_name = get_current_username(self.request.cookies)
-        query = db.GqlQuery("SELECT * FROM SiteUser WHERE username = :1", user_name)
-        user_k = query.get().key()
-        
+        user_k = get_user_entity_from_username(get_current_username(self.request.cookies)).key()
         
         query = db.GqlQuery("SELECT * FROM BlogPostReaction WHERE blog_post = :1 AND site_user = :2",
             db.get(post_k),
@@ -295,8 +312,11 @@ def validate_blog_post(title, summary, contents, user_name):
         if len(title) == 0:
             errors.append("Title is required.")
             
-        if len(contents) == 0:
+        if len(summary) == 0:
             errors.append("Summary is required.")
+            
+        if len(contents) == 0:
+            errors.append("Contents is required.")
     
     return errors
 
