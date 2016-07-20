@@ -159,10 +159,10 @@ class LikePostCheckHandler(Handler):
         
 
 class DeleteEntryHandler(Handler):
-    def get(self, post_k):
+    def post(self, post_k):
         
-        self.response.delete_cookie('user_name')
-        self.redirect("/")
+        if db.get(post_k) is not None:
+            db.get(post_k).delete()
 
 class MembersHandler(Handler):
     def get(self):
@@ -330,6 +330,7 @@ app = webapp2.WSGIApplication([
     ('/blog', BlogHandler),
     ('/blog/add', NewEntryHandler),
     ('/blog/edit/(.+)', EditEntryHandler),
+    ('/blog/delete/(.+)', DeleteEntryHandler),
     ('/blog/(.+)', BlogEntryHandler),
     ('/members', MembersHandler),
     ('/login', LoginHandler),
