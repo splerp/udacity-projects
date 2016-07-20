@@ -13,10 +13,13 @@ class SiteUser(db.Model):
 # A DB entity
 class BlogPost(db.Model):
     title = db.StringProperty(required = True)
-    owner = db.StringProperty(required = True)
     contents = db.TextProperty(required = True)
     summary = db.StringProperty() 
     date_posted = db.DateTimeProperty(auto_now_add = True)
+    
+    owner = db.ReferenceProperty(SiteUser,
+                                 required=True,
+                                 collection_name='blog_posts')
 
 class BlogPostReaction(db.Model):
     
