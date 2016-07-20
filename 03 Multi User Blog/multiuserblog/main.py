@@ -178,8 +178,14 @@ class LikePostCheckHandler(Handler):
 class DeleteEntryHandler(Handler):
     def post(self, post_k):
         
-        if db.get(post_k) is not None:
-            db.get(post_k).delete()
+        post = db.get(post_k)
+        user_k = get_user_entity_from_username(get_current_username(self.request.cookies)).key()
+        
+        if user_k == post.owner.key():
+            if db.get(post_k) is not None:
+                db.get(post_k).delete()
+        else:
+            self.error(401)
 
 class MembersHandler(Handler):
     def get(self):
