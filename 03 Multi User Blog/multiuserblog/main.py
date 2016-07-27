@@ -27,6 +27,18 @@ class IndexHandler(Handler):
         
         self.render("landing.html")
 
+# https://cloud.google.com/appengine/docs/python/images/usingimages
+class BlogImage(Handler):
+    def get(self):
+        blog_post_k = db.Key(self.request.get('img_id'))
+        blog_post = db.get(blog_post_k)
+        
+        if blog_post.title_image:
+            self.response.headers['Content-Type'] = 'image/png'
+            self.response.out.write(blog_post.title_image)
+        else:
+            self.redirect("/content/blank.png")
+
 class BlogHandler(Handler):
     def get(self):
     
@@ -45,7 +57,7 @@ class NewEntryHandler(Handler):
         self.render("entry_new.html", True, new_id = None)
         
     def post(self):
-        title, summary, contents = self.getThese("entry_title", "entry_summary", "entry_contents")
+        title, summary, contents, image = self.getThese("entry_title", "entry_summary", "entry_contents", "entry_image")
         
         user_name = get_current_username(self.request.cookies)
         user = get_user_entity_from_username(user_name)
@@ -60,7 +72,8 @@ class NewEntryHandler(Handler):
                 title = title,
                 owner = user,
                 contents = contents,
-                summary = summary)
+                summary = summary,
+                title_image = image)
             post.put()
             new_id = post.key()
         
@@ -205,14 +218,15 @@ class AdminHandler(Handler):
         delete_users, delete_posts = self.getThese("delete_users", "delete_posts")
         
         if delete_users is not None:
-            users = db.GqlQuery("SELECT * FROM SiteUser")
+            users = SiteUser.all()
             for user in users:
                 user.delete()
             
         if delete_posts is not None:
-            posts = db.GqlQuery("SELECT * FROM BlogPost")
-            for post in posts:
-                post.delete()
+            posts = BlogPost.all()
+            print "Post is", posts
+            for one_post in posts:
+                one_post.delete()
         
         self.render("admin.html", True)
 
@@ -350,6 +364,7 @@ def attempt_user_login(username, password):
 
 app = webapp2.WSGIApplication([
     ('/', IndexHandler),
+    ('/img/blogtitle', BlogImage),
     ('/admin', AdminHandler),
     ('/fizzbuzz', FizzbuzzHandler),
     ('/register', RegisterHandler),

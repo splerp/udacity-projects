@@ -17,6 +17,8 @@ class BlogPost(db.Model):
     summary = db.StringProperty() 
     date_posted = db.DateTimeProperty(auto_now_add = True)
     
+    title_image = db.BlobProperty()
+    
     owner = db.ReferenceProperty(SiteUser,
                                  required=True,
                                  collection_name='blog_posts')

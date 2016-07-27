@@ -3,7 +3,7 @@
 {% block content %}
 
 <h2>Blog Entries</h2>
-{% if user_name != None %}<a href="/blog/add">+ Add new entry</a>{% endif %}
+{% if user_name != None %}<p><a href="/blog/add">+ Add new entry</a><p>{% endif %}
 
 {% for blog_post in blog_posts %}
 	<div class="blogpost">
@@ -28,7 +28,7 @@
 		<div class="panel panel-default blog-post" post-key="{{blog_post.key()}}">
 		  <div class="panel-heading">
 			<div class="post-heading">
-				<a href="/blog/{{blog_post.key()}}">{{blog_post.title}}</a><br />
+				<a href="/blog/{{blog_post.key()}}">{{blog_post.title}}</a>
 				<div class="subtitle">
 					<span class="points">
 						{{blog_post.reactions.filter('reaction_type =', 'like').count() - blog_post.reactions.filter('reaction_type =', 'dislike').count()}}
@@ -55,7 +55,15 @@
 			{% endif %}
 		  </div>
 		  <div class="panel-body">
-			<div class="blogpost-image"></div>
+			<div class="blogpost-image">
+				<a href="/blog/{{blog_post.key()}}">
+					<img width="120" height="120"
+						 src="/img/blogtitle?img_id={{blog_post.key()}}" alt="Blog Image">
+					</img>
+				</a>
+			
+				
+			</div>
 			<div class="blogpost-text">{{blog_post.summary}}</div>
 		  </div>
 		</div>
