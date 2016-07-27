@@ -22,7 +22,7 @@ def hash_str(s):
 
 def make_cookie_data(value):
     return "%s|%s" % (value, hash_str(value))
-    
+
 def cookie_is_valid(cookie):
     if cookie is not None:
         value = cookie.split("|")[0]
@@ -30,10 +30,9 @@ def cookie_is_valid(cookie):
             return value
     else:
         return None
-        
+
 def cookie_value(cookie):
     return cookie if cookie is None else cookie.split("|")[0]
-    
+
 def is_logged_in(request):
     return cookie_value(request.cookies.get('user_name', None)) is not None
-    
