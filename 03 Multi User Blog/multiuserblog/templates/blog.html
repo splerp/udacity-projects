@@ -28,7 +28,10 @@
 		<div class="panel panel-default blog-post" post-key="{{blog_post.key()}}">
 		  <div class="panel-heading">
 			<div class="post-heading">
-				<a href="/blog/{{blog_post.key()}}">{{blog_post.title}}</a>
+				<div class="upper">
+					<a href="/blog/{{blog_post.key()}}">{{blog_post.title}}</a>
+					<span class="author"> by {{blog_post.owner.username}}</span>
+				</div>
 				<div class="subtitle">
 					<span class="points">
 						{{blog_post.reactions.filter('reaction_type =', 'like').count() - blog_post.reactions.filter('reaction_type =', 'dislike').count()}}
@@ -40,9 +43,11 @@
 				<div class="post-controls">
 				
 				{% if blog_post.owner.username == user_name %}
-				<a class="button-edit" href="/blog/edit/{{blog_post.key()}}">(edit)</a><span class="divider">|</span>
-				<a class="button-delete" href="/blog/delete/{{blog_post.key()}}">(delete)</a><span class="divider">|</span>
+				<a class="button-edit" href="/blog/edit/{{blog_post.key()}}">(edit)</a>
+				<span class="divider">|</span>
+				<a class="button-delete" href="/blog/delete/{{blog_post.key()}}">(delete)</a>
 				{% endif %}
+				{% if blog_post.owner.username != user_name %}
 				<span class="button-group">
 					<button class="btn btn-default like-post">
 						<span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>
@@ -51,6 +56,7 @@
 						<span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span>
 					</button>
 				</span>
+				{% endif %}
 			</div>
 			{% endif %}
 		  </div>
@@ -116,7 +122,7 @@
 			var key = group.attr("post-key");
 		
 			// Set button default values.
-			$.post( "/likepostcheck/" + key, function(responseData) {
+			$.get( "/blog/reactstatus/" + key, function(responseData) {
 			if(responseData.success)
 			{
 				if(responseData.value == "like")
@@ -179,7 +185,7 @@
 		{
 			// The button is already selected - unset the value.
 			// Post the blog post reaction.
-			$.post( "/likepost/" + key, { reaction_type: "" }, function(responseData) {
+			$.post( "/blog/react/" + key, { reaction_type: "" }, function(responseData) {
 				if(responseData.success)
 				{
 					// Update the count locally.
@@ -206,7 +212,7 @@
 		else
 		{
 			// Post the blog post reaction.
-			$.post( "/likepost/" + key, { reaction_type: reactionName }, function(responseData) {
+			$.post( "/blog/react/" + key, { reaction_type: reactionName }, function(responseData) {
 				if(responseData.success)
 				{
 					// Update the count locally.
@@ -227,27 +233,9 @@
 					console.log("Could not react to post...");
 				}});
 		}
-		
-		
 	}
 
 	initialiseButtonStates();
-	
-	
-	// Add click handler for like buttons.
-	/*$(".like-post").click(function() {
-		
-		// Get key from page.
-		var key = $(this).attr("post-key");
-		var buttonPressed = $(this);
-		
-		// Post the blog post reaction.
-		$.post( "/likepost/" + key, { reaction_type: "like", time: "2pm" }, function(responseData) {
-			console.log("Result: " + responseData);
-			buttonPressed.removeClass("btn-default");
-			buttonPressed.addClass(dislikeButtonClass);
-		});
-	});*/
 	
 </script>
 {% endblock %}

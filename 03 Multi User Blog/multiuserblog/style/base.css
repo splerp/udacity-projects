@@ -206,11 +206,24 @@ input[type="radio"]
 	font-weight:bold;
 }
 
-.blogpost .post-heading a
+.blogpost .post-heading .upper
 {
-	display: block;
 	line-height: 20px;
 	margin-bottom: 5px;
+}
+
+.blogpost .post-heading .upper .author
+{
+	font-size:10pt;
+	font-weight:normal;
+	font-style: italic;
+	
+}
+
+.blogpost .post-heading a .author:hover
+{
+	text-decoration:none !important;
+	
 }
 
 .blogpost .subtitle

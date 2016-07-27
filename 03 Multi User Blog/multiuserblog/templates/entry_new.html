@@ -22,11 +22,11 @@
 <form method="post" enctype="multipart/form-data">
 
 	<div class="col-lg-12">
-		<div class="input-group">
+		<div class="form-group">
 			<label for="entry_title">Title</label>
 			<input class="form-control" type="text" name="entry_title"></input>
 		</div>
-		<div class="input-group">
+		<div class="form-group">
 			<label for="entry_summary">Summary</label>
 			<input class="form-control" type="text" name="entry_summary"></input>
 		</div>
@@ -41,10 +41,13 @@
 				</span>
 			</label>
 			<input type="text" class="form-control" readonly>
+			<span class="input-group-btn">
+        <button class="btn btn-danger delete-attachment" type="button">Remove</button>
+      </span>
 		</div>
 	</div>
 	<div class="col-lg-12">
-		<div class="input-group">
+		<div class="form-group">
 			<label for="entry_contents">Contents</label>
 			<textarea class="form-control" name="entry_contents" rows="10"></textarea>
 		</div>
@@ -57,6 +60,13 @@
 
 /* Source: Whipping File Inputs Into Shape with Bootstrap 3 http://disq.us/t/259nb3o */
 $(function() {
+
+	$(".delete-attachment").click(function() {
+		
+		$(this).parents('.input-group').find(':text').val("");
+		$(this).parents('.input-group').find(':file').val("");
+		
+	});
 
   // We can attach the `fileselect` event to all file inputs on the page
   $(document).on('change', ':file', function() {
@@ -71,16 +81,15 @@ $(function() {
 
       $(':file').on('fileselect', function(event, label) {
 
-			alert("3 trigger 2");
-			
 			var input = $(this).parents('.input-group').find(':text');
-
+			
 			// Set value in input field if available.
 			if(input.length)
 			{
 			  input.val(label);
 			}
-      });
+			
+    });
   });
 });
 

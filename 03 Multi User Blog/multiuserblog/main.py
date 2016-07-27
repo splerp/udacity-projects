@@ -49,7 +49,7 @@ class BlogHandler(Handler):
 class BlogEntryHandler(Handler):
     def get(self, post_k):
     
-        self.render("post.html", post = db.get(post_k))
+        self.render("entry_details.html", post = db.get(post_k))
        
 
 class NewEntryHandler(Handler):
@@ -73,7 +73,7 @@ class NewEntryHandler(Handler):
                 owner = user,
                 contents = contents,
                 summary = summary,
-                title_image = image)
+                title_image = image if image != "" else None)
             post.put()
             new_id = post.key()
         
@@ -88,7 +88,7 @@ class EditEntryHandler(Handler):
         submitted = False
         post = db.get(post_k)
     
-        title, summary, contents = self.getThese("entry-title", "entry-summary", "entry-contents")
+        title, summary, contents, image, delete_attachment = self.getThese("entry-title", "entry-summary", "entry-contents", "entry_image", "remove-attachment")
         
         # Find entry for current user.
         user_name = get_current_username(self.request.cookies)
@@ -103,6 +103,12 @@ class EditEntryHandler(Handler):
             if len(error_messages) == 0:
                 post.title = title
                 post.contents = contents
+                
+                if delete_attachment == "0":
+                    post.title_image = image or post.title_image
+                else:
+                    post.title_image = None
+                
                 post.put()
                 submitted = True
         else:
@@ -112,6 +118,7 @@ class EditEntryHandler(Handler):
 
 import json
 
+# Sets the current user's reaction to a post as specified.
 class LikePostHandler(Handler):
 
     def post(self, post_k):
@@ -161,9 +168,11 @@ class LikePostHandler(Handler):
 
         self.response.out.write(json.dumps(obj))
         
+
+# Returns the current reaction value for a given user on a given post.
 class LikePostCheckHandler(Handler):
 
-    def post(self, post_k):
+    def get(self, post_k):
         
         # Will be returning JSON.
         self.response.headers['Content-Type'] = 'application/json'   
@@ -371,13 +380,13 @@ app = webapp2.WSGIApplication([
     ('/blog', BlogHandler),
     ('/blog/add', NewEntryHandler),
     ('/blog/edit/(.+)', EditEntryHandler),
+    ('/blog/react/(.+)', LikePostHandler),
+    ('/blog/reactstatus/(.+)', LikePostCheckHandler),
     ('/blog/delete/(.+)', DeleteEntryHandler),
     ('/blog/(.+)', BlogEntryHandler),
     ('/members', MembersHandler),
     ('/login', LoginHandler),
-    ('/logout', LogoutHandler),
-    ('/likepost/(.+)', LikePostHandler),
-    ('/likepostcheck/(.+)', LikePostCheckHandler)
+    ('/logout', LogoutHandler)
 ], debug=True)
 
 
