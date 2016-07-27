@@ -265,6 +265,12 @@ input[type="radio"]
 #post-contents
 {
 	word-wrap:break-word;
+	
+}
+
+.pre
+{
+	white-space: pre;
 }
 
 .blogpost-image
