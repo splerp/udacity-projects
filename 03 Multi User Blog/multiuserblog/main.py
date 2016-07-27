@@ -5,7 +5,7 @@ from google.appengine.ext import db
 
 import src.security as security
 from src.route import Handler
-from src.data import SiteUser, BlogPost
+from src.data import SiteUser, BlogPost, BlogPostReaction
 import src.data as data
 import src.dbextensions as dbExtensions
 
@@ -13,10 +13,31 @@ import src.dbextensions as dbExtensions
 # self.response.headers.add_header('Set-Cookie', 'user_name=%s' % "Override.")
 # user_name = self.request.cookies.get('user_name', 'Guest') + " asd."
 
+def get_current_username(cookies):
+    return security.cookie_value(cookies.get('user_name', None))
+
+
+def get_user_entity_from_username(user_name):
+    query = db.GqlQuery("SELECT * FROM SiteUser WHERE username = :1", user_name)
+    return query.get()
+
+
 class IndexHandler(Handler):
     def get(self):
         
         self.render("landing.html")
+
+# https://cloud.google.com/appengine/docs/python/images/usingimages
+class BlogImage(Handler):
+    def get(self):
+        blog_post_k = db.Key(self.request.get('img_id'))
+        blog_post = db.get(blog_post_k)
+        
+        if blog_post.title_image:
+            self.response.headers['Content-Type'] = 'image/png'
+            self.response.out.write(blog_post.title_image)
+        else:
+            self.redirect("/content/blank.png")
 
 class BlogHandler(Handler):
     def get(self):
@@ -28,41 +49,165 @@ class BlogHandler(Handler):
 class BlogEntryHandler(Handler):
     def get(self, post_k):
     
-        self.render("post.html", post = db.get(post_k))
+        self.render("entry_details.html", post = db.get(post_k))
+       
 
 class NewEntryHandler(Handler):
     def get(self):
-        self.render("entry_new.html")
+        self.render("entry_new.html", True, new_id = None)
         
     def post(self):
-        title, summary, contents = self.getThese("entry_title", "entry_summary", "entry_contents")
-        user_name = self.request.cookies.get('user_name', None)
+        title, summary, contents, image = self.getThese("entry_title", "entry_summary", "entry_contents", "entry_image")
         
+        user_name = get_current_username(self.request.cookies)
+        user = get_user_entity_from_username(user_name)
         
-        post = BlogPost(
-            title = title,
-            owner = user_name,
-            contents = contents,
-            summary = summary)
-        post.put()
+        error_messages = validate_blog_post(title, summary, contents, user_name)
         
-        self.render("entry_new.html", new_id = post.key())
+        new_id = None
+        
+        if len(error_messages) == 0:
+            
+            post = BlogPost(
+                title = title,
+                owner = user,
+                contents = contents,
+                summary = summary,
+                title_image = image if image != "" else None)
+            post.put()
+            new_id = post.key()
+        
+        self.render("entry_new.html", True, new_id = new_id, error_messages = error_messages)
 
 class EditEntryHandler(Handler):
     def get(self, post_k):
-        self.render("entry_edit.html", post = db.get(post_k))
+        self.render("entry_edit.html", True, post = db.get(post_k))
         
     def post(self, post_k):
     
+        submitted = False
         post = db.get(post_k)
     
-        title, contents = self.getThese("entry_title", "entry_contents")
+        title, summary, contents, image, delete_attachment = self.getThese("entry-title", "entry-summary", "entry-contents", "entry_image", "remove-attachment")
         
-        post.title = title
-        post.contents = contents
-        post.put()
+        # Find entry for current user.
+        user_name = get_current_username(self.request.cookies)
+        current_user = get_user_entity_from_username(user_name)
         
-        self.render("entry_new.html", post = db.get(post_k))
+        error_messages = []
+        
+        if post.owner.key() == current_user.key():
+        
+            error_messages = validate_blog_post(title, summary, contents, user_name)
+            
+            if len(error_messages) == 0:
+                post.title = title
+                post.contents = contents
+                
+                if delete_attachment == "0":
+                    post.title_image = image or post.title_image
+                else:
+                    post.title_image = None
+                
+                post.put()
+                submitted = True
+        else:
+            error_messages.append("You cannot edit someone else's blog post!")
+        
+        self.render("entry_edit.html", True, submitted = submitted, post = post, error_messages = error_messages)
+
+import json
+
+# Sets the current user's reaction to a post as specified.
+class LikePostHandler(Handler):
+
+    def post(self, post_k):
+        
+        reaction_already_exists = False
+        deleted = False
+        
+        # Will be returning JSON.
+        self.response.headers['Content-Type'] = 'application/json'   
+        
+        # Find entry for current user.
+        user_k = get_user_entity_from_username(get_current_username(self.request.cookies)).key()
+        
+        # Find reaction type.
+        (reaction_type, ) = self.getThese("reaction_type")
+        
+        query = db.GqlQuery("SELECT * FROM BlogPostReaction WHERE blog_post = :1 AND site_user = :2",
+            db.get(post_k),
+            db.get(user_k))
+        
+        old_reaction = query.get()
+        
+        # Check if this value should be removed instead.
+        if reaction_type == "":
+            if old_reaction is not None:
+                old_reaction.delete()
+                reaction_already_exists = True
+                deleted = True
+        else:
+            if old_reaction is not None:
+                old_reaction.reaction_type = reaction_type
+                old_reaction.put()
+                reaction_already_exists = True
+            else:
+                # Create new reaction entry.
+                post_reaction = BlogPostReaction(
+                    blog_post = db.get(post_k),
+                    site_user = db.get(user_k),
+                    reaction_type = reaction_type)
+                post_reaction.put()
+                reaction_already_exists = False
+        
+        # Generate data to return and return it.
+        obj = {'success': True,
+               'alreadyExists': reaction_already_exists,  # Added vote, or removed vote.
+               'deleted': deleted}
+
+        self.response.out.write(json.dumps(obj))
+        
+
+# Returns the current reaction value for a given user on a given post.
+class LikePostCheckHandler(Handler):
+
+    def get(self, post_k):
+        
+        # Will be returning JSON.
+        self.response.headers['Content-Type'] = 'application/json'   
+        
+        # Find entry for current user.
+        user_k = get_user_entity_from_username(get_current_username(self.request.cookies)).key()
+        
+        query = db.GqlQuery("SELECT * FROM BlogPostReaction WHERE blog_post = :1 AND site_user = :2",
+            db.get(post_k),
+            db.get(user_k))
+        
+        old_reaction = query.get()
+        
+        current_value = ""
+        if old_reaction is not None:
+            current_value = old_reaction.reaction_type
+        
+        # Generate data to return and return it.
+        obj = {'success': True,
+               'value': current_value}
+
+        self.response.out.write(json.dumps(obj))
+        
+
+class DeleteEntryHandler(Handler):
+    def post(self, post_k):
+        
+        post = db.get(post_k)
+        user_k = get_user_entity_from_username(get_current_username(self.request.cookies)).key()
+        
+        if user_k == post.owner.key():
+            if db.get(post_k) is not None:
+                db.get(post_k).delete()
+        else:
+            self.error(401)
 
 class MembersHandler(Handler):
     def get(self):
@@ -76,22 +221,23 @@ class FizzbuzzHandler(Handler):
 
 class AdminHandler(Handler):
     def get(self):
-        self.render("admin.html")
+        self.render("admin.html", True)
         
     def post(self):
         delete_users, delete_posts = self.getThese("delete_users", "delete_posts")
         
         if delete_users is not None:
-            users = db.GqlQuery("SELECT * FROM SiteUser")
+            users = SiteUser.all()
             for user in users:
                 user.delete()
             
         if delete_posts is not None:
-            posts = db.GqlQuery("SELECT * FROM BlogPost")
-            for post in posts:
-                post.delete()
+            posts = BlogPost.all()
+            print "Post is", posts
+            for one_post in posts:
+                one_post.delete()
         
-        self.render("admin.html")
+        self.render("admin.html", True)
 
 #######################
 # User Authentication #
@@ -113,12 +259,13 @@ class LoginHandler(Handler):
             if result:
             
                 # Set current user cookie.
-                self.response.headers.add_header('Set-Cookie', str('user_name=%s' % security.make_cookie_value(name.lower())))
+                self.response.headers.add_header('Set-Cookie', str('user_name=%s' % security.make_cookie_data(name.lower())))
                 
+                # Return to main page.
                 self.redirect("/")
                 
         
-        self.render("login.html", error_messages = error_messages)
+        self.render("login.html", error_messages = error_messages, form_user_name = name)
 
 class LogoutHandler(Handler):
     def get(self):
@@ -129,7 +276,7 @@ class LogoutHandler(Handler):
 class RegisterHandler(Handler):
     def get(self):
         
-        self.render("register.html")
+        self.render("register.html", new_id = None)
         
     def post(self):
     
@@ -137,14 +284,17 @@ class RegisterHandler(Handler):
     
         error_messages = validate_register(name, pass1, pass2, email)
         
+        new_id = None
+        
         if len(error_messages) == 0:
             user = SiteUser(
                 username = name.lower(),
                 password = security.make_pw_hash(name, pass1, security.make_salt()),
                 email = email)
             user.put()
+            new_id = user.key()
             
-        self.render("register.html", error_messages = error_messages)
+        self.render("register.html", new_id = new_id, error_messages = error_messages, form_user_name = name, form_email = email)
         
 
 #############################
@@ -156,11 +306,15 @@ def validate_register(username, password, password2, email):
     
     if len(username) == 0:
         errors.append("Username is required.")
-    elif len(username) > 10:
-        errors.append("Username cannot be longer than 10 characters.")
-
+        
     if password != password2:
         errors.append("Passwords must match.")
+    else:
+        if len(password) == 0:
+            errors.append("Password is required.")
+            
+        if len(password2) == 0:
+            errors.append("Password confirmation is required.")
     
     return errors
     
@@ -176,6 +330,25 @@ def validate_login(username, password):
     
     return errors
 
+def validate_blog_post(title, summary, contents, user_name):
+    
+    errors = []
+    
+    if user_name is None:
+        errors.append("You must be logged in to create a blog post.")
+    
+    else:
+        if len(title) == 0:
+            errors.append("Title is required.")
+            
+        if len(summary) == 0:
+            errors.append("Summary is required.")
+            
+        if len(contents) == 0:
+            errors.append("Contents is required.")
+    
+    return errors
+
  
 def attempt_user_login(username, password):
     
@@ -185,12 +358,12 @@ def attempt_user_login(username, password):
     user = dbExtensions.get_user_from_username(username)
     
     if user is None:
-        errors.append("No user matches this username")
+        errors.append("No user could be found with this username.")
     else:
         if security.valid_pw(username, password, user.password):
             valid = True
         else:
-            errors.append("No user matches this username or password.")
+            errors.append("The password for this user is incorrect.")
             
     return errors, valid
 
@@ -200,12 +373,16 @@ def attempt_user_login(username, password):
 
 app = webapp2.WSGIApplication([
     ('/', IndexHandler),
+    ('/img/blogtitle', BlogImage),
     ('/admin', AdminHandler),
     ('/fizzbuzz', FizzbuzzHandler),
     ('/register', RegisterHandler),
     ('/blog', BlogHandler),
     ('/blog/add', NewEntryHandler),
     ('/blog/edit/(.+)', EditEntryHandler),
+    ('/blog/react/(.+)', LikePostHandler),
+    ('/blog/reactstatus/(.+)', LikePostCheckHandler),
+    ('/blog/delete/(.+)', DeleteEntryHandler),
     ('/blog/(.+)', BlogEntryHandler),
     ('/members', MembersHandler),
     ('/login', LoginHandler),

@@ -2,33 +2,97 @@
 
 {% block content %}
 
-{% if new_id is defined %}
+{% if new_id != None %}
 	<div class="alert alert-success" role="alert">New blog entry added! <a href="/blog/{{ new_id }}">View the new post here</a>.</div>
+{% endif %}
+
+{% if error_messages %}
+	<div class="alert alert-danger">
+		There were problems with your request:
+		<ul>
+		{% for item in error_messages %}
+			<li>{{item}}</li>
+		{% endfor %}
+		</ul>
+	</div>
 {% endif %}
 
 <h2>Add entry</h2>
 
-<form method="post">
+<form method="post" enctype="multipart/form-data">
 
 	<div class="col-lg-12">
-		<div class="input-group">
+		<div class="form-group">
 			<label for="entry_title">Title</label>
 			<input class="form-control" type="text" name="entry_title"></input>
 		</div>
-	</div>
-	<div class="col-lg-12">
-		<div class="input-group">
-			<label for="entry_summary">contents</label>
+		<div class="form-group">
+			<label for="entry_summary">Summary</label>
 			<input class="form-control" type="text" name="entry_summary"></input>
 		</div>
 	</div>
 	<div class="col-lg-12">
+		<label for="entry_title">Summary Image</label>
 		<div class="input-group">
-			<label for="entry_contents">contents</label>
-			<textarea class="form-control" name="entry_contents"></textarea>
+			
+			<label class="input-group-btn">
+				<span class="btn btn-default">
+					Browse&hellip; <input type="file" style="display: none;" name="entry_image">
+				</span>
+			</label>
+			<input type="text" class="form-control" readonly>
+			<span class="input-group-btn">
+        <button class="btn btn-danger delete-attachment" type="button">Remove</button>
+      </span>
 		</div>
 	</div>
-	<button type="submit">Post</button>
+	<div class="col-lg-12">
+		<div class="form-group">
+			<label for="entry_contents">Contents</label>
+			<textarea class="form-control" name="entry_contents" rows="10"></textarea>
+		</div>
+		<button type="submit" class="btn btn-primary">Post</button>
+	</div>
+	
 </form>
-{% endblock %}
 
+<script>
+
+/* Source: Whipping File Inputs Into Shape with Bootstrap 3 http://disq.us/t/259nb3o */
+$(function() {
+
+	$(".delete-attachment").click(function() {
+		
+		$(this).parents('.input-group').find(':text').val("");
+		$(this).parents('.input-group').find(':file').val("");
+		
+	});
+
+  // We can attach the `fileselect` event to all file inputs on the page
+  $(document).on('change', ':file', function() {
+    var input = $(this);
+    var label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+	
+    input.trigger('fileselect', [label]);
+  });
+
+  // We can watch for our custom `fileselect` event like this
+  $(document).ready( function() {
+
+      $(':file').on('fileselect', function(event, label) {
+
+			var input = $(this).parents('.input-group').find(':text');
+			
+			// Set value in input field if available.
+			if(input.length)
+			{
+			  input.val(label);
+			}
+			
+    });
+  });
+});
+
+</script>
+
+{% endblock %}

@@ -14,12 +14,15 @@ class Handler(webapp2.RequestHandler):
         t = jinja_env.get_template(template)
         return t.render(params, name=self.request.get("name"))
         
-    def render(self, template, **kw):
+    def render(self, template, must_be_logged_in = False, **kw):
     
         # Append data that should be available on all pages.
         kw['user_name'] = security.cookie_value(self.request.cookies.get('user_name', None))
-    
-        self.write(self.render_str(template, **kw))
+        
+        if must_be_logged_in and not security.is_logged_in(self.request):
+            self.write(self.render_str("403.html", **kw))
+        else:
+            self.write(self.render_str(template, **kw))
     
     def write(self, *a, **kw):
         self.response.out.write(*a, **kw)

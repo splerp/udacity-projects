@@ -1,23 +1,303 @@
- {% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block content %}
 
-<a id="addNewEntry" href="blog/add">+ Add new entry</a>
-
 <h2>Blog Entries</h2>
+{% if user_name != None %}<p><a href="/blog/add">+ Add new entry</a><p>{% endif %}
 
 {% for blog_post in blog_posts %}
 	<div class="blogpost">
 		
-		<div class="blogpost-title">
-			<a href="blog/{{blog_post.key()}}"><h1>{{blog_post.title}}</h1></a> <a href="{{blog_post.key()}}">(edit)</a>
+		<!--<div class="blogpost-title">
+			<a href="/blog/{{blog_post.key()}}"><h1>{{blog_post.title}}</h1></a> <a href="/blog/edit/{{blog_post.key()}}">(edit)</a>
+			 | 
+			<a href="/blog/delete/{{blog_post.key()}}">(delete)</a>
+			 | 
+			<button class="btn btn-default like-post" post-key="{{blog_post.key()}}">
+				<span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>
+			</button>
+			<button class="btn btn-default like-post" post-key="{{blog_post.key()}}">
+				<span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span>
+			</button>
 		</div>
 		<div class="blogpost-content">
 			<div class="blogpost-image"></div>
 			<div class="blogpost-text">{{blog_post.summary}}</div>
-		</div>
+		</div>-->
 		
+		<div class="panel panel-default blog-post" post-key="{{blog_post.key()}}">
+		  <div class="panel-heading">
+			<div class="post-heading">
+				<div class="upper">
+					<a href="/blog/{{blog_post.key()}}">{{blog_post.title}}</a>
+					<span class="author"> by {{blog_post.owner.username}}</span>
+				</div>
+				<div class="subtitle">
+					<span class="points">
+						{{blog_post.reactions.filter('reaction_type =', 'like').count() - blog_post.reactions.filter('reaction_type =', 'dislike').count()}}
+					</span>
+					 points
+				</div>
+			</div>
+			{% if user_name != None %}
+				<div class="post-controls">
+				
+				{% if blog_post.owner.username == user_name %}
+				<a class="button-edit" href="/blog/edit/{{blog_post.key()}}">(edit)</a>
+				<span class="divider">|</span>
+				<a class="button-delete" href="/blog/delete/{{blog_post.key()}}">(delete)</a>
+				{% endif %}
+				{% if blog_post.owner.username != user_name %}
+				<span class="button-group">
+					<button class="btn btn-default like-post">
+						<span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>
+					</button>
+					<button class="btn btn-default dislike-post">
+						<span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span>
+					</button>
+				</span>
+				{% endif %}
+			</div>
+			{% endif %}
+		  </div>
+		  <div class="panel-body">
+			<div class="blogpost-image">
+				<a href="/blog/{{blog_post.key()}}">
+					<img width="120" height="120"
+						 src="/img/blogtitle?img_id={{blog_post.key()}}" alt="Blog Image">
+					</img>
+				</a>
+			
+				
+			</div>
+			<div class="blogpost-text">{{blog_post.summary}}</div>
+		  </div>
+		</div>
 	</div>
 {% endfor %}
 
+<script>
+	// Helpers
+	function addToPoints(domElement, amount)
+	{
+		domElement.html(parseInt(domElement.html(),10)  + amount);
+	}
+
+	function getAllPostElements()
+	{
+		return $(".blog-post");
+	}
+</script>
+
+<script>
+	// Deleting post functionality
+	getAllPostElements().each(function(index)
+	{
+		var group = $(this);
+		var key = group.attr("post-key");
+		
+		$(".button-delete", group).click(function(e) {
+			e.preventDefault();
+			if(confirm("Are you sure you want to delete this entry?"))
+			{
+				$.post($(this).attr("href"));
+				group.remove();
+			}
+		});
+	});
+
+</script>
+
+<script>
+// Like / dislike button functionality
+
+	var likeButtonClass = "btn-success";
+	var dislikeButtonClass = "btn-danger";
+
+	function initialiseButtonStates()
+	{
+		getAllPostElements().each(function(index)
+		{
+			var group = $(this);
+			var key = group.attr("post-key");
+		
+			// Set button default values.
+			$.get( "/blog/reactstatus/" + key, function(responseData) {
+			if(responseData.success)
+			{
+				if(responseData.value == "like")
+				{
+					group.find(".like-post")
+						.removeClass("btn-default")
+						.addClass("btn-success");
+				}
+				if(responseData.value == "dislike")
+				{
+					group.find(".dislike-post")
+						.removeClass("btn-default")
+						.addClass(dislikeButtonClass);
+				}
+			}
+			else
+			{
+				console.log("Could not react to post...");
+			}});
+			
+			// Add button listeners.
+			$(this).find(".like-post").click(function() {
+				handleButtonClick(group, $(this), "like", likeButtonClass);
+			});
+			
+			$(this).find(".dislike-post").click(function() {
+				handleButtonClick(group, $(this), "dislike", dislikeButtonClass);
+			});
+		});
+	}
+	
+	// Add click handler for like buttons.
+	function handleButtonClick(group, button, reactionName, selectedClass)
+	{
+		// Get key from page.
+		var key = group.attr("post-key");
+		var buttonPressed = button;
+		var pointsDiv = group.find(".points");
+	
+		// Remove existing classes from other button.
+		button.parent().find("button").each(function(){
+			if($(this).get(0) !== button.get(0))
+			{
+				if($(this).hasClass(likeButtonClass))
+				{
+					addToPoints(pointsDiv, -1);
+				}
+				if($(this).hasClass(dislikeButtonClass))
+				{
+					addToPoints(pointsDiv, 1);
+				}
+				$(this)
+					.removeClass(likeButtonClass)
+					.removeClass(dislikeButtonClass)
+					.addClass("btn-default");
+			}
+		});
+		
+		if(buttonPressed.hasClass(selectedClass))
+		{
+			// The button is already selected - unset the value.
+			// Post the blog post reaction.
+			$.post( "/blog/react/" + key, { reaction_type: "" }, function(responseData) {
+				if(responseData.success)
+				{
+					// Update the count locally.
+					if(selectedClass == likeButtonClass)
+					{
+						console.log("Current found " + pointsDiv + " - " + pointsDiv.get(0));
+						addToPoints(pointsDiv, -1);
+					}
+					else
+					{
+						addToPoints(pointsDiv, 1);
+					}
+				
+					buttonPressed.removeClass(selectedClass);
+					buttonPressed.addClass("btn-default");
+				}
+				else
+				{
+					console.log("Could not delete reaction...");
+				}
+				
+			});
+		}
+		else
+		{
+			// Post the blog post reaction.
+			$.post( "/blog/react/" + key, { reaction_type: reactionName }, function(responseData) {
+				if(responseData.success)
+				{
+					// Update the count locally.
+					if(selectedClass == likeButtonClass)
+					{
+						addToPoints(pointsDiv, 1);
+					}
+					else
+					{
+						addToPoints(pointsDiv, -1);
+					}
+				
+					buttonPressed.removeClass("btn-default");
+					buttonPressed.addClass(selectedClass);
+				}
+				else
+				{
+					console.log("Could not react to post...");
+				}});
+		}
+	}
+
+	initialiseButtonStates();
+	
+</script>
 {% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

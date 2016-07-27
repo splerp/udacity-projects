@@ -13,10 +13,31 @@ class SiteUser(db.Model):
 # A DB entity
 class BlogPost(db.Model):
     title = db.StringProperty(required = True)
-    owner = db.StringProperty(required = True)
     contents = db.TextProperty(required = True)
-    likes = db.IntegerProperty()
+    summary = db.StringProperty() 
     date_posted = db.DateTimeProperty(auto_now_add = True)
+    
+    title_image = db.BlobProperty()
+    
+    owner = db.ReferenceProperty(SiteUser,
+                                 required=True,
+                                 collection_name='blog_posts')
+
+class BlogPostReaction(db.Model):
+    
+    blog_post = db.ReferenceProperty(BlogPost,
+                                     required=True,
+                                     collection_name='reactions')
+                                     
+    site_user = db.ReferenceProperty(SiteUser,
+                                     required=True,
+                                     collection_name='reactions')
+
+    reaction_type = db.StringProperty(required=True,
+                                      choices=('like', 'dislike'))
+                                      
+    date_liked = db.DateTimeProperty(auto_now_add = True)
+
 
 
 months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]

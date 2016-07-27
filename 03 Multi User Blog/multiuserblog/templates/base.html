@@ -5,7 +5,7 @@
   <meta charset="utf-8">
 
   <title>My Portfolio</title>
-  <meta name="description" content="Multi-user Blog">
+  <meta name="description" content="Blog Pond">
   <meta name="author" content="Ben Phelps">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -13,7 +13,9 @@
   <link href='https://fonts.googleapis.com/css?family=Neuton' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
 	integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+	
+  <script src="https://code.jquery.com/jquery-3.1.0.min.js"
+	integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
   
   <script>
 	// Navigation positioning.
@@ -49,12 +51,12 @@
   <div id="outer-container">
 	  <header>
 	    <img src="/content/main-icon.jpg" width="20%" alt="Website Icon" />
-		<h1>B Phelps</h1>
-		<h2>Website Extravanaza</h2>
+		<h1>Blog Pond</h1>
+		<h2>Share your thoughts on the internet, or don't</h2>
 		
 		<h3 id="userBar">
-			{% if user_name is defined %}Welcome, {{ user_name }}!
-			{% else %}<a href="login">Login here!</a>{% endif %}
+			{% if user_name != None %}Welcome, {{ user_name }}! <a href="/logout">Log out here</a>.
+			{% else %}<a href="/login">Login here!</a>{% endif %}
 		</h3>
 	  </header>
 	  <div id="main-flex-area">
