@@ -255,11 +255,6 @@ class MembersHandler(Handler):
         self.render("members.html", users=users)
 
 
-class FizzbuzzHandler(Handler):
-    def get(self):
-        self.render("fizzbuzz.html")
-
-
 class AdminHandler(Handler):
     def get(self):
         self.render("admin.html", True)
@@ -290,7 +285,6 @@ app = webapp2.WSGIApplication([
     ('/', IndexHandler),
     ('/img/blogtitle', BlogImage),
     ('/admin', AdminHandler),
-    ('/fizzbuzz', FizzbuzzHandler),
     ('/register', RegisterHandler),
     ('/blog', BlogHandler),
     ('/blog/add', NewEntryHandler),
