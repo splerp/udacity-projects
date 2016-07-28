@@ -128,6 +128,7 @@ class EditEntryHandler(Handler):
 
             if len(error_messages) == 0:
                 post.title = title
+                post.summary = summary
                 post.contents = contents
 
                 if delete_attachment == "0":
