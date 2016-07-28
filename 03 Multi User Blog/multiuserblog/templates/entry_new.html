@@ -24,11 +24,11 @@
 	<div class="col-lg-12">
 		<div class="form-group">
 			<label for="entry_title">Title</label>
-			<input class="form-control" type="text" name="entry_title"></input>
+			<input class="form-control" type="text" name="entry_title" value="{{entry_title}}"></input>
 		</div>
 		<div class="form-group">
 			<label for="entry_summary">Summary</label>
-			<input class="form-control" type="text" name="entry_summary"></input>
+			<input class="form-control" type="text" name="entry_summary" value="{{entry_summary}}"></input>
 		</div>
 	</div>
 	<div class="col-lg-12">
@@ -49,7 +49,7 @@
 	<div class="col-lg-12">
 		<div class="form-group">
 			<label for="entry_contents">Contents</label>
-			<textarea class="form-control" name="entry_contents" rows="10"></textarea>
+			<textarea class="form-control" name="entry_contents" rows="10">{{entry_contents}}</textarea>
 		</div>
 		<button type="submit" class="btn btn-primary">Post</button>
 	</div>

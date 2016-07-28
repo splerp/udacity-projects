@@ -93,12 +93,24 @@ class NewEntryHandler(Handler):
             "entry_new.html",
             True,
             new_id=new_id,
-            error_messages=error_messages)
+            error_messages=error_messages,
+            entry_title=title,
+            entry_summary=summary,
+            entry_contents=contents)
 
 
 class EditEntryHandler(Handler):
     def get(self, post_k):
-        self.render("entry_edit.html", True, post=db.get(post_k))
+
+        post = db.get(post_k)
+
+        self.render(
+            "entry_edit.html",
+            True,
+            post=post,
+            entry_title=post.title,
+            entry_summary=post.summary,
+            entry_contents=post.contents)
 
     def post(self, post_k):
 
@@ -146,6 +158,9 @@ class EditEntryHandler(Handler):
             True,
             submitted=submitted,
             post=post,
+            entry_title=title,
+            entry_summary=summary,
+            entry_contents=contents,
             error_messages=error_messages)
 
 
