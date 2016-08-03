@@ -56,6 +56,9 @@ Stores information about a blog post. Contains a reference to a SiteUser.
 #### BlogPostReaction
 Stores all 'reactions' to blog posts (i.e. likes and dislikes by users). Each entry contains a reference to the SiteUser that reacted and the BlogPost they reacted to.
 
+#### BlogPostComment
+Stores information about a blog post comment. Contains a reference to the SiteUser commenter and the BlogPost the comment is for.
+
 ## Code layout
 - main.py: Entry point for program. Defines handlers for main pages of site and all routing information.
 
