@@ -73,6 +73,11 @@ class RegisterHandler(Handler):
             user.put()
             new_id = user.key()
 
+            # Log the user in when they register.
+            self.response.headers.add_header(
+                'Set-Cookie',
+                str('user_name=%s' % security.make_cookie_data(
+                    name.lower())))
         self.render(
             "register.html",
             new_id=new_id,
