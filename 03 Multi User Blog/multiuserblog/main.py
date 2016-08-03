@@ -24,7 +24,13 @@ def get_user_entity_from_username(user_name):
 class IndexHandler(Handler):
     def get(self):
 
-        self.render("landing.html")
+        blog_posts = db.GqlQuery(
+            "SELECT * FROM BlogPost ORDER BY date_posted DESC")
+
+        self.render(
+            "landing.html",
+            blog_posts=blog_posts)
+
 
 class WelcomeHandler(Handler):
     def get(self):
@@ -60,7 +66,8 @@ class BlogImage(Handler):
 class BlogHandler(Handler):
     def get(self):
 
-        blog_posts = db.GqlQuery("SELECT * FROM BlogPost ORDER BY date_posted")
+        blog_posts = db.GqlQuery(
+            "SELECT * FROM BlogPost ORDER BY date_posted DESC")
 
         self.render("blog.html", blog_posts=blog_posts)
 
