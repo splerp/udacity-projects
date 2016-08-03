@@ -38,8 +38,10 @@ def cookie_is_valid(cookie):
     else:
         return None
 
+
 def cookie_value(cookie):
     return cookie if cookie is None else cookie.split("|")[0]
+
 
 def is_logged_in(request):
     return cookie_value(request.cookies.get('user_name', None)) is not None
