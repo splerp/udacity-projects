@@ -68,15 +68,15 @@ Stores information about a blog post comment. Contains a reference to the SiteUs
 - security.py: All functions that interact with cookies and validating users / passwords.
 - validation.py: Functions that handler registration / login validation.
 
-### scripts/ folder
+#### scripts/ folder
 - Javascript files.
 
 
-### style/ folder
+#### style/ folder
 - CSS files.
 
 
-### templates/ folder
+#### templates/ folder
 - Each file contains a separate jinja template. base.html defines the base page contents.
 
 ## Code base
