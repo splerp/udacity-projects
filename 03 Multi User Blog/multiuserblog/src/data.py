@@ -38,3 +38,19 @@ class BlogPostReaction(db.Model):
                                       choices=('like', 'dislike'))
 
     date_liked = db.DateTimeProperty(auto_now_add=True)
+
+
+class BlogPostComment(db.Model):
+
+    blog_post = db.ReferenceProperty(BlogPost,
+                                     required=True,
+                                     collection_name='comments')
+
+    site_user = db.ReferenceProperty(SiteUser,
+                                     required=True,
+                                     collection_name='comments')
+
+    title = db.StringProperty()
+    content = db.StringProperty()
+
+    date_posted = db.DateTimeProperty(auto_now_add=True)

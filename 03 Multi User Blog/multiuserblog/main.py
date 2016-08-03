@@ -5,7 +5,7 @@ from google.appengine.ext import db
 
 import src.security as security
 from src.route import Handler
-from src.data import SiteUser, BlogPost, BlogPostReaction
+from src.data import SiteUser, BlogPost, BlogPostReaction, BlogPostComment
 from src.auth import LoginHandler, LogoutHandler, RegisterHandler
 from src.validation import validate_blog_post
 
@@ -76,6 +76,25 @@ class BlogEntryHandler(Handler):
     def get(self, post_k):
 
         self.render("entry_details.html", post=db.get(post_k))
+
+    def post(self, post_k):
+
+        # Occurs when someone posts a comment.
+
+        (title, content) = self.getThese("entry-title", "entry-comment")
+
+        user_name = get_current_username(self.request.cookies)
+        user = get_user_entity_from_username(user_name)
+        blog_post = db.get(post_k)
+
+        post_comment = BlogPostComment(
+            blog_post=blog_post,
+            site_user=user,
+            title=title,
+            content=content)
+        post_comment.put()
+
+        self.redirect("/blog/" + post_k)
 
 
 class NewEntryHandler(Handler):
@@ -286,6 +305,21 @@ class DeleteEntryHandler(Handler):
             self.error(401)
 
 
+class DeleteCommentHandler(Handler):
+    def post(self, comment_k):
+
+        comment = db.get(comment_k)
+        user_k = get_user_entity_from_username(
+            get_current_username(self.request.cookies)).key()
+
+        # Do not allow deletion unless the current user is the comment owner.
+        if user_k == comment.site_user.key():
+            if db.get(comment_k) is not None:
+                db.get(comment_k).delete()
+        else:
+            self.error(401)
+
+            
 class MembersHandler(Handler):
     def get(self):
 
@@ -332,6 +366,7 @@ app = webapp2.WSGIApplication([
     ('/blog/reactstatus/(.+)', LikePostCheckHandler),
     ('/blog/delete/(.+)', DeleteEntryHandler),
     ('/blog/(.+)', BlogEntryHandler),
+    ('/comment_delete/(.+)', DeleteCommentHandler),
     ('/members', MembersHandler),
     ('/login', LoginHandler),
     ('/logout', LogoutHandler)
