@@ -29,8 +29,8 @@ class LoginHandler(Handler):
                     str('user_name=%s' % security.make_cookie_data(
                         name.lower())))
 
-                # Return to main page.
-                self.redirect("/")
+                # Redirect to the welcome page
+                self.redirect("/welcome?action=login")
 
         self.render(
             "login.html",
@@ -78,6 +78,10 @@ class RegisterHandler(Handler):
                 'Set-Cookie',
                 str('user_name=%s' % security.make_cookie_data(
                     name.lower())))
+
+            # Redirect to the welcome page
+            self.redirect("/welcome?action=register")
+
         self.render(
             "register.html",
             new_id=new_id,

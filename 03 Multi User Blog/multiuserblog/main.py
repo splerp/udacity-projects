@@ -26,6 +26,21 @@ class IndexHandler(Handler):
 
         self.render("landing.html")
 
+class WelcomeHandler(Handler):
+    def get(self):
+
+        (action, ) = self.getThese("action")
+
+        if not security.is_logged_in(self.request):
+            self.redirect("/")
+        else:
+            self.render(
+                "welcome.html",
+                action_name=(
+                    "logging in" if action == "login"
+                    else "registering")
+                )
+
 
 class BlogImage(Handler):
     """Code based on content at
@@ -299,6 +314,7 @@ class AdminHandler(Handler):
 
 app = webapp2.WSGIApplication([
     ('/', IndexHandler),
+    ('/welcome', WelcomeHandler),
     ('/img/blogtitle', BlogImage),
     ('/admin', AdminHandler),
     ('/register', RegisterHandler),
