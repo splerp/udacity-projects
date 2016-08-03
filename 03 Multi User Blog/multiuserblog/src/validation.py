@@ -18,6 +18,10 @@ def validate_register(username, password, password2, email):
         if len(password2) == 0:
             errors.append("Password confirmation is required.")
 
+    user = dbExtensions.get_user_from_username(username)
+    if user is not None:
+        errors.append("A user with this name already exists. Please choose another.")
+
     return errors
 
 
