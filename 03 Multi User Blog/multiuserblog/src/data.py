@@ -2,7 +2,8 @@ from google.appengine.ext import db
 
 
 class SiteUser(db.Model):
-    """A DB Entity"""
+    """Defines a SiteUser to reference registered users."""
+
     username = db.StringProperty(required=True)
     password = db.StringProperty(required=True)
     email = db.StringProperty()
@@ -11,7 +12,8 @@ class SiteUser(db.Model):
 
 
 class BlogPost(db.Model):
-    """A DB Entity"""
+    """Defines a BlogPost to reference user's blog entries."""
+
     title = db.StringProperty(required=True)
     contents = db.TextProperty(required=True)
     summary = db.StringProperty()
@@ -25,6 +27,7 @@ class BlogPost(db.Model):
 
 
 class BlogPostReaction(db.Model):
+    """Defines a BlogPostReaction to reference users' reactions to posts."""
 
     blog_post = db.ReferenceProperty(BlogPost,
                                      required=True,
@@ -41,6 +44,7 @@ class BlogPostReaction(db.Model):
 
 
 class BlogPostComment(db.Model):
+    """Defines a SiteUser to reference users' comments on posts."""
 
     blog_post = db.ReferenceProperty(BlogPost,
                                      required=True,

@@ -12,6 +12,7 @@ jinja_env = jinja2.Environment(
 
 class Handler(webapp2.RequestHandler):
     """Base handler for easier writing"""
+
     def render_str(self, template, **params):
         t = jinja_env.get_template(template)
         return t.render(params, name=self.request.get("name"))

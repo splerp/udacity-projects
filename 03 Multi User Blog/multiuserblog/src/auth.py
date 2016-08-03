@@ -8,6 +8,8 @@ from src.validation import (
 
 
 class LoginHandler(Handler):
+    """ Handles login requests, including validation. """
+
     def get(self):
         self.render("login.html")
 
@@ -39,6 +41,7 @@ class LoginHandler(Handler):
 
 
 class LogoutHandler(Handler):
+    """ Handles logout requests. """
     def get(self):
 
         self.response.delete_cookie('user_name')
@@ -46,6 +49,7 @@ class LogoutHandler(Handler):
 
 
 class RegisterHandler(Handler):
+    """ Handles register requests, including validation. """
     def get(self):
 
         self.render("register.html", new_id=None)

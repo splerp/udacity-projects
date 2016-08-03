@@ -11,6 +11,7 @@ function addToPoints(domElement, amount) {
     domElement.html(parseInt(domElement.html(), 10) + amount);
 }
 
+// Returns all posts.
 function getAllPostElements() {
     return $(".blog-post");
 }
@@ -19,6 +20,7 @@ function getAllPostElements() {
 getAllPostElements().each(function () {
     var group = $(this);
 
+	// On click, displays a confirmation menu then removes the entry.
     $(".button-delete", group).click(function (e) {
         e.preventDefault();
         if (window.confirm("Are you sure you want to delete this entry?")) {
@@ -28,8 +30,7 @@ getAllPostElements().each(function () {
     });
 });
 
-// Like / dislike button functionality
-
+// Like / dislike button functionality \\
 
 // Add click handler for like buttons.
 function handleButtonClick(group, button, reactionName, selectedClass) {
@@ -66,6 +67,7 @@ function handleButtonClick(group, button, reactionName, selectedClass) {
                     addToPoints(pointsDiv, 1);
                 }
 
+				// Update button classes.
                 buttonPressed.removeClass(selectedClass);
                 buttonPressed.addClass("btn-default");
             }
@@ -82,6 +84,7 @@ function handleButtonClick(group, button, reactionName, selectedClass) {
                     addToPoints(pointsDiv, -1);
                 }
 
+				// Update button classes.
                 buttonPressed.removeClass("btn-default");
                 buttonPressed.addClass(selectedClass);
             }
@@ -89,6 +92,7 @@ function handleButtonClick(group, button, reactionName, selectedClass) {
     }
 }
 
+// Set buttons to initial values.
 function initialiseButtonStates() {
     getAllPostElements().each(function () {
         var group = $(this);

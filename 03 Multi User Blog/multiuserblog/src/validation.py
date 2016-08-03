@@ -3,6 +3,10 @@ import src.dbextensions as dbExtensions
 
 
 def validate_register(username, password, password2, email):
+    """
+    Handles validation for registration form. Returns
+    a list of any errors encountered while validating.
+    """
 
     errors = []
 
@@ -20,12 +24,18 @@ def validate_register(username, password, password2, email):
 
     user = dbExtensions.get_user_from_username(username)
     if user is not None:
-        errors.append("A user with this name already exists. Please choose another.")
+        errors.append(
+            ("A user with this name already exists. "
+                "Please choose another."))
 
     return errors
 
 
 def validate_login(username, password):
+    """
+    Handles validation for login form. Returns
+    a list of any errors encountered while validating.
+    """
 
     errors = []
 
@@ -39,6 +49,10 @@ def validate_login(username, password):
 
 
 def validate_blog_post(title, summary, contents, user_name):
+    """
+    Handles validation for creating a blog post. Returns
+    a list of any errors encountered while validating.
+    """
 
     errors = []
 
@@ -59,6 +73,10 @@ def validate_blog_post(title, summary, contents, user_name):
 
 
 def attempt_user_login(username, password):
+    """
+    After login form validation is complete, check that the username
+    specified matche s auser and that their password is valid.
+    """
 
     errors = []
     valid = False

@@ -22,6 +22,8 @@ def get_user_entity_from_username(user_name):
 
 
 class IndexHandler(Handler):
+    """Handler for the landing page of the website."""
+
     def get(self):
 
         blog_posts = db.GqlQuery(
@@ -33,6 +35,8 @@ class IndexHandler(Handler):
 
 
 class WelcomeHandler(Handler):
+    """Handler for the welcome page shown when registering / logging in."""
+
     def get(self):
 
         (action, ) = self.getThese("action")
@@ -40,6 +44,7 @@ class WelcomeHandler(Handler):
         if not security.is_logged_in(self.request):
             self.redirect("/")
         else:
+            # Customise welcome message to be relevent to user's origin
             self.render(
                 "welcome.html",
                 action_name=(
@@ -77,9 +82,8 @@ class BlogEntryHandler(Handler):
 
         self.render("entry_details.html", post=db.get(post_k))
 
+    # Occurs when someone posts a comment.
     def post(self, post_k):
-
-        # Occurs when someone posts a comment.
 
         (title, content) = self.getThese("entry-title", "entry-comment")
 
@@ -111,6 +115,7 @@ class NewEntryHandler(Handler):
         user_name = get_current_username(self.request.cookies)
         user = get_user_entity_from_username(user_name)
 
+        # Validate post and retrieve errors.
         error_messages = validate_blog_post(
             title,
             summary,
@@ -121,6 +126,7 @@ class NewEntryHandler(Handler):
 
         if len(error_messages) == 0:
 
+            # Create new blog post.
             post = BlogPost(
                 title=title,
                 owner=user,
@@ -130,6 +136,7 @@ class NewEntryHandler(Handler):
             post.put()
             new_id = post.key()
 
+        # Render page with all required information.
         self.render(
             "entry_new.html",
             True,
@@ -173,6 +180,7 @@ class EditEntryHandler(Handler):
 
         if post.owner.key() == current_user.key():
 
+            # Validate post and return errors.
             error_messages = validate_blog_post(
                 title,
                 summary,
@@ -180,10 +188,13 @@ class EditEntryHandler(Handler):
                 user_name)
 
             if len(error_messages) == 0:
+
+                # Update post details.
                 post.title = title
                 post.summary = summary
                 post.contents = contents
 
+                # Only delete the attachment if the delete button was pressed.
                 if delete_attachment == "0":
                     post.title_image = image or post.title_image
                 else:
@@ -319,7 +330,7 @@ class DeleteCommentHandler(Handler):
         else:
             self.error(401)
 
-            
+
 class MembersHandler(Handler):
     def get(self):
 
@@ -328,6 +339,8 @@ class MembersHandler(Handler):
 
 
 class AdminHandler(Handler):
+    """Page to easily bulk delete all users / blog posts."""
+
     def get(self):
         self.render("admin.html", True)
 
@@ -350,9 +363,7 @@ class AdminHandler(Handler):
         self.render("admin.html", True)
 
 
-###################
-# Routing Details #
-
+# Routing Details
 app = webapp2.WSGIApplication([
     ('/', IndexHandler),
     ('/welcome', WelcomeHandler),
