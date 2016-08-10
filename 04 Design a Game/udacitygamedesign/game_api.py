@@ -163,7 +163,7 @@ class SnakesAndLaddersAPI(remote.Service):
             "SELECT * FROM SnakesAndLaddersGame WHERE game_name = :1",
             request.game_name.lower()).get()
 
-        board_to_use = convert_board_to_string(default_sal_board)
+        board_to_use = ""
 
         if existing_game is not None:
             events.append("EXISTING GAME WITH NAME " + request.game_name.lower())
@@ -175,6 +175,8 @@ class SnakesAndLaddersAPI(remote.Service):
                      "and " + request.player_name_2.lower()))
 
             else:
+
+                board_to_use = convert_board_to_string(default_sal_board)
 
                 # Create game with players.
                 game = SnakesAndLaddersGame(
