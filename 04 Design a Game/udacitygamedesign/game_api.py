@@ -1,16 +1,11 @@
-"""Hello World API implemented using Google Cloud Endpoints.
-
-Contains declarations of endpoint, endpoint methods,
-as well as the ProtoRPC message class and container required
-for endpoint method definition.
-"""
+from __future__ import division
 import random
 
 import endpoints
 from protorpc import messages
 from protorpc import message_types
 from protorpc import remote
-from data import SnakesAndLaddersGame, UserGame, SiteUser
+from data import SnakesAndLaddersGame, UserGame, SiteUser, HistoryStep
 
 from google.appengine.ext import db
 
@@ -60,6 +55,11 @@ REQUEST_CANCEL_GAME = endpoints.ResourceContainer(
     game_name=messages.StringField(1)
 )
 
+REQUEST_GAME_HISTORY = endpoints.ResourceContainer(
+    message_types.VoidMessage,
+    game_name=messages.StringField(1)
+)
+
 class BasicResponse(messages.Message):
     success = messages.BooleanField(1)
     events = messages.StringField(2)
@@ -90,6 +90,18 @@ class PlayerGamesResponse(messages.Message):
     games_in_progress = messages.StringField(3)
     games_completed = messages.StringField(4)
 
+class PlayerRankingsResponse(messages.Message):
+    success = messages.BooleanField(1)
+    events = messages.StringField(2)
+
+    rankings = messages.StringField(3)
+
+class GameHistoryResponse(messages.Message):
+    success = messages.BooleanField(1)
+    events = messages.StringField(2)
+
+    steps = messages.StringField(3)
+
 @endpoints.api(name='snakesandladdersendpoints', version='v1')
 class SnakesAndLaddersAPI(remote.Service):
 
@@ -108,17 +120,38 @@ class SnakesAndLaddersAPI(remote.Service):
 
         return CreateSiteUserResponse(
             success=True,
-            events=[],
+            events=str([]),
             site_user_id=str(user.key()))
 
     @endpoints.method(
-        REQUEST_EMPTY, BasicResponse, http_method='POST',
-        path = "killEverything", name = "killEverything")
-    def kill_everything(self, request):
-        remove_all_data()
-        return BasicResponse(
+        REQUEST_EMPTY, PlayerRankingsResponse, http_method='GET',
+        path = "playerRankings", name = "playerRankings")
+    def player_rankings(self, request):
+
+        rankings = []
+
+        players = SiteUser.all()
+        for player in players:
+
+            wins = 0
+            losses = 0
+            for x in player.games:
+                if x.game.game_state == 'complete':
+                    if x.is_winner:
+                        wins += 1
+                    else:
+                        losses += 1
+
+            win_average = wins / (wins + losses) if (wins + losses) != 0 else 0
+
+            rankings.append((player.username, wins, win_average))
+
+        rankings.sort(key=lambda tuple: (tuple[1], tuple[2]), reverse=True)
+
+        return PlayerRankingsResponse(
             success=True,
-            events=[]
+            events=str([]),
+            rankings=str(rankings)
         )
 
     @endpoints.method(
@@ -175,6 +208,38 @@ class SnakesAndLaddersAPI(remote.Service):
             events=str(events),
             games_in_progress=str(games_in_progress),
             games_completed=str(games_completed)
+        )
+
+    @endpoints.method(
+        REQUEST_GAME_HISTORY, GameHistoryResponse, http_method='GET',
+        path = "getGameHistory", name = "getGameHistory")
+    def get_game_history(self, request):
+
+        success = False
+        events = []
+
+        steps = []
+
+        # Get user from name.
+        game = db.GqlQuery("SELECT * FROM SnakesAndLaddersGame WHERE game_name = :1", request.game_name.lower()).get()
+        if game is None:
+            events.append("No game exists with name '" + request.game_name.lower() + "'.")
+        else:
+
+            for move in game.moves.order("move_num"):
+                steps.append((
+                    move.player_name,
+                    move.roll_value,
+                    move.hit_snake,
+                    move.hit_ladder,
+                    move.new_pos))
+
+            success = True
+
+        return GameHistoryResponse(
+            success=success,
+            events=str(events),
+            steps=str(steps)
         )
 
     @endpoints.method(
@@ -296,24 +361,34 @@ class SnakesAndLaddersAPI(remote.Service):
                     current_board = convert_string_to_board(game.game_board)
 
                     # Check for ladders
+                    hit_ladder = False
                     for ladder in current_board.ladders:
                         if ladder[0] == new_position:
+                            hit_ladder = True
                             new_position = ladder[1]
+                            game.ladders_hit += 1
                             events.append(
                                 ("Hit a ladder!"))
 
                     # Check for snakes
+                    hit_snake = False
                     for snake in current_board.snakes:
                         if snake[0] == new_position:
+                            hit_snake = True
                             new_position = snake[1]
+                            game.snakes_hit += 1
                             events.append(
                                 ("Hit a snake..."))
 
+                    # Update player location
+                    player.position = new_position
+                    game.total_moves += 1
 
                     # Check for win condition
                     if new_position >= current_board.size:
                         new_position = 100
                         game.game_state = "complete"
+                        player.is_winner = True
                         events.append(
                             (player.user.username + " has won the game!"))
                     else:
@@ -322,20 +397,28 @@ class SnakesAndLaddersAPI(remote.Service):
                         elif game.game_state == "turn_p2":
                             game.game_state = "turn_p1"
 
-                    # Update player location
-                    player.position = new_position
+                    # Create a history step for game.
+                    step = HistoryStep(
+                        game=game,
+                        move_num=game.total_moves,
+                        player_name=player.user.username,
+                        roll_value=dice_roll,
+                        new_pos=new_position,
+                        hit_snake=hit_snake,
+                        hit_ladder=hit_ladder
+                    )
 
                     success = True
 
                     player.save()
                     game.save()
+                    step.save()
 
         return PlayTurnResponse(
             success=success,
             events=str(events),
             roll=dice_roll,
             new_position=new_position)
-
 
 APPLICATION = endpoints.api_server([SnakesAndLaddersAPI])
 

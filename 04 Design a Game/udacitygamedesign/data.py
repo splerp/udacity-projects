@@ -26,6 +26,22 @@ class SnakesAndLaddersGame(db.Model):
     snakes_hit = db.IntegerProperty(default=0)
 
 
+class HistoryStep(db.Model):
+
+    game = db.ReferenceProperty(SnakesAndLaddersGame,
+                                required=True,
+                                collection_name='moves')
+
+    move_num = db.IntegerProperty(required=True)
+
+    player_name = db.StringProperty(required=True)
+    roll_value = db.IntegerProperty(required=True)
+    new_pos = db.IntegerProperty(required=True)
+
+    hit_snake = db.BooleanProperty(required=True)
+    hit_ladder = db.BooleanProperty(required=True)
+
+
 
 class UserGame(db.Model):
 
