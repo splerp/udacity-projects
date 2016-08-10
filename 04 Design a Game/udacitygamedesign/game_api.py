@@ -55,6 +55,11 @@ REQUEST_USER_GAMES = endpoints.ResourceContainer(
     player_name=messages.StringField(1)
 )
 
+REQUEST_CANCEL_GAME = endpoints.ResourceContainer(
+    message_types.VoidMessage,
+    game_name=messages.StringField(1)
+)
+
 class BasicResponse(messages.Message):
     success = messages.BooleanField(1)
     events = messages.StringField(2)
@@ -114,6 +119,30 @@ class SnakesAndLaddersAPI(remote.Service):
         return BasicResponse(
             success=True,
             events=[]
+        )
+
+    @endpoints.method(
+        REQUEST_CANCEL_GAME, BasicResponse, http_method='POST',
+        path = "cancelGame", name = "cancelGame")
+    def cancelGame(self, request):
+
+        success = False
+        events = []
+
+        game_to_cancel = db.GqlQuery("SELECT * FROM SnakesAndLaddersGame WHERE game_name = :1", request.game_name.lower()).get()
+        if game_to_cancel is None:
+            events.append("Game '" + request.game_name.lower() + "' does not exist.")
+        elif game_to_cancel.game_state == "cancelled" or game_to_cancel.game_state == "complete":
+            events.append("Game cannot be cancelled because it is in state '" + game_to_cancel.game_state + "'.")
+        else:
+            game_to_cancel.game_state = "cancelled"
+            game_to_cancel.save()
+
+            success = True
+
+        return BasicResponse(
+            success=success,
+            events=str(events)
         )
 
     @endpoints.method(
