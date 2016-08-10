@@ -8,8 +8,16 @@ from protorpc import remote
 from data import SnakesAndLaddersGame, UserGame, SiteUser, HistoryStep
 
 from google.appengine.ext import db
+from google.appengine.api import taskqueue
 
-package = 'Hello'
+
+"""Hello World API implemented using Google Cloud Endpoints.
+
+Contains declarations of endpoint, endpoint methods,
+as well as the ProtoRPC message class and container required
+for endpoint method definition.
+"""
+package = 'SplGame'
 
 # If the request contains path or querystring arguments,
 # you cannot use a simple Message class.
@@ -266,7 +274,7 @@ class SnakesAndLaddersAPI(remote.Service):
             if player1 is None or player2 is None:
                 events.append(
                     ("COULD NOT FIND BOTH PLAYERS for " + request.player_name_1.lower() +
-                     "and " + request.player_name_2.lower()))
+                     " and " + request.player_name_2.lower()))
 
             else:
 
@@ -288,6 +296,18 @@ class SnakesAndLaddersAPI(remote.Service):
                 success = True
                 events.append("You are starting a new game called {} with players {} and {}".format(
                     request.game_name, request.player_name_1, request.player_name_2))
+
+                taskqueue.add(
+                    url='/tasks/send_invite_email',
+                    params={'email': player1.email,
+                            'game_name': request.game_name}
+                )
+
+                taskqueue.add(
+                    url='/tasks/send_invite_email',
+                    params={'email': player2.email,
+                            'game_name': request.game_name}
+                )
 
         return CreateGameResponse(
             success=success,

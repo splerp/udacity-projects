@@ -1,0 +1,4 @@
+cron:
+- description: Send a reminder email to all users
+  url: /crons/send_test_cron
+  schedule: every 1 minutes
