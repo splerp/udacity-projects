@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Blog Entries</h2>
+{% if user_name != None %}<p><a href="/blog/add">+ Add new entry</a><p>{% endif %}
+
+{% for blog_post in blog_posts %}
+	<div class="blogpost">
+		
+		<!--<div class="blogpost-title">
+			<a href="/blog/{{blog_post.key()}}"><h1>{{blog_post.title}}</h1></a> <a href="/blog/edit/{{blog_post.key()}}">(edit)</a>
+			 | 
+			<a href="/blog/delete/{{blog_post.key()}}">(delete)</a>
+			 | 
+			<button class="btn btn-default like-post" post-key="{{blog_post.key()}}">
+				<span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>
+			</button>
+			<button class="btn btn-default like-post" post-key="{{blog_post.key()}}">
+				<span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span>
+			</button>
+		</div>
+		<div class="blogpost-content">
+			<div class="blogpost-image"></div>
+			<div class="blogpost-text">{{blog_post.summary}}</div>
+		</div>-->
+		
+		<div class="panel panel-default blog-post" post-key="{{blog_post.key()}}">
+		  <div class="panel-heading">
+			<div class="post-heading">
+				<div class="upper">
+					<a href="/blog/{{blog_post.key()}}">{{blog_post.title}}</a>
+					<span class="author"> by {{blog_post.owner.username}}</span>
+				</div>
+				<div class="subtitle">
+					<span class="points">
+						{{blog_post.reactions.filter('reaction_type =', 'like').count() - blog_post.reactions.filter('reaction_type =', 'dislike').count()}}
+					</span>
+					 points
+				</div>
+			</div>
+			{% if user_name != None %}
+				<div class="post-controls">
+				
+				{% if blog_post.owner.username == user_name %}
+				<a class="button-edit" href="/blog/edit/{{blog_post.key()}}">(edit)</a>
+				<span class="divider">|</span>
+				<a class="button-delete" href="/blog/delete/{{blog_post.key()}}">(delete)</a>
+				{% endif %}
+				{% if blog_post.owner.username != user_name %}
+				<span class="button-group">
+					<button class="btn btn-default like-post">
+						<span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>
+					</button>
+					<button class="btn btn-default dislike-post">
+						<span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span>
+					</button>
+				</span>
+				{% endif %}
+			</div>
+			{% endif %}
+		  </div>
+		  <div class="panel-body">
+			<div class="blogpost-image">
+				<a href="/blog/{{blog_post.key()}}">
+					<img width="120" height="120"
+						 src="/img/blogtitle?img_id={{blog_post.key()}}" alt="Blog Image">
+					</img>
+				</a>
+			</div>
+			<div class="blogpost-text">{{blog_post.summary}}</div>
+		  </div>
+		</div>
+	</div>
+{% endfor %}
+
+<script src="/scripts/blog.js"></script>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

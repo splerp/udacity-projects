@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if error_messages %}
+	<div class="alert alert-danger">
+		There were problems with your request:
+		<ul>
+		{% for item in error_messages %}
+			<li>{{item}}</li>
+		{% endfor %}
+		</ul>
+	</div>
+{% endif %}
+
+<h2>Log in</h2>
+	
+<form method="post">
+
+	<div class="col-lg-12">
+		<div class="input-group">
+			<label for="login-name">Username</label>
+			<input class="form-control" id="login-name" type="text" name="login-name" value="{{ form_user_name }}"></input>
+		</div>
+	</div>
+	
+	<div class="col-lg-12">
+		<div class="input-group">
+			<label for="login-password">Password</label>
+			<input class="form-control" id="login-password" type="password" name="login-password"></input>
+		</div>
+	</div>
+	
+	<div class="col-lg-12">
+		<button class="btn btn-primary">Log In</button>
+	</div>
+	
+</form>
+
+<span>No account yet? <a href="register">Register here.</a></span>
+{% endblock %}

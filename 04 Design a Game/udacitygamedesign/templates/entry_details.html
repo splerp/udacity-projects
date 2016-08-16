@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2><a href="/blog">Blog</a> &gt; {{post.title}}</h2>
+<div id="post-contents" class="panel panel-default">
+	<div class="panel-body">
+		<span class="pre">{{post.contents}}</span>
+	</div>
+</div>
+
+<div id="post-comments">
+	<h2>Comments</h2>
+	
+	{% for comment in post.comments %}
+		<div class="post-comment panel panel-default col-lg-8">
+			<div class="comment-title label label-success" >
+				{{comment.title}}
+				{% if comment.site_user.username == user_name %}
+					<span><a class="comment-delete-text" href='/comment_delete/{{comment.key()}}'>Delete</a></span>
+				{% endif %}
+			</div>
+			<div><span><i>"{{comment.content}}"</i> - {{comment.site_user.username}}</span></div>
+		</div>
+	{% endfor %}
+	
+	{% if post.comments.count() < 1 %}
+		<span id="no-comments">No comments. Add one below!</span>
+	{% endif %}
+	
+	
+</div>
+
+<form id="comment-form" method="post">
+	<div class="col-lg-12">
+		<div class="input-group">
+			<label for="entry-title">Title</label>
+			<input class="form-control" id="entry-title" type="text" name="entry-title"></input>
+		</div>
+		<div class="input-group">
+			<label for="entry-comment">Comment</label>
+			<input class="form-control" id="entry-comment" type="text" name="entry-comment"></input>
+		</div>
+	</div>
+	
+	<div class="col-lg-12">
+		<button class="btn btn-primary">Post Comment</button>
+	</div>
+</form>
+
+<script>
+
+$("#comment-form").submit(function (e) {
+	
+	e.preventDefault();
+	
+	$.post('', $('#comment-form').serialize(), function(data) {
+		
+		$("#post-comments").append(
+			"<div class=\"post-comment panel panel-default col-lg-8\">" + 
+				"<div class=\"comment-title label label-success\" >" + 
+					$("#entry-title").val() + 
+				"</div>" + 
+				"<div><span><i>" + $("#entry-comment").val() + "</i> - {{user_name}}</span></div>" + 
+			"</div>"
+			);
+		
+		$("#no-comments").remove();
+	});
+	return false;
+});
+
+// Deleting comment functionality
+$(".post-comment").each(function () {
+    var group = $(this);
+
+    $(".comment-delete-text", group).click(function (e) {
+        e.preventDefault();
+        if (window.confirm("Are you sure you want to delete this comment?")) {
+            $.post($(this).attr("href"));
+            group.remove();
+        }
+    });
+});
+
+</script>
+
+{% endblock %}
+
