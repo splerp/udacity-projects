@@ -17,7 +17,7 @@ handlers:
   script: game_api.APPLICATION
   secure: always
   
-- url: /tasks/send_invite_email
+- url: /tasks/.*
   script: main.app
 
 - url: /crons/send_test_cron
