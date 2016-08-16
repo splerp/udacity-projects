@@ -11,15 +11,17 @@ class SiteUser(db.Model):
     joindate = db.DateTimeProperty(auto_now_add=True)
 
 
-
 class SnakesAndLaddersGame(db.Model):
 
     game_name = db.StringProperty(required=True)
     game_board = db.TextProperty(required=True)
 
     game_state = db.StringProperty(required=True,
-                                   choices=('created', 'turn_p1', 'turn_p2', 'cancelled', 'complete'),
+                                   choices=('created', 'playing', 'cancelled', 'complete'),
                                    default='created')
+                                   
+    num_players = db.IntegerProperty(default=0)
+    current_player_num = db.IntegerProperty(default=0)
 
     total_moves = db.IntegerProperty(default=0)
     ladders_hit = db.IntegerProperty(default=0)
@@ -44,6 +46,9 @@ class HistoryStep(db.Model):
 
 
 class UserGame(db.Model):
+
+    # Determines which order the players take their turns.
+    player_num = db.IntegerProperty(default=0)
 
     user = db.ReferenceProperty(SiteUser,
                                 required=True,

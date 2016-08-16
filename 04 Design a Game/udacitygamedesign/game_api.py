@@ -43,14 +43,25 @@ REQUEST_SITE_USER = endpoints.ResourceContainer(
 REQUEST_CREATE_GAME_CONTAINER = endpoints.ResourceContainer(
     message_types.VoidMessage,
     game_name=messages.StringField(1, default="A New Game"),
-    player_name_1=messages.StringField(2, required=True),
-    player_name_2=messages.StringField(3, required=True), # Make required
+    # player_name_1=messages.StringField(2, required=True),
+    # player_name_2=messages.StringField(3, required=True), # Make required
+)
+
+REQUEST_JOIN_GAME = endpoints.ResourceContainer(
+    message_types.VoidMessage,
+    game_name=messages.StringField(1, required=True),
+    player_name=messages.StringField(2, required=True)
 )
 
 REQUEST_PLAY_TURN = endpoints.ResourceContainer(
     message_types.VoidMessage,
     game_name=messages.StringField(1),
     player_name=messages.StringField(2)
+)
+
+REQUEST_START_GAME = endpoints.ResourceContainer(
+    message_types.VoidMessage,
+    game_name=messages.StringField(1)
 )
 
 REQUEST_USER_GAMES = endpoints.ResourceContainer(
@@ -77,6 +88,10 @@ class CreateGameResponse(messages.Message):
     events = messages.StringField(2)
 
     board = messages.StringField(3)
+    
+class JoinGameResponse(messages.Message):
+    success = messages.BooleanField(1)
+    events = messages.StringField(2)
 
 class CreateSiteUserResponse(messages.Message):
     success = messages.BooleanField(1)
@@ -90,6 +105,13 @@ class PlayTurnResponse(messages.Message):
 
     roll = messages.IntegerField(3)
     new_position = messages.IntegerField(4)
+    next_player = messages.StringField(5)
+    
+class StartGameResponse(messages.Message):
+    success = messages.BooleanField(1)
+    events = messages.StringField(2)
+
+    next_player = messages.StringField(3)
 
 class PlayerGamesResponse(messages.Message):
     success = messages.BooleanField(1)
@@ -202,9 +224,7 @@ class SnakesAndLaddersAPI(remote.Service):
             events.append("No user exists with the name " + request.player_name.lower() + ".")
         else:
             for usergame in user.games:
-                if usergame.game.game_state == "turn_p1":
-                    games_in_progress.append(usergame.game.game_name)
-                elif usergame.game.game_state == "turn_p2":
+                if usergame.game.game_state == "playing":
                     games_in_progress.append(usergame.game.game_name)
                 elif usergame.game.game_state == "complete":
                     games_completed.append(usergame.game.game_name)
@@ -258,9 +278,6 @@ class SnakesAndLaddersAPI(remote.Service):
         success = False
         events = []
 
-        player1 = db.GqlQuery("SELECT * FROM SiteUser WHERE username = :1", request.player_name_1.lower()).get()
-        player2 = db.GqlQuery("SELECT * FROM SiteUser WHERE username = :1", request.player_name_2.lower()).get()
-
         existing_game = db.GqlQuery(
             "SELECT * FROM SnakesAndLaddersGame WHERE game_name = :1",
             request.game_name.lower()).get()
@@ -271,49 +288,68 @@ class SnakesAndLaddersAPI(remote.Service):
             events.append("EXISTING GAME WITH NAME " + request.game_name.lower())
         else:
 
-            if player1 is None or player2 is None:
-                events.append(
-                    ("COULD NOT FIND BOTH PLAYERS for " + request.player_name_1.lower() +
-                     " and " + request.player_name_2.lower()))
+            board_to_use = convert_board_to_string(default_sal_board)
 
-            else:
+            # Create game with players.
+            game = SnakesAndLaddersGame(
+                game_name = request.game_name.lower(),
+                game_board = board_to_use,
+            )
+            game.save()
 
-                board_to_use = convert_board_to_string(default_sal_board)
-
-                # Create game with players.
-                game = SnakesAndLaddersGame(
-                    game_name = request.game_name.lower(),
-                    game_board = board_to_use,
-                )
-                game.save()
-
-                playerGame1 = UserGame(user=player1, game=game)
-                playerGame1.save()
-
-                playerGame2 = UserGame(user=player2, game=game)
-                playerGame2.save()
-
-                success = True
-                events.append("You are starting a new game called {} with players {} and {}".format(
-                    request.game_name, request.player_name_1, request.player_name_2))
-
-                taskqueue.add(
-                    url='/tasks/send_invite_email',
-                    params={'email': player1.email,
-                            'game_name': request.game_name}
-                )
-
-                taskqueue.add(
-                    url='/tasks/send_invite_email',
-                    params={'email': player2.email,
-                            'game_name': request.game_name}
-                )
+            success = True
+            events.append("You are starting a new empty game called {}".format(
+                request.game_name))
 
         return CreateGameResponse(
             success=success,
             events=str(events),
             board=board_to_use)
 
+            
+    @endpoints.method(
+        REQUEST_JOIN_GAME, JoinGameResponse, http_method='POST',
+        path = "joinGame", name = "joinGame")
+    def join_game(self, request):
+
+        success = False
+        events = []
+
+        player = db.GqlQuery("SELECT * FROM SiteUser WHERE username = :1", request.player_name.lower()).get()
+
+        game = db.GqlQuery(
+            "SELECT * FROM SnakesAndLaddersGame WHERE game_name = :1",
+            request.game_name.lower()).get()
+
+        if game is None:
+            events.append("No game found with the name " + request.game_name.lower())
+        elif player is None:
+            events.append("No player found with the name " + request.game_name.lower())
+        else:
+
+            newUserGame = UserGame(user=player, game=game, player_num=(game.num_players + 1))
+            newUserGame.save()
+
+            game.num_players += 1
+            game.current_player_num = 1 if game.current_player_num == 0 else game.current_player_num
+            game.save()
+
+            success = True
+            events.append("{} has successfully joined {}!".format(
+                player.username, request.game_name))
+
+            taskqueue.add(
+                url='/tasks/email_game_join',
+                params={'user': player.key(),
+                        'game_name': request.game_name}
+            )
+
+        return JoinGameResponse(
+            success=success,
+            events=str(events))
+
+            
+            
     @endpoints.method(
         REQUEST_PLAY_TURN, PlayTurnResponse, http_method='POST',
         path = "playTurn", name = "playTurn")
@@ -323,6 +359,9 @@ class SnakesAndLaddersAPI(remote.Service):
         events = []
         dice_roll=-1
         new_position = -1
+        next_player = None
+        
+        request_name = request.player_name.lower()
 
         game = db.GqlQuery(
             "SELECT * FROM SnakesAndLaddersGame WHERE game_name = :1",
@@ -332,7 +371,7 @@ class SnakesAndLaddersAPI(remote.Service):
             events.append("Game does not exist! (" + request.game_name.lower() + ")")
         else:
 
-            EXPECTED_PLAYERS = 2
+            EXPECTED_PLAYERS = game.num_players
 
             players = game.players.fetch(EXPECTED_PLAYERS)
 
@@ -342,14 +381,10 @@ class SnakesAndLaddersAPI(remote.Service):
                      " for game '" + game.game_name.lower() + "'. Expected: " + str(EXPECTED_PLAYERS)))
             else:
 
-                player_1 = players[0]
-                player_2 = players[1] # TODO When adding a game, player1 and player2 are specified. Use this for ordering
+                # Get player to update (if any).
+                expected_player = game.players.filter("player_num =", game.current_player_num).get()
 
-                # TODO Temporary; 'created' state will only be used if variable player count is implemented.
-                if game.game_state == "created":
-                    game.game_state = "turn_p1"
-
-                if game.game_state != "turn_p1" and game.game_state != "turn_p2":
+                if game.game_state != "playing":
                     if game.game_state == "created":
                         events.append(
                             ("Waiting for players to join before starting the game."))
@@ -360,85 +395,128 @@ class SnakesAndLaddersAPI(remote.Service):
                         events.append(
                             ("A turn cannot be done in state '" + game.game_state + "'."))
 
-                elif request.player_name != player_1.user.username and request.player_name != player_2.user.username:
-                    events.append(
-                        ("Player '" + request.player_name + "' is not part of this game."))
-
-                elif (game.game_state == "turn_p1" and request.player_name != player_1.user.username) or (game.game_state == "turn_p2" and request.player_name != player_2.user.username):
-                    events.append(
-                        ("It is not your turn, " + request.player_name + "."))
-
                 else:
-
-                    # Get player to update.
-                    player = player_1 if game.game_state == "turn_p1" else player_2
-
-                    # Play the turn...
-                    dice_roll = random.randint(1, 6)
-                    new_position = player.position + dice_roll
-
-                    # Get board info to check for snakes and ladders.
-                    current_board = convert_string_to_board(game.game_board)
-
-                    # Check for ladders
-                    hit_ladder = False
-                    for ladder in current_board.ladders:
-                        if ladder[0] == new_position:
-                            hit_ladder = True
-                            new_position = ladder[1]
-                            game.ladders_hit += 1
-                            events.append(
-                                ("Hit a ladder!"))
-
-                    # Check for snakes
-                    hit_snake = False
-                    for snake in current_board.snakes:
-                        if snake[0] == new_position:
-                            hit_snake = True
-                            new_position = snake[1]
-                            game.snakes_hit += 1
-                            events.append(
-                                ("Hit a snake..."))
-
-                    # Update player location
-                    player.position = new_position
-                    game.total_moves += 1
-
-                    # Check for win condition
-                    if new_position >= current_board.size:
-                        new_position = 100
-                        game.game_state = "complete"
-                        player.is_winner = True
+                    
+                    # At this point, set next_player (good for the user to know about)
+                    next_player = game.players.filter("player_num =", game.current_player_num).get().user.username
+                    
+                    if request_name not in [player.user.username for player in players]:
                         events.append(
-                            (player.user.username + " has won the game!"))
+                            ("Player '" + request_name + "' is not part of this game."))
+
+                    elif (request_name != expected_player.user.username):
+                        events.append(
+                            ("It is not your turn, " + request_name + "."))
+
                     else:
-                        if game.game_state == "turn_p1":
-                            game.game_state = "turn_p2"
-                        elif game.game_state == "turn_p2":
-                            game.game_state = "turn_p1"
 
-                    # Create a history step for game.
-                    step = HistoryStep(
-                        game=game,
-                        move_num=game.total_moves,
-                        player_name=player.user.username,
-                        roll_value=dice_roll,
-                        new_pos=new_position,
-                        hit_snake=hit_snake,
-                        hit_ladder=hit_ladder
-                    )
+                        # Play the turn...
+                        dice_roll = random.randint(1, 6)
+                        new_position = expected_player.position + dice_roll
 
-                    success = True
+                        # Get board info to check for snakes and ladders.
+                        current_board = convert_string_to_board(game.game_board)
 
-                    player.save()
-                    game.save()
-                    step.save()
+                        # Check for ladders
+                        hit_ladder = False
+                        for ladder in current_board.ladders:
+                            if ladder[0] == new_position:
+                                hit_ladder = True
+                                new_position = ladder[1]
+                                game.ladders_hit += 1
+                                events.append(
+                                    ("Hit a ladder!"))
+
+                        # Check for snakes
+                        hit_snake = False
+                        for snake in current_board.snakes:
+                            if snake[0] == new_position:
+                                hit_snake = True
+                                new_position = snake[1]
+                                game.snakes_hit += 1
+                                events.append(
+                                    ("Hit a snake..."))
+
+                        # Update player location
+                        expected_player.position = new_position
+                        game.total_moves += 1
+
+                        # Check for win condition
+                        if new_position >= current_board.size:
+                            new_position = 100
+                            game.game_state = "complete"
+                            expected_player.is_winner = True
+                            events.append(
+                                (expected_player.user.username + " has won the game!"))
+                        else:
+                            game.game_state = "playing"
+
+                            # Move onto next player
+                            game.current_player_num = expected_player.player_num + 1
+                            game.current_player_num = ((game.current_player_num - 1) % game.num_players) + 1
+
+                            # Change next_player value too
+                            next_player = game.players.filter("player_num =", game.current_player_num).get().user.username
+
+                        # Create a history step for game.
+                        step = HistoryStep(
+                            game=game,
+                            move_num=game.total_moves,
+                            player_name=expected_player.user.username,
+                            roll_value=dice_roll,
+                            new_pos=new_position,
+                            hit_snake=hit_snake,
+                            hit_ladder=hit_ladder
+                        )
+
+                        success = True
+
+                        expected_player.save()
+                        game.save()
+                        step.save()
 
         return PlayTurnResponse(
             success=success,
             events=str(events),
             roll=dice_roll,
-            new_position=new_position)
+            new_position=new_position,
+            next_player=next_player)
+            
+            
+    @endpoints.method(
+        REQUEST_START_GAME, StartGameResponse, http_method='POST',
+        path = "startGame", name = "startGame")
+    def start_game(self, request):
+
+        success = False
+        events = []
+        next_player = None
+        
+        game = db.GqlQuery(
+            "SELECT * FROM SnakesAndLaddersGame WHERE game_name = :1",
+            request.game_name.lower()).get()
+
+        if game is None:
+            events.append("Game does not exist! (" + request.game_name.lower() + ")")
+        elif game.num_players == 0:
+            events.append("No players have been added to this game.")
+        elif game.game_state != "created":
+            events.append("This game has already been started.")
+        else:
+
+            # Get the name of the current player whose turn it is.
+            next_player = game.players.filter("player_num =", game.current_player_num).get().user.username
+
+            game.game_state = "playing"
+            game.save()
+            
+            events.append("Game starting with " + str(game.num_players) + " players.")
+            success = True
+
+        return StartGameResponse(
+            success=success,
+            events=str(events),
+            next_player=next_player)
 
 APPLICATION = endpoints.api_server([SnakesAndLaddersAPI])
 
