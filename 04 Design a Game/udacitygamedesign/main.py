@@ -3,18 +3,18 @@
 """main.py - This file contains handlers that are called by taskqueue and/or
 cronjobs."""
 
+import ast
+import json
 import webapp2
+import endpoints
 from google.appengine.api import mail, app_identity
 from google.appengine.ext import db
 
 import src.security as security
 from src.route import Handler
-from src.data import SiteUser
+from src.data import SiteUser, SnakesAndLaddersGame, UserGame
 from src.auth import LoginHandler, LogoutHandler, RegisterHandler
-from src.validation import validate_blog_post
-
-from src.game_api import SnakesAndLaddersAPI
-
+from src.game_api import SnakesAndLaddersAPI, REQUEST_CREATE_GAME_CONTAINER
 
 def get_current_username(cookies):
     return security.cookie_value(cookies.get('user_name', None))
@@ -32,13 +32,123 @@ class IndexHandler(Handler):
 
     def get(self):
 
-        blog_posts = db.GqlQuery(
-            "SELECT * FROM BlogPost ORDER BY date_posted DESC")
+        user_name = get_current_username(self.request.cookies)
+        user = get_user_entity_from_username(user_name)
+
+        # Get the associated game for each UserGame entry for this user.
+        all_games = []
+        if user is not None:
+            all_games = [game.game for game in user.games]
 
         self.render(
-            "landing.html",
-            blog_posts=blog_posts)
+            "index.html",
+            user_games=all_games
+        )
 
+class GameListHandler(Handler):
+    """Handler for the games page, which lists all currently open games for joining."""
+
+    def get(self):
+
+        all_games = SnakesAndLaddersGame.all().filter("game_state =", "created")
+
+        self.render(
+            "games.html",
+            games=all_games
+        )
+
+class CreateGameHandler(Handler):
+    """Handler for the create game page."""
+
+    def get(self):
+
+        self.render(
+            "games-add.html",
+            success=True,
+            events=[]
+        )
+
+    def post(self):
+
+        (title, ) = self.getThese("game-name")
+
+        user_name = get_current_username(self.request.cookies)
+        user = get_user_entity_from_username(user_name)
+
+        # Call API.
+        api = SnakesAndLaddersAPI()
+        container = REQUEST_CREATE_GAME_CONTAINER.combined_message_class(game_name=title)
+        response = api.create_game(container)
+
+        new_game = SnakesAndLaddersGame.all().filter("game_name =", title.lower()).get()
+
+        print "new_game***************", new_game
+
+        # Automatically add the current user to the game too.
+        newUserGame = UserGame(user=user, game=new_game, player_num=1)
+        newUserGame.save()
+
+        self.redirect("/games/" + str(new_game.key()))
+
+        self.render(
+            "games-add.html",
+            game_name=title,
+            success=response.success,
+            events=ast.literal_eval(response.events)
+        )
+
+
+class GameListMineHandler(Handler):
+    """Handler for the games page, which lists all currently open games for joining."""
+
+    def get(self):
+
+        user_name = get_current_username(self.request.cookies)
+        user = get_user_entity_from_username(user_name)
+
+        # Get the associated game for each UserGame entry for this user.
+        all_games = []
+        if user is not None:
+            all_games = [game.game for game in user.games]
+
+        self.render(
+            "games-mine.html", True,
+            user_games=all_games
+        )
+
+class GameHandler(Handler):
+    """Handler for the games page, which lists all currently open games for joining."""
+
+    def get(self, game_k):
+
+        game = db.get(game_k)
+
+        self.render(
+            "game.html", True,
+            game=game
+        )
+
+class GameInfoHandler(Handler):
+    """Handler for the games page, which lists all currently open games for joining."""
+
+    def get(self, game_k):
+
+        game = db.get(game_k)
+
+        # Will be returning JSON.
+        self.response.headers['Content-Type'] = 'application/json'
+
+        current_player = game.players.filter("player_num =", game.current_player_num).get()
+
+        # Generate data to return and return it.
+        obj = {'success': True,
+               'game_state': game.game_state,
+               'num_players': game.num_players,
+               'player_data': [{"name" : player.user.username, "position" : player.position, "player_num" : player.player_num} for player in game.players],
+               'current_player_num': game.current_player_num,
+               'current_player_name': current_player.user.username if current_player is not None else ""}
+
+        self.response.out.write(json.dumps(obj))
 
 class WelcomeHandler(Handler):
     """Handler for the welcome page shown when registering / logging in."""
@@ -59,315 +169,11 @@ class WelcomeHandler(Handler):
                 )
 
 
-class BlogImage(Handler):
-    """Code based on content at
-    https://cloud.google.com/appengine/docs/python/images/usingimages"""
-
-    def get(self):
-        blog_post_k = db.Key(self.request.get('img_id'))
-        blog_post = db.get(blog_post_k)
-
-        if blog_post.title_image:
-            self.response.headers['Content-Type'] = 'image/png'
-            self.response.out.write(blog_post.title_image)
-        else:
-            self.redirect("/content/blank.png")
-
-
-class BlogHandler(Handler):
-    def get(self):
-
-        blog_posts = db.GqlQuery(
-            "SELECT * FROM BlogPost ORDER BY date_posted DESC")
-
-        self.render("blog.html", blog_posts=blog_posts)
-
-
-class BlogEntryHandler(Handler):
-    def get(self, post_k):
-
-        self.render("entry_details.html", post=db.get(post_k))
-
-    # Occurs when someone posts a comment.
-    def post(self, post_k):
-
-        (title, content) = self.getThese("entry-title", "entry-comment")
-
-        user_name = get_current_username(self.request.cookies)
-        user = get_user_entity_from_username(user_name)
-        blog_post = db.get(post_k)
-
-        post_comment = BlogPostComment(
-            blog_post=blog_post,
-            site_user=user,
-            title=title,
-            content=content)
-        post_comment.put()
-
-        self.redirect("/blog/" + post_k)
-
-
-class NewEntryHandler(Handler):
-    def get(self):
-        self.render("entry_new.html", True, new_id=None)
-
-    def post(self):
-        title, summary, contents, image = self.getThese(
-            "entry_title",
-            "entry_summary",
-            "entry_contents",
-            "entry_image")
-
-        user_name = get_current_username(self.request.cookies)
-        user = get_user_entity_from_username(user_name)
-
-        # Validate post and retrieve errors.
-        error_messages = validate_blog_post(
-            title,
-            summary,
-            contents,
-            user_name)
-
-        new_id = None
-
-        if len(error_messages) == 0:
-
-            # Create new blog post.
-            post = BlogPost(
-                title=title,
-                owner=user,
-                contents=contents,
-                summary=summary,
-                title_image=image if image != "" else None)
-            post.put()
-            new_id = post.key()
-
-        # Render page with all required information.
-        self.render(
-            "entry_new.html",
-            True,
-            new_id=new_id,
-            error_messages=error_messages,
-            entry_title=title,
-            entry_summary=summary,
-            entry_contents=contents)
-
-
-class EditEntryHandler(Handler):
-    def get(self, post_k):
-
-        post = db.get(post_k)
-
-        self.render(
-            "entry_edit.html",
-            True,
-            post=post,
-            entry_title=post.title,
-            entry_summary=post.summary,
-            entry_contents=post.contents)
-
-    def post(self, post_k):
-
-        submitted = False
-        post = db.get(post_k)
-
-        title, summary, contents, image, delete_attachment = self.getThese(
-            "entry-title",
-            "entry-summary",
-            "entry-contents",
-            "entry_image",
-            "remove-attachment")
-
-        # Find entry for current user.
-        user_name = get_current_username(self.request.cookies)
-        current_user = get_user_entity_from_username(user_name)
-
-        error_messages = []
-
-        if post.owner.key() == current_user.key():
-
-            # Validate post and return errors.
-            error_messages = validate_blog_post(
-                title,
-                summary,
-                contents,
-                user_name)
-
-            if len(error_messages) == 0:
-
-                # Update post details.
-                post.title = title
-                post.summary = summary
-                post.contents = contents
-
-                # Only delete the attachment if the delete button was pressed.
-                if delete_attachment == "0":
-                    post.title_image = image or post.title_image
-                else:
-                    post.title_image = None
-
-                post.put()
-                submitted = True
-        else:
-            error_messages.append("You cannot edit someone else's blog post!")
-
-        self.render(
-            "entry_edit.html",
-            True,
-            submitted=submitted,
-            post=post,
-            entry_title=title,
-            entry_summary=summary,
-            entry_contents=contents,
-            error_messages=error_messages)
-
-
-class LikePostHandler(Handler):
-    """Sets the current user's reaction to a post as specified."""
-
-    def post(self, post_k):
-
-        reaction_already_exists = False
-        deleted = False
-
-        # Will be returning JSON.
-        self.response.headers['Content-Type'] = 'application/json'
-
-        # Find entry for current user.
-        user_k = get_user_entity_from_username(
-            get_current_username(self.request.cookies)).key()
-
-        # Find reaction type.
-        (reaction_type, ) = self.getThese("reaction_type")
-
-        query = db.GqlQuery(
-            ("SELECT * FROM BlogPostReaction WHERE "
-                "blog_post = :1 AND site_user = :2"),
-            db.get(post_k),
-            db.get(user_k))
-
-        old_reaction = query.get()
-
-        # Check if this value should be removed instead.
-        if reaction_type == "":
-            if old_reaction is not None:
-                old_reaction.delete()
-                reaction_already_exists = True
-                deleted = True
-        else:
-            if old_reaction is not None:
-                old_reaction.reaction_type = reaction_type
-                old_reaction.put()
-                reaction_already_exists = True
-            else:
-                # Create new reaction entry.
-                post_reaction = BlogPostReaction(
-                    blog_post=db.get(post_k),
-                    site_user=db.get(user_k),
-                    reaction_type=reaction_type)
-                post_reaction.put()
-                reaction_already_exists = False
-
-        # Generate data to return and return it.
-        obj = {'success': True,
-               'alreadyExists': reaction_already_exists,
-               'deleted': deleted}
-
-        self.response.out.write(json.dumps(obj))
-
-
-class LikePostCheckHandler(Handler):
-    """Returns the current reaction value for a given user on a given post."""
-
-    def get(self, post_k):
-
-        # Will be returning JSON.
-        self.response.headers['Content-Type'] = 'application/json'
-
-        # Find entry for current user.
-        user_k = get_user_entity_from_username(
-            get_current_username(self.request.cookies)).key()
-
-        query = db.GqlQuery(
-            ("SELECT * FROM BlogPostReaction "
-                "WHERE blog_post = :1 AND site_user = :2"),
-            db.get(post_k),
-            db.get(user_k))
-
-        old_reaction = query.get()
-
-        current_value = ""
-        if old_reaction is not None:
-            current_value = old_reaction.reaction_type
-
-        # Generate data to return and return it.
-        obj = {'success': True,
-               'value': current_value}
-
-        self.response.out.write(json.dumps(obj))
-
-
-class DeleteEntryHandler(Handler):
-    def post(self, post_k):
-
-        post = db.get(post_k)
-        user_k = get_user_entity_from_username(
-            get_current_username(self.request.cookies)).key()
-
-        # Do not allow deletion unless the current user is the entry owner.
-        if user_k == post.owner.key():
-            if db.get(post_k) is not None:
-                db.get(post_k).delete()
-        else:
-            self.error(401)
-
-
-class DeleteCommentHandler(Handler):
-    def post(self, comment_k):
-
-        comment = db.get(comment_k)
-        user_k = get_user_entity_from_username(
-            get_current_username(self.request.cookies)).key()
-
-        # Do not allow deletion unless the current user is the comment owner.
-        if user_k == comment.site_user.key():
-            if db.get(comment_k) is not None:
-                db.get(comment_k).delete()
-        else:
-            self.error(401)
-
-
 class MembersHandler(Handler):
     def get(self):
 
         users = db.GqlQuery("SELECT * FROM SiteUser ORDER BY username")
         self.render("members.html", users=users)
-
-
-class AdminHandler(Handler):
-    """Page to easily bulk delete all users / blog posts."""
-
-    def get(self):
-        self.render("admin.html", True)
-
-    def post(self):
-        delete_users, delete_posts = self.getThese(
-            "delete_users",
-            "delete_posts")
-
-        if delete_users is not None:
-            users = SiteUser.all()
-            for user in users:
-                user.delete()
-
-        if delete_posts is not None:
-            posts = BlogPost.all()
-            print "Post is", posts
-            for one_post in posts:
-                one_post.delete()
-
-        self.render("admin.html", True)
-
 
 class SendReminderEmail(webapp2.RequestHandler):
     def get(self):
@@ -436,18 +242,13 @@ class EmailGameJoin(webapp2.RequestHandler):
 app = webapp2.WSGIApplication([
     ('/', IndexHandler),
     ('/welcome', WelcomeHandler),
-    ('/img/blogtitle', BlogImage),
-    ('/admin', AdminHandler),
     ('/register', RegisterHandler),
-    ('/blog', BlogHandler),
-    ('/blog/add', NewEntryHandler),
-    ('/blog/edit/(.+)', EditEntryHandler),
-    ('/blog/react/(.+)', LikePostHandler),
-    ('/blog/reactstatus/(.+)', LikePostCheckHandler),
-    ('/blog/delete/(.+)', DeleteEntryHandler),
-    ('/blog/(.+)', BlogEntryHandler),
-    ('/comment_delete/(.+)', DeleteCommentHandler),
     ('/members', MembersHandler),
+    ('/games', GameListHandler),
+    ('/games/add', CreateGameHandler),
+    ('/games/mine', GameListMineHandler),
+    ('/games/(.+)/getdata', GameInfoHandler),
+    ('/games/(.+)', GameHandler),
     ('/login', LoginHandler),
     ('/logout', LogoutHandler),
     ('/crons/send_test_cron', SendReminderEmail),

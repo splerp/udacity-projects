@@ -9,7 +9,7 @@
   <meta name="author" content="Ben Phelps">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="/style/base.css?v=1.0">
+  <link rel="stylesheet" href="/static/style/base.css?v=1.0">
   <link href='https://fonts.googleapis.com/css?family=Neuton' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
 	integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
@@ -50,9 +50,9 @@
 <body>
   <div id="outer-container">
 	  <header>
-	    <img src="/content/main-icon.jpg" width="20%" alt="Website Icon" />
-		<h1>Blog Pond</h1>
-		<h2>Share your thoughts on the internet, or don't</h2>
+	    <img src="/static/main-icon.jpg" width="20%" alt="Website Icon" />
+		<h1>Snakes &amp; Ladders</h1>
+		<h2>Just because why not</h2>
 		
 		<h3 id="userBar">
 			{% if user_name != None %}Welcome, {{ user_name }}! <a href="/logout">Log out here</a>.
@@ -63,7 +63,13 @@
 		  <section id="main-content">
 			{% block content %}{% endblock %}
 		  </section>
-		  <nav><ul><a href="/"><li>Home</li></a><a href="/blog/add"><li>Create Post</li></a><a href="/blog"><li>Blog</li></a><a href="/members"><li>Member List</li></a></ul></nav>
+		  <nav><ul>
+			<a href="/"><li>Home</li></a>
+			<a href="/games/add"><li>Create a game</li></a>
+			<a href="/games"><li>Join a game</li></a>
+			<a href="/games/mine"><li>My games</li></a>
+			<a href="/games/leaderboard"><li>Leaderboard</li></a>
+		  </ul></nav>
 	  </div>
 	  <footer></footer>
   </div>

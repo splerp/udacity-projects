@@ -48,30 +48,6 @@ def validate_login(username, password):
     return errors
 
 
-def validate_blog_post(title, summary, contents, user_name):
-    """
-    Handles validation for creating a blog post. Returns
-    a list of any errors encountered while validating.
-    """
-
-    errors = []
-
-    if user_name is None:
-        errors.append("You must be logged in to create a blog post.")
-
-    else:
-        if len(title) == 0:
-            errors.append("Title is required.")
-
-        if len(summary) == 0:
-            errors.append("Summary is required.")
-
-        if len(contents) == 0:
-            errors.append("Contents is required.")
-
-    return errors
-
-
 def attempt_user_login(username, password):
     """
     After login form validation is complete, check that the username

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Open Games</h2>
+<p>Join any of these... they aren't closed yet.</p>
+
+{% for game in games %}
+<div id="game-listing-current">
+    <div class="game-entry">
+        <div class="panel-heading">
+            <div class="game-entry-heading">
+                <div class="upper">
+                    <a href="/games/{{game.key()}}">{{game.game_name}}</a>
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="game-entry-text">{{game.get_summary()}}</div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}
+
+

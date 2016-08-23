@@ -47,6 +47,10 @@ REQUEST_CREATE_GAME_CONTAINER = endpoints.ResourceContainer(
     # player_name_2=messages.StringField(3, required=True), # Make required
 )
 
+"""class RequestCreateGameClass(messages.Message):
+    game_name = messages.StringField(1)"""
+
+
 REQUEST_JOIN_GAME = endpoints.ResourceContainer(
     message_types.VoidMessage,
     game_name=messages.StringField(1, required=True),
@@ -83,21 +87,25 @@ class BasicResponse(messages.Message):
     success = messages.BooleanField(1)
     events = messages.StringField(2)
 
+
 class CreateGameResponse(messages.Message):
     success = messages.BooleanField(1)
     events = messages.StringField(2)
 
     board = messages.StringField(3)
-    
+
+
 class JoinGameResponse(messages.Message):
     success = messages.BooleanField(1)
     events = messages.StringField(2)
+
 
 class CreateSiteUserResponse(messages.Message):
     success = messages.BooleanField(1)
     events = messages.StringField(2)
 
     site_user_id = messages.StringField(3)
+
 
 class PlayTurnResponse(messages.Message):
     success = messages.BooleanField(1)
@@ -106,7 +114,8 @@ class PlayTurnResponse(messages.Message):
     roll = messages.IntegerField(3)
     new_position = messages.IntegerField(4)
     next_player = messages.StringField(5)
-    
+
+
 class StartGameResponse(messages.Message):
     success = messages.BooleanField(1)
     events = messages.StringField(2)
@@ -120,17 +129,20 @@ class PlayerGamesResponse(messages.Message):
     games_in_progress = messages.StringField(3)
     games_completed = messages.StringField(4)
 
+
 class PlayerRankingsResponse(messages.Message):
     success = messages.BooleanField(1)
     events = messages.StringField(2)
 
     rankings = messages.StringField(3)
 
+
 class GameHistoryResponse(messages.Message):
     success = messages.BooleanField(1)
     events = messages.StringField(2)
 
     steps = messages.StringField(3)
+
 
 @endpoints.api(name='snakesandladdersendpoints', version='v1')
 class SnakesAndLaddersAPI(remote.Service):
@@ -141,10 +153,10 @@ class SnakesAndLaddersAPI(remote.Service):
     def create_site_user(self, request):
 
         user = SiteUser(
-            username = request.username.lower(),
-            password = request.password,
-            email = request.email,
-            description = request.description
+            username=request.username.lower(),
+            password=request.password,
+            email=request.email,
+            description=request.description
         )
         user.save()
 
@@ -155,7 +167,7 @@ class SnakesAndLaddersAPI(remote.Service):
 
     @endpoints.method(
         REQUEST_EMPTY, PlayerRankingsResponse, http_method='GET',
-        path = "playerRankings", name = "playerRankings")
+        path="playerRankings", name="playerRankings")
     def player_rankings(self, request):
 
         rankings = []
@@ -192,11 +204,17 @@ class SnakesAndLaddersAPI(remote.Service):
         success = False
         events = []
 
-        game_to_cancel = db.GqlQuery("SELECT * FROM SnakesAndLaddersGame WHERE game_name = :1", request.game_name.lower()).get()
+        game_to_cancel = db.GqlQuery(
+            "SELECT * FROM SnakesAndLaddersGame WHERE game_name = :1",
+            request.game_name.lower()).get()
+
         if game_to_cancel is None:
-            events.append("Game '" + request.game_name.lower() + "' does not exist.")
-        elif game_to_cancel.game_state == "cancelled" or game_to_cancel.game_state == "complete":
-            events.append("Game cannot be cancelled because it is in state '" + game_to_cancel.game_state + "'.")
+            events.append(
+                "Game '" + request.game_name.lower() + "' does not exist.")
+        elif (game_to_cancel.game_state == "cancelled"
+            or game_to_cancel.game_state == "complete"):
+            events.append(
+                "Game cannot be cancelled because it is in state '" + game_to_cancel.game_state + "'.")
         else:
             game_to_cancel.game_state = "cancelled"
             game_to_cancel.save()
@@ -210,7 +228,7 @@ class SnakesAndLaddersAPI(remote.Service):
 
     @endpoints.method(
         REQUEST_USER_GAMES, PlayerGamesResponse, http_method='GET',
-        path = "getUserGames", name = "getUserGames")
+        path="getUserGames", name="getUserGames")
     def get_user_games(self, request):
 
         success = False
@@ -219,9 +237,13 @@ class SnakesAndLaddersAPI(remote.Service):
         games_completed = []
 
         # Get user from name.
-        user = db.GqlQuery("SELECT * FROM SiteUser WHERE username = :1", request.player_name.lower()).get()
+        user = db.GqlQuery(
+            "SELECT * FROM SiteUser WHERE username = :1",
+            request.player_name.lower()).get()
+
         if user is None:
-            events.append("No user exists with the name " + request.player_name.lower() + ".")
+            events.append(
+                "No user exists with the name " + request.player_name.lower() + ".")
         else:
             for usergame in user.games:
                 if usergame.game.game_state == "playing":
@@ -240,7 +262,7 @@ class SnakesAndLaddersAPI(remote.Service):
 
     @endpoints.method(
         REQUEST_GAME_HISTORY, GameHistoryResponse, http_method='GET',
-        path = "getGameHistory", name = "getGameHistory")
+        path="getGameHistory", name="getGameHistory")
     def get_game_history(self, request):
 
         success = False
@@ -249,7 +271,10 @@ class SnakesAndLaddersAPI(remote.Service):
         steps = []
 
         # Get user from name.
-        game = db.GqlQuery("SELECT * FROM SnakesAndLaddersGame WHERE game_name = :1", request.game_name.lower()).get()
+        game = db.GqlQuery(
+            "SELECT * FROM SnakesAndLaddersGame WHERE game_name = :1",
+            request.game_name.lower()).get()
+
         if game is None:
             events.append("No game exists with name '" + request.game_name.lower() + "'.")
         else:
@@ -272,7 +297,7 @@ class SnakesAndLaddersAPI(remote.Service):
 
     @endpoints.method(
         REQUEST_CREATE_GAME_CONTAINER, CreateGameResponse, http_method='POST',
-        path = "createGame", name = "createGame")
+        path="createGame", name="createGame")
     def create_game(self, request):
 
         success = False
@@ -285,37 +310,41 @@ class SnakesAndLaddersAPI(remote.Service):
         board_to_use = ""
 
         if existing_game is not None:
-            events.append("EXISTING GAME WITH NAME " + request.game_name.lower())
+            events.append(
+                "EXISTING GAME WITH NAME " + request.game_name.lower())
         else:
 
             board_to_use = convert_board_to_string(default_sal_board)
 
             # Create game with players.
             game = SnakesAndLaddersGame(
-                game_name = request.game_name.lower(),
-                game_board = board_to_use,
+                game_name=request.game_name.lower(),
+                game_board=board_to_use,
             )
             game.save()
 
             success = True
-            events.append("You are starting a new empty game called {}".format(
-                request.game_name))
+            events.append(
+                "You are starting a new empty game called {}".format(
+                    request.game_name))
 
         return CreateGameResponse(
             success=success,
             events=str(events),
             board=board_to_use)
 
-            
+
     @endpoints.method(
         REQUEST_JOIN_GAME, JoinGameResponse, http_method='POST',
-        path = "joinGame", name = "joinGame")
+        path="joinGame", name="joinGame")
     def join_game(self, request):
 
         success = False
         events = []
 
-        player = db.GqlQuery("SELECT * FROM SiteUser WHERE username = :1", request.player_name.lower()).get()
+        site_user = db.GqlQuery(
+            "SELECT * FROM SiteUser WHERE username = :1",
+            request.player_name.lower()).get()
 
         game = db.GqlQuery(
             "SELECT * FROM SnakesAndLaddersGame WHERE game_name = :1",
@@ -323,11 +352,15 @@ class SnakesAndLaddersAPI(remote.Service):
 
         if game is None:
             events.append("No game found with the name " + request.game_name.lower())
-        elif player is None:
+        elif game.game_state != "created":
+            events.append("Players can only join before a game has started. ")
+        elif site_user is None:
             events.append("No player found with the name " + request.game_name.lower())
+        elif site_user.username in [player.user.username for player in game.players]:
+            events.append("Player " + request.game_name.lower() + " is already in this game.")
         else:
 
-            newUserGame = UserGame(user=player, game=game, player_num=(game.num_players + 1))
+            newUserGame = UserGame(user=site_user, game=game, player_num=(game.num_players + 1))
             newUserGame.save()
 
             game.num_players += 1
@@ -336,11 +369,11 @@ class SnakesAndLaddersAPI(remote.Service):
 
             success = True
             events.append("{} has successfully joined {}!".format(
-                player.username, request.game_name))
+                site_user.username, request.game_name))
 
             taskqueue.add(
                 url='/tasks/email_game_join',
-                params={'user': player.key(),
+                params={'user': site_user.key(),
                         'game_name': request.game_name}
             )
 
@@ -348,11 +381,11 @@ class SnakesAndLaddersAPI(remote.Service):
             success=success,
             events=str(events))
 
-            
-            
+
+
     @endpoints.method(
         REQUEST_PLAY_TURN, PlayTurnResponse, http_method='POST',
-        path = "playTurn", name = "playTurn")
+        path="playTurn", name="playTurn")
     def play_turn(self, request):
 
         success = False
@@ -360,7 +393,7 @@ class SnakesAndLaddersAPI(remote.Service):
         dice_roll=-1
         new_position = -1
         next_player = None
-        
+
         request_name = request.player_name.lower()
 
         game = db.GqlQuery(
@@ -378,11 +411,13 @@ class SnakesAndLaddersAPI(remote.Service):
             if len(players) != EXPECTED_PLAYERS:
                 events.append(
                     ("Unexpected player count " + str(len(players)) +
-                     " for game '" + game.game_name.lower() + "'. Expected: " + str(EXPECTED_PLAYERS)))
+                     " for game '" + game.game_name.lower() + 
+                     "'. Expected: " + str(EXPECTED_PLAYERS)))
             else:
 
                 # Get player to update (if any).
-                expected_player = game.players.filter("player_num =", game.current_player_num).get()
+                expected_player = game.players.filter(
+                    "player_num =", game.current_player_num).get()
 
                 if game.game_state != "playing":
                     if game.game_state == "created":
@@ -393,13 +428,15 @@ class SnakesAndLaddersAPI(remote.Service):
                             ("This game is already over."))
                     else:
                         events.append(
-                            ("A turn cannot be done in state '" + game.game_state + "'."))
-
+                            ("A turn cannot be done in state '"
+                            game.game_state + "'."))
                 else:
-                    
+
                     # At this point, set next_player (good for the user to know about)
-                    next_player = game.players.filter("player_num =", game.current_player_num).get().user.username
-                    
+                    next_player = game.players.filter(
+                        "player_num =",
+                        game.current_player_num).get().user.username
+
                     if request_name not in [player.user.username for player in players]:
                         events.append(
                             ("Player '" + request_name + "' is not part of this game."))
@@ -456,7 +493,9 @@ class SnakesAndLaddersAPI(remote.Service):
                             game.current_player_num = ((game.current_player_num - 1) % game.num_players) + 1
 
                             # Change next_player value too
-                            next_player = game.players.filter("player_num =", game.current_player_num).get().user.username
+                            next_player = game.players.filter(
+                                "player_num =",
+                                game.current_player_num).get().user.username
 
                         # Create a history step for game.
                         step = HistoryStep(
@@ -481,23 +520,25 @@ class SnakesAndLaddersAPI(remote.Service):
             roll=dice_roll,
             new_position=new_position,
             next_player=next_player)
-            
-            
+
+
     @endpoints.method(
         REQUEST_START_GAME, StartGameResponse, http_method='POST',
-        path = "startGame", name = "startGame")
+        path="startGame", name="startGame")
     def start_game(self, request):
 
         success = False
         events = []
         next_player = None
-        
+
         game = db.GqlQuery(
             "SELECT * FROM SnakesAndLaddersGame WHERE game_name = :1",
             request.game_name.lower()).get()
 
         if game is None:
-            events.append("Game does not exist! (" + request.game_name.lower() + ")")
+            events.append(
+                "Game does not exist! (" + request.game_name.lower() + ")")
+
         elif game.num_players == 0:
             events.append("No players have been added to this game.")
         elif game.game_state != "created":
@@ -505,12 +546,15 @@ class SnakesAndLaddersAPI(remote.Service):
         else:
 
             # Get the name of the current player whose turn it is.
-            next_player = game.players.filter("player_num =", game.current_player_num).get().user.username
+            next_player = game.players.filter(
+                "player_num =", game.current_player_num).get().user.username
 
             game.game_state = "playing"
             game.save()
-            
-            events.append("Game starting with " + str(game.num_players) + " players.")
+
+            events.append(
+                "Game starting with " + str(game.num_players) + " players.")
+
             success = True
 
         return StartGameResponse(
@@ -534,52 +578,3 @@ default_sal_board = SALBoard(
     snakes=[(15, 2), (23, 9), (65, 50), (91, 14)],
     ladders=[(5, 20), (6, 50), (61, 87), (43, 97)]
 )
-
-def convert_board_to_string(board):
-    # FIXME Do not store an empty element; do not add a . to the end of the string.
-    # Add size.
-    to_return = "" + str(board.size) + ":"
-    # Add snakes.
-    for snake in board.snakes:
-        to_return += str(snake[0]) + "," + str(snake[1]) + "."
-    to_return += ":"
-    # Add ladders.
-    for ladder in board.ladders:
-        to_return += str(ladder[0]) + "," + str(ladder[1]) + "."
-    return to_return
-
-def convert_string_to_board(the_string):
-
-    (size_str, snakes_str, ladders_str) = the_string.split(':')
-    size = int(size_str)
-
-    snakes = []
-    snakes_str = snakes_str.split('.')
-    for snake_str in snakes_str:
-        if snake_str != '':
-            (x, y) = snake_str.split(',')
-            snakes.append((int(x), int(y)))
-
-    ladders = []
-    ladders_str = ladders_str.split('.')
-    for ladder_str in ladders_str:
-        if ladder_str != '':
-            (x, y) = ladder_str.split(',')
-            ladders.append((int(x), int(y)))
-
-    return SALBoard(
-        size = size,
-        snakes=snakes,
-        ladders=ladders
-    )
-
-def remove_all_data():
-
-    for x in SnakesAndLaddersGame.all():
-        x.delete()
-
-    for x in SiteUser.all():
-        x.delete()
-
-    for x in UserGame.all():
-        x.delete()

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Hi :3</h2>
+<p>This is the main game view. EVERYTHING about the game is here.</p>
+
+<span style="display:none;" id="player-name">{{user_name}}</span>
+<h2 id="game-name">{{game.game_name}}</h2>
+<h3 id="game-state">{{game.game_state}}</h3>
+
+<p>{{game.get_summary()}}</p>
+
+<div id="game-area">
+    <div id="game-board">
+        <div class="player-token"></div>
+    </div>
+    <div id="game-players-list">
+        {% for player in game.players %}
+        <div class="game-player">
+            <h3>"{{player.user.user_name}}"</h3>
+            <p>Currently at position: {{player.position}}</p>
+        </div>
+        {% endfor %}
+    </div>
+    <div id="game-controls">
+        <button id="button-join-game" class="btn btn-default">Join game</button>
+        <button id="button-play-turn" class="btn btn-default">Play my turn!</button>
+
+        <!--Extra controls for owner of the game-->
+        <button id="button-next-game-state" class="btn btn-default">Start Game</button> <!--Or cancel game-->
+    </div>
+</div>
+
+<script>
+    // Initial data.
+    var gameKey = "{{game.key()}}";
+
+    var playerName = "{{user_name}}";
+    var gameName = "{{game.game_name}}";
+
+</script>
+<script src="/static/scripts/game.js"></script>
+<script src="https://apis.google.com/js/client.js?onload=onLoad"></script>
+
+{% endblock %}
+
+
