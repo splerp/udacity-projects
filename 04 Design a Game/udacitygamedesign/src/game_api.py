@@ -10,6 +10,8 @@ from data import SnakesAndLaddersGame, UserGame, SiteUser, HistoryStep
 from google.appengine.ext import db
 from google.appengine.api import taskqueue
 
+import src.security as security
+from src.validation import validate_register
 
 """Hello World API implemented using Google Cloud Endpoints.
 
@@ -152,18 +154,29 @@ class SnakesAndLaddersAPI(remote.Service):
         path = "createSiteUser", name = "createSiteUser")
     def create_site_user(self, request):
 
-        user = SiteUser(
-            username=request.username.lower(),
-            password=request.password,
-            email=request.email,
-            description=request.description
-        )
-        user.save()
+        name = request.username.lower()
+        pass1 = request.password
+        pass2 = request.password
+        email = request.email
+
+        error_messages = validate_register(name, pass1, pass2, email)
+
+        user_key = None
+        if len(error_messages) == 0:
+            user = SiteUser(
+                username=name,
+                password=security.make_pw_hash(
+                    name,
+                    pass1,
+                    security.make_salt()),
+                email=email)
+            user.put()
+            user_key = user.key()
 
         return CreateSiteUserResponse(
             success=True,
-            events=str([]),
-            site_user_id=str(user.key()))
+            events=str(error_messages),
+            site_user_id=str(user_key))
 
     @endpoints.method(
         REQUEST_EMPTY, PlayerRankingsResponse, http_method='GET',
