@@ -428,7 +428,7 @@ class SnakesAndLaddersAPI(remote.Service):
                             ("This game is already over."))
                     else:
                         events.append(
-                            ("A turn cannot be done in state '"
+                            ("A turn cannot be done in state '" +
                             game.game_state + "'."))
                 else:
 
