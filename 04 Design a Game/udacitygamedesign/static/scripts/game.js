@@ -31,7 +31,7 @@ function onLoad() {
         console.log("Loading 2");
 	    initialiseData();
 
-	    setInterval(refreshData, 5000);
+	    setInterval(refreshData, 1000);
 
         // Add button listeners.
         joinGameButton.click(function () {

@@ -200,8 +200,7 @@ class SendReminderEmail(webapp2.RequestHandler):
         num_created = 1
         
         for user in users:
-        
-            if user.email is not None:
+            if user.email is not None and user.email != "":
                 for usergame in user.games:
                 
                     should_send_email = False
@@ -243,7 +242,7 @@ class EmailGameJoin(webapp2.RequestHandler):
         user_k = db.Key(self.request.get('user'))
         user = db.get(user_k)
             
-        if user.email is not None:
+        if user.email is not None and user.email != "":
             email_to = user.email
             email_from = 'noreply@{}.appspotmail.com'.format(app_id)
             game_name = self.request.get("game_name")

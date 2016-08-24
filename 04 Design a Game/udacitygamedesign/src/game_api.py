@@ -357,9 +357,9 @@ class SnakesAndLaddersAPI(remote.Service):
         elif game.game_state != "created":
             events.append("Players can only join before a game has started. ")
         elif site_user is None:
-            events.append("No player found with the name " + request.game_name.lower())
+            events.append("No player found with the name " + request.player_name.lower())
         elif site_user.username in [player.user.username for player in game.players]:
-            events.append("Player " + request.game_name.lower() + " is already in this game.")
+            events.append("Player " + request.player_name.lower() + " is already in this game.")
         else:
 
             newUserGame = UserGame(user=site_user, game=game, player_num=(game.num_players() + 1))
