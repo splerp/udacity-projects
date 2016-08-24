@@ -21,19 +21,27 @@ class SnakesAndLaddersGame(db.Model):
         choices=('created', 'playing', 'cancelled', 'complete'),
         default='created')
 
-    num_players = db.IntegerProperty(default=0)
+    #num_players = db.IntegerProperty(default=0)
     current_player_num = db.IntegerProperty(default=0)
 
     total_moves = db.IntegerProperty(default=0)
     ladders_hit = db.IntegerProperty(default=0)
     snakes_hit = db.IntegerProperty(default=0)
 
+    def num_players(self):
+        return self.players.count()
+    
     def get_summary(self):
-        return "{0} player{1} have hit {2} object{3}.".format(
-            num_players,
-            "" if num_players == 1 else "s",
-            ladders_hit + snakes_hit,
-            "" if (ladders_hit + snakes_hit) == 1 else "s")
+        
+        summary = ""
+    
+        summary += "{0} player{1} hit {2} object{3}.".format(
+            self.num_players(),
+            " has" if self.num_players() == 1 else "s have",
+            self.ladders_hit + self.snakes_hit,
+            "" if (self.ladders_hit + self.snakes_hit) == 1 else "s")
+
+        return summary
 
 
 class HistoryStep(db.Model):
@@ -65,7 +73,7 @@ class UserGame(db.Model):
                                 required=True,
                                 collection_name='players')
 
-    position = db.IntegerProperty(default=0)
+    position = db.IntegerProperty(default=1)
     is_winner = db.BooleanProperty(default=False)
 
 
@@ -78,6 +86,16 @@ class Score(db.Model):
     game = db.ReferenceProperty(SnakesAndLaddersGame,
                                 required=True,
                                 collection_name='scores')
+
+
+class SALBoard():
+    size = 100
+    snakes = []
+    ladders = []
+    def __init__(self, size, snakes, ladders):
+        self.size = size
+        self.snakes = snakes
+        self.ladders = ladders
 
 
 def convert_board_to_string(board):
@@ -118,3 +136,10 @@ def convert_string_to_board(the_string):
         snakes=snakes,
         ladders=ladders
     )
+
+
+default_sal_board = SALBoard(
+    size = 100,
+    snakes=[(15, 2), (23, 9), (65, 50), (91, 14)],
+    ladders=[(5, 20), (6, 50), (61, 87), (43, 97)]
+)

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Leaderboard</h2>
+<p>The best players are shown here.</p>
+
+<table id="leaderboard">
+	<thead>
+		<tr>
+		<th></th>
+		<th>Player</th>
+		<th># Wins</th>
+		<th># Losses</th>
+		<th>W/L Ratio</th>
+		</tr>
+	</thead>
+	<tbody>
+	{% for ranking in rankings %}
+	
+		{% if ranking[0] == user_name %}
+		<tr class="current-player">
+		{% else %}
+		<tr>
+		{% endif %}
+		
+		<td>{{loop.index}}</td>
+		<td>{{ranking[0]}}</td>
+		<td>{{ranking[1]}}</td>
+		<td>{{ranking[2]}}</td>
+		<td>{{ranking[3] * 100}}%</td>
+		</tr>
+	{% endfor %}
+	</tbody>
+</table>
+{% endblock %}
+

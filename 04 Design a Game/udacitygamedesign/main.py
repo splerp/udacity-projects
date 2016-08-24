@@ -12,9 +12,10 @@ from google.appengine.ext import db
 
 import src.security as security
 from src.route import Handler
-from src.data import SiteUser, SnakesAndLaddersGame, UserGame
+from src.data import SiteUser, SnakesAndLaddersGame, UserGame, convert_string_to_board
 from src.auth import LoginHandler, LogoutHandler, RegisterHandler
-from src.game_api import SnakesAndLaddersAPI, REQUEST_CREATE_GAME_CONTAINER
+from src.game_api import SnakesAndLaddersAPI, REQUEST_CREATE_GAME_CONTAINER, REQUEST_EMPTY
+from src.dbextensions import get_rankings
 
 def get_current_username(cookies):
     return security.cookie_value(cookies.get('user_name', None))
@@ -38,7 +39,7 @@ class IndexHandler(Handler):
         # Get the associated game for each UserGame entry for this user.
         all_games = []
         if user is not None:
-            all_games = [game.game for game in user.games]
+            all_games = [game.game for game in user.games if game.game.game_state == "playing" or game.game.game_state == "created"]
 
         self.render(
             "index.html",
@@ -80,7 +81,7 @@ class CreateGameHandler(Handler):
         container = REQUEST_CREATE_GAME_CONTAINER.combined_message_class(game_name=title)
         response = api.create_game(container)
 
-        new_game = SnakesAndLaddersGame.all().filter("game_name =", title.lower()).get()
+        new_game = db.get(response.game_key)
 
         print "new_game***************", new_game
 
@@ -109,13 +110,25 @@ class GameListMineHandler(Handler):
         # Get the associated game for each UserGame entry for this user.
         all_games = []
         if user is not None:
-            all_games = [game.game for game in user.games]
+            all_games = [game.game for game in user.games if game.game.game_state == "playing" or game.game.game_state == "created"]
 
         self.render(
             "games-mine.html", True,
             user_games=all_games
         )
 
+
+class LeaderboardHandler(Handler):
+    """"""
+
+    def get(self):
+
+        self.render(
+            "leaderboard.html", True,
+            rankings=get_rankings()
+        )
+
+        
 class GameHandler(Handler):
     """Handler for the games page, which lists all currently open games for joining."""
 
@@ -125,7 +138,8 @@ class GameHandler(Handler):
 
         self.render(
             "game.html", True,
-            game=game
+            game=game,
+            game_board=json.dumps(convert_string_to_board(game.game_board).__dict__)
         )
 
 class GameInfoHandler(Handler):
@@ -143,7 +157,7 @@ class GameInfoHandler(Handler):
         # Generate data to return and return it.
         obj = {'success': True,
                'game_state': game.game_state,
-               'num_players': game.num_players,
+               'num_players': game.num_players(),
                'player_data': [{"name" : player.user.username, "position" : player.position, "player_num" : player.player_num} for player in game.players],
                'current_player_num': game.current_player_num,
                'current_player_name': current_player.user.username if current_player is not None else ""}
@@ -247,6 +261,7 @@ app = webapp2.WSGIApplication([
     ('/games', GameListHandler),
     ('/games/add', CreateGameHandler),
     ('/games/mine', GameListMineHandler),
+    ('/games/leaderboard', LeaderboardHandler),
     ('/games/(.+)/getdata', GameInfoHandler),
     ('/games/(.+)', GameHandler),
     ('/login', LoginHandler),

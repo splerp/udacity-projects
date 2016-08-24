@@ -2,27 +2,15 @@
 
 {% block content %}
 
-<h2>Hi :3</h2>
-<p>This is the main game view. EVERYTHING about the game is here.</p>
-
-<span style="display:none;" id="player-name">{{user_name}}</span>
 <h2 id="game-name">{{game.game_name}}</h2>
 <h3 id="game-state">{{game.game_state}}</h3>
 
-<p>{{game.get_summary()}}</p>
-
+<span style="display:none;" id="player-name">{{user_name}}</span>
 <div id="game-area">
-    <div id="game-board">
+    <canvas id="game-board" width="460" height="420">
         <div class="player-token"></div>
-    </div>
-    <div id="game-players-list">
-        {% for player in game.players %}
-        <div class="game-player">
-            <h3>"{{player.user.user_name}}"</h3>
-            <p>Currently at position: {{player.position}}</p>
-        </div>
-        {% endfor %}
-    </div>
+    </canvas>
+    <div id="game-players-list"></div>
     <div id="game-controls">
         <button id="button-join-game" class="btn btn-default">Join game</button>
         <button id="button-play-turn" class="btn btn-default">Play my turn!</button>
@@ -38,6 +26,8 @@
 
     var playerName = "{{user_name}}";
     var gameName = "{{game.game_name}}";
+	
+	var gameBoardData = {{ game_board|safe }};
 
 </script>
 <script src="/static/scripts/game.js"></script>

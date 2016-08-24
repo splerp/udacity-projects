@@ -1,17 +1,22 @@
 from __future__ import division
-import random
 
 import endpoints
+import json
+import random
+
 from protorpc import messages
 from protorpc import message_types
 from protorpc import remote
-from data import SnakesAndLaddersGame, UserGame, SiteUser, HistoryStep
+from data import (
+    SnakesAndLaddersGame, UserGame, SiteUser, HistoryStep,
+    convert_board_to_string, convert_string_to_board, default_sal_board)
 
 from google.appengine.ext import db
 from google.appengine.api import taskqueue
 
 import src.security as security
 from src.validation import validate_register
+from src.dbextensions import get_rankings
 
 """Hello World API implemented using Google Cloud Endpoints.
 
@@ -94,7 +99,8 @@ class CreateGameResponse(messages.Message):
     success = messages.BooleanField(1)
     events = messages.StringField(2)
 
-    board = messages.StringField(3)
+    game_key = messages.StringField(3)
+    board = messages.StringField(4)
 
 
 class JoinGameResponse(messages.Message):
@@ -183,25 +189,7 @@ class SnakesAndLaddersAPI(remote.Service):
         path="playerRankings", name="playerRankings")
     def player_rankings(self, request):
 
-        rankings = []
-
-        players = SiteUser.all()
-        for player in players:
-
-            wins = 0
-            losses = 0
-            for x in player.games:
-                if x.game.game_state == 'complete':
-                    if x.is_winner:
-                        wins += 1
-                    else:
-                        losses += 1
-
-            win_average = wins / (wins + losses) if (wins + losses) != 0 else 0
-
-            rankings.append((player.username, wins, win_average))
-
-        rankings.sort(key=lambda tuple: (tuple[1], tuple[2]), reverse=True)
+        rankings = get_rankings()
 
         return PlayerRankingsResponse(
             success=True,
@@ -344,6 +332,7 @@ class SnakesAndLaddersAPI(remote.Service):
         return CreateGameResponse(
             success=success,
             events=str(events),
+            game_key=str(game.key()),
             board=board_to_use)
 
 
@@ -373,10 +362,9 @@ class SnakesAndLaddersAPI(remote.Service):
             events.append("Player " + request.game_name.lower() + " is already in this game.")
         else:
 
-            newUserGame = UserGame(user=site_user, game=game, player_num=(game.num_players + 1))
+            newUserGame = UserGame(user=site_user, game=game, player_num=(game.num_players() + 1))
             newUserGame.save()
 
-            game.num_players += 1
             game.current_player_num = 1 if game.current_player_num == 0 else game.current_player_num
             game.save()
 
@@ -417,15 +405,15 @@ class SnakesAndLaddersAPI(remote.Service):
             events.append("Game does not exist! (" + request.game_name.lower() + ")")
         else:
 
-            EXPECTED_PLAYERS = game.num_players
+            total_players = game.num_players()
 
-            players = game.players.fetch(EXPECTED_PLAYERS)
+            players = game.players.fetch(total_players)
 
-            if len(players) != EXPECTED_PLAYERS:
+            if len(players) != total_players:
                 events.append(
                     ("Unexpected player count " + str(len(players)) +
                      " for game '" + game.game_name.lower() + 
-                     "'. Expected: " + str(EXPECTED_PLAYERS)))
+                     "'. Expected: " + str(total_players)))
             else:
 
                 # Get player to update (if any).
@@ -503,7 +491,7 @@ class SnakesAndLaddersAPI(remote.Service):
 
                             # Move onto next player
                             game.current_player_num = expected_player.player_num + 1
-                            game.current_player_num = ((game.current_player_num - 1) % game.num_players) + 1
+                            game.current_player_num = ((game.current_player_num - 1) % game.num_players()) + 1
 
                             # Change next_player value too
                             next_player = game.players.filter(
@@ -529,7 +517,7 @@ class SnakesAndLaddersAPI(remote.Service):
 
         return PlayTurnResponse(
             success=success,
-            events=str(events),
+            events=json.dumps(events),
             roll=dice_roll,
             new_position=new_position,
             next_player=next_player)
@@ -552,7 +540,7 @@ class SnakesAndLaddersAPI(remote.Service):
             events.append(
                 "Game does not exist! (" + request.game_name.lower() + ")")
 
-        elif game.num_players == 0:
+        elif game.num_players() == 0:
             events.append("No players have been added to this game.")
         elif game.game_state != "created":
             events.append("This game has already been started.")
@@ -566,7 +554,7 @@ class SnakesAndLaddersAPI(remote.Service):
             game.save()
 
             events.append(
-                "Game starting with " + str(game.num_players) + " players.")
+                "Game starting with " + str(game.num_players()) + " players.")
 
             success = True
 
@@ -576,18 +564,3 @@ class SnakesAndLaddersAPI(remote.Service):
             next_player=next_player)
 
 APPLICATION = endpoints.api_server([SnakesAndLaddersAPI])
-
-class SALBoard():
-    size = 100
-    snakes = []
-    ladders = []
-    def __init__(self, size, snakes, ladders):
-        self.size = size
-        self.snakes = snakes
-        self.ladders = ladders
-
-default_sal_board = SALBoard(
-    size = 100,
-    snakes=[(15, 2), (23, 9), (65, 50), (91, 14)],
-    ladders=[(5, 20), (6, 50), (61, 87), (43, 97)]
-)
