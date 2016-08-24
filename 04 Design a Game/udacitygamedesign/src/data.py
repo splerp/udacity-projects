@@ -138,8 +138,14 @@ def convert_string_to_board(the_string):
     )
 
 
-default_sal_board = SALBoard(
+"""default_sal_board = SALBoard(
     size = 100,
     snakes=[(15, 2), (23, 9), (65, 50), (91, 14)],
     ladders=[(5, 20), (6, 50), (61, 87), (43, 97)]
+)"""
+
+default_sal_board = SALBoard(
+    size = 100,
+    snakes=[(4, 2), (12, 9), (62, 19), (70, 28), (72, 23), (85, 14), (98, 90), (99, 5)],
+    ladders=[(1, 100), (6, 66), (27, 45), (47, 77), (73, 88), (69, 83)]
 )
