@@ -7,7 +7,6 @@ var gameArea;
 var gameBoard;
 var context;
 var gameState;
-var playerObjects;
 var joinGameButton;
 var playTurnButton;
 var startGameButton;
@@ -27,7 +26,7 @@ function onLoad() {
 
     // Referencing API path, attempt to load API.
 	var rootPath = "//" + window.location.host + "/_ah/api";
-	gapi.client.load(apiName, 'v1', function() {
+	window.gapi.client.load(apiName, 'v1', function() {
 	    // On completed loading.
 
         console.log("Loading 2");
@@ -53,13 +52,13 @@ function onLoad() {
 
 function sendAPIRequest(endPoint, data, callback)
 {
-    var request = window["gapi"]["client"][apiName][endPoint](data);
+    var request = window.gapi.client[apiName][endPoint](data);
     request.execute(function(response) {
 
         if(!response.success)
         {
             console.log("Something bad happened :o 'Apic' fail, amirite?");
-            console.log(response.events)
+            console.log(response.events);
         }
         refreshData(callback, response);
     });
@@ -81,7 +80,6 @@ function initialiseData()
 
 function drawGameBoard()
 {
-	var size = gameBoardData.size;
 	var snakes = gameBoardData.snakes;
 	var ladders = gameBoardData.ladders;
 	
@@ -215,7 +213,7 @@ function updatePlayerInfo(state)
 
 function refreshUI()
 {
-	updatePlayerInfo(currentGameState)
+	updatePlayerInfo(currentGameState);
 
     // Check if they're already in the game and enable / disable the Join button.
     joinGameButton.prop("disabled", false);
@@ -251,11 +249,6 @@ function refreshUI()
 	$("#game-players-list").append($(document.createElement("p")).html(turnInfoText));
 }
 
-function getTileFromPos()
-{
-	
-}
-
 function getPosFromTileIndex(tileIndex)
 {
 	var numSquaresX = 10;
@@ -279,11 +272,6 @@ function getPosFromTileIndex(tileIndex)
 	}
 	
 	return [finalPosX, finalPosY];
-}
-
-function getPosFromTilePos()
-{
-	
 }
 
 function joinGame()
@@ -319,20 +307,3 @@ function startGame()
 
     })
 }
-
-
-// Set button default values.
-/*$.get("/blog/reactstatus/" + key, function (responseData) {
-    if (responseData.success) {
-        if (responseData.value === "like") {
-            group.find(".like-post")
-                .removeClass("btn-default")
-                .addClass("btn-success");
-        }
-        if (responseData.value === "dislike") {
-            group.find(".dislike-post")
-                .removeClass("btn-default")
-                .addClass(dislikeButtonClass);
-        }
-    }
-});*/

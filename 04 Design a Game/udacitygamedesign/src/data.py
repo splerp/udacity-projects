@@ -10,7 +10,7 @@ class SiteUser(db.Model):
     description = db.TextProperty()
     joindate = db.DateTimeProperty(auto_now_add=True)
 
-    
+
 class SnakesAndLaddersGame(db.Model):
 
     game_name = db.StringProperty(required=True)
@@ -21,7 +21,6 @@ class SnakesAndLaddersGame(db.Model):
         choices=('created', 'playing', 'cancelled', 'complete'),
         default='created')
 
-    #num_players = db.IntegerProperty(default=0)
     current_player_num = db.IntegerProperty(default=0)
 
     total_moves = db.IntegerProperty(default=0)
@@ -30,25 +29,25 @@ class SnakesAndLaddersGame(db.Model):
 
     def num_players(self):
         return self.players.count()
-    
+
     def get_owner(self):
-        
+
         # Find a matching player.
         for player in self.players:
             if player.is_owner:
                 return player.user.username
-    
+
         return ""
-    
+
     def get_summary(self):
-        
+
         summary = ""
         nametxt = "No players"
-    
+
         if self.players.count() > 0:
-            names = [str(player.user.username) for player in self.players];
+            names = [str(player.user.username) for player in self.players]
             nametxt = string_commas_and(names)
- 
+
         summary += "{0} are playing. They have hit {1} object{2}.".format(
             nametxt,
             self.ladders_hit + self.snakes_hit,
@@ -106,6 +105,7 @@ class SALBoard():
     size = 100
     snakes = []
     ladders = []
+
     def __init__(self, size, snakes, ladders):
         self.size = size
         self.snakes = snakes
@@ -113,7 +113,8 @@ class SALBoard():
 
 
 def convert_board_to_string(board):
-    # FIXME Do not store an empty element; do not add a . to the end of the string.
+    # FIXME Do not store an empty element
+    # fixme do not add a . to the end of the string.
     # Add size.
     to_return = "" + str(board.size) + ":"
     # Add snakes.
@@ -153,30 +154,27 @@ def convert_string_to_board(the_string):
 
 
 def string_commas_and(to_convert):
-    
+
     to_return = ""
-    
+
     if len(to_convert) > 0:
         # Convert into style x, y, z, and w
         if len(to_convert) > 1:
             for element in to_convert[:-2]:
                 to_return += element + ", "
-            
-            to_return += to_convert[len(to_convert)-2] + " and " + to_convert[len(to_convert)-1]
+
+            to_return += (to_convert[len(to_convert)-2] +
+                          " and " + to_convert[len(to_convert)-1])
         # Return first element
         else:
             to_return += to_convert[0]
-    
+
     return to_return
 
-"""default_sal_board = SALBoard(
-    size = 100,
-    snakes=[(15, 2), (23, 9), (65, 50), (91, 14)],
-    ladders=[(5, 20), (6, 50), (61, 87), (43, 97)]
-)"""
 
 default_sal_board = SALBoard(
-    size = 100,
-    snakes=[(4, 2), (12, 9), (62, 19), (70, 28), (72, 23), (85, 14), (98, 91), (99, 5)],
+    size=100,
+    snakes=[(4, 2), (12, 9), (62, 19), (70, 28), (72, 23),
+            (85, 14), (98, 91), (99, 5)],
     ladders=[(1, 100), (6, 66), (27, 45), (47, 77), (73, 88), (69, 83)]
 )
