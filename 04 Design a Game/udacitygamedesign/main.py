@@ -64,7 +64,7 @@ class CreateGameHandler(Handler):
     def get(self):
 
         self.render(
-            "games-add.html",
+            "games-add.html", True,
             success=True,
             events=[]
         )
@@ -124,7 +124,7 @@ class LeaderboardHandler(Handler):
     def get(self):
 
         self.render(
-            "leaderboard.html", True,
+            "leaderboard.html",
             rankings=get_rankings()
         )
 

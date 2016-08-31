@@ -51,12 +51,12 @@
   <div id="outer-container">
 	  <header>
 	    <img src="/static/main-icon.jpg" width="20%" alt="Website Icon" />
-		<h1>Snakes &amp; Ladders</h1>
+		<a href="/"><h1>Snakes &amp; Ladders</h1></a>
 		<h2>Just because why not</h2>
 		
 		<h3 id="userBar">
 			{% if user_name != None %}Welcome, {{ user_name }}! <a href="/logout">Log out here</a>.
-			{% else %}<a href="/login">Login here!</a>{% endif %}
+			{% else %}<a href="/login">Login here!</a> (or <a href="/register">sign up</a>){% endif %}
 		</h3>
 	  </header>
 	  <div id="main-flex-area">
@@ -64,10 +64,11 @@
 			{% block content %}{% endblock %}
 		  </section>
 		  <nav><ul>
-			<a href="/"><li>Home</li></a>
-			<a href="/games/add"><li>Create a game</li></a>
+			{% if user_name != None %}
+			<a href="/games/add"><li>Create!</li></a>
 			<a href="/games"><li>Join a game</li></a>
-			<a href="/games/mine"><li>My games</li></a>
+			<a href="/games/mine"><li>View my games</li></a>
+			{% endif %}
 			<a href="/games/leaderboard"><li>Leaderboard</li></a>
 		  </ul></nav>
 	  </div>
