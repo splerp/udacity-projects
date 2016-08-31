@@ -50,12 +50,19 @@ class GameListHandler(Handler):
     """Handler for the games page, which lists all currently open games for joining."""
 
     def get(self):
-
+        
+        user_name = get_current_username(self.request.cookies)
+        user = get_user_entity_from_username(user_name)
+        user_games = [usergame.game.game_name for usergame in user.games]
+        
         all_games = SnakesAndLaddersGame.all().filter("game_state =", "created")
-
+        
+        # Remove any games this player is already in.
+        filtered = [game for game in all_games if game.game_name not in user_games]
+        
         self.render(
             "games.html",
-            games=all_games
+            games=filtered
         )
 
 class CreateGameHandler(Handler):

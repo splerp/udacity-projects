@@ -6,7 +6,7 @@
 <p>All games below are waiting for players. Feel free to join one!</p>
 
 <div id="game-listing-current">
-{% if games.count() < 1 %}
+{% if games|length < 1 %}
 	<p>There are currently no available games.</p>
 {% else %}
 	{% for game in games %}
