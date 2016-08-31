@@ -34,10 +34,14 @@ class SnakesAndLaddersGame(db.Model):
     def get_summary(self):
         
         summary = ""
+        nametxt = "No players"
     
-        summary += "{0} player{1} hit {2} object{3}.".format(
-            self.num_players(),
-            " has" if self.num_players() == 1 else "s have",
+        if self.players.count() > 0:
+            names = [str(player.user.username) for player in self.players];
+            nametxt = string_commas_and(names)
+ 
+        summary += "{0} are playing. They have hit {1} object{2}.".format(
+            nametxt,
             self.ladders_hit + self.snakes_hit,
             "" if (self.ladders_hit + self.snakes_hit) == 1 else "s")
 
@@ -137,6 +141,23 @@ def convert_string_to_board(the_string):
         ladders=ladders
     )
 
+
+def string_commas_and(to_convert):
+    
+    to_return = ""
+    
+    if len(to_convert) > 0:
+        # Convert into style x, y, z, and w
+        if len(to_convert) > 1:
+            for element in to_convert[:-2]:
+                to_return += element + ", "
+            
+            to_return += to_convert[len(to_convert)-2] + " and " + to_convert[len(to_convert)-1]
+        # Return first element
+        else:
+            to_return += to_convert[0]
+    
+    return to_return
 
 """default_sal_board = SALBoard(
     size = 100,
