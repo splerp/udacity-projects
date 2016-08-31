@@ -158,6 +158,7 @@ class GameInfoHandler(Handler):
         obj = {'success': True,
                'game_state': game.game_state,
                'num_players': game.num_players(),
+               'owner': game.get_owner(),
                'player_data': [{"name" : player.user.username, "position" : player.position, "player_num" : player.player_num} for player in game.players],
                'current_player_num': game.current_player_num,
                'current_player_name': current_player.user.username if current_player is not None else ""}

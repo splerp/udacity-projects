@@ -10,7 +10,7 @@ class SiteUser(db.Model):
     description = db.TextProperty()
     joindate = db.DateTimeProperty(auto_now_add=True)
 
-
+    
 class SnakesAndLaddersGame(db.Model):
 
     game_name = db.StringProperty(required=True)
@@ -30,6 +30,15 @@ class SnakesAndLaddersGame(db.Model):
 
     def num_players(self):
         return self.players.count()
+    
+    def get_owner(self):
+        
+        # Find a matching player.
+        for player in self.players:
+            if player.is_owner:
+                return player.user.username
+    
+        return ""
     
     def get_summary(self):
         

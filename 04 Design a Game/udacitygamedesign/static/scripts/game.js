@@ -16,6 +16,8 @@ var currentGameState;
 var currentPlayerData;
 var currentPlayerTurnName;
 
+var gameOwner = "";
+
 var turnInfoText = "";
 
 // Called from google api client.js when loaded.
@@ -164,7 +166,8 @@ function refreshData(callback, response)
 				
                 currentPlayerTurnName = responseData.current_player_name;
                 currentPlayerData = responseData.player_data;
-
+				
+				gameOwner = responseData.owner;
 
                 refreshUI();
 				drawGameBoard();
@@ -224,7 +227,7 @@ function refreshUI()
     });
 
     playTurnButton.prop("disabled", currentGameState != "playing" || currentPlayerTurnName != playerName);
-	startGameButton.prop("disabled", currentGameState != "created" || currentPlayerData.length < 2);
+	startGameButton.prop("disabled", currentGameState != "created" || currentPlayerData.length < 2 || gameOwner != playerName);
 	
 	// Remove any existing player list entries.
     $("#game-players-list").empty();
