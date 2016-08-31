@@ -79,6 +79,7 @@ class UserGame(db.Model):
 
     position = db.IntegerProperty(default=1)
     is_winner = db.BooleanProperty(default=False)
+    is_owner = db.BooleanProperty(default=False)
 
 
 class Score(db.Model):

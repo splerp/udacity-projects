@@ -363,9 +363,12 @@ class SnakesAndLaddersAPI(remote.Service):
         else:
 
             newUserGame = UserGame(user=site_user, game=game, player_num=(game.num_players() + 1))
-            newUserGame.save()
 
-            game.current_player_num = 1 if game.current_player_num == 0 else game.current_player_num
+            if game.current_player_num == 0:
+                game.current_player_num = 1
+                newUserGame.is_owner = True
+            
+            newUserGame.save()
             game.save()
 
             success = True

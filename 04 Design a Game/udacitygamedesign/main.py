@@ -86,7 +86,7 @@ class CreateGameHandler(Handler):
         print "new_game***************", new_game
 
         # Automatically add the current user to the game too.
-        newUserGame = UserGame(user=user, game=new_game, player_num=1)
+        newUserGame = UserGame(user=user, game=new_game, player_num=1, is_owner=True)
         newUserGame.save()
 
         self.redirect("/games/" + str(new_game.key()))
