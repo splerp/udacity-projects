@@ -1,3 +1,5 @@
+from __future__ import division
+
 from google.appengine.ext import db
 
 from src.data import SiteUser
