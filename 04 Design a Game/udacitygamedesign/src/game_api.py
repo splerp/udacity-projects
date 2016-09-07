@@ -90,6 +90,7 @@ REQUEST_GAME_HISTORY = endpoints.ResourceContainer(
     game_name=messages.StringField(1)
 )
 
+
 class BasicResponse(messages.Message):
     success = messages.BooleanField(1)
     events = messages.StringField(2)
@@ -130,6 +131,7 @@ class StartGameResponse(messages.Message):
 
     next_player = messages.StringField(3)
 
+
 class PlayerGamesResponse(messages.Message):
     success = messages.BooleanField(1)
     events = messages.StringField(2)
@@ -157,9 +159,8 @@ class SnakesAndLaddersAPI(remote.Service):
 
     @endpoints.method(
         REQUEST_SITE_USER, CreateSiteUserResponse, http_method='POST',
-        path = "createSiteUser", name = "createSiteUser")
+        path="createSiteUser", name="createSiteUser")
     def create_site_user(self, request):
-
         name = request.username.lower()
         pass1 = request.password
         pass2 = request.password
@@ -188,7 +189,6 @@ class SnakesAndLaddersAPI(remote.Service):
         REQUEST_EMPTY, PlayerRankingsResponse, http_method='GET',
         path="playerRankings", name="playerRankings")
     def player_rankings(self, request):
-
         rankings = get_rankings()
 
         return PlayerRankingsResponse(
@@ -199,9 +199,8 @@ class SnakesAndLaddersAPI(remote.Service):
 
     @endpoints.method(
         REQUEST_CANCEL_GAME, BasicResponse, http_method='POST',
-        path = "cancelGame", name = "cancelGame")
+        path="cancelGame", name="cancelGame")
     def cancelGame(self, request):
-
         success = False
         events = []
 
@@ -211,11 +210,14 @@ class SnakesAndLaddersAPI(remote.Service):
 
         if game_to_cancel is None:
             events.append(
-                "Game '" + request.game_name.lower() + "' does not exist.")
-        elif (game_to_cancel.game_state == "cancelled"
-            or game_to_cancel.game_state == "complete"):
+                ("Game '" +
+                 request.game_name.lower() +
+                 "' does not exist."))
+        elif (game_to_cancel.game_state == "cancelled" or
+              game_to_cancel.game_state == "complete"):
             events.append(
-                "Game cannot be cancelled because it is in state '" + game_to_cancel.game_state + "'.")
+                ("Game cannot be cancelled because it is in state '" +
+                 game_to_cancel.game_state + "'."))
         else:
             game_to_cancel.game_state = "cancelled"
             game_to_cancel.save()
@@ -231,7 +233,6 @@ class SnakesAndLaddersAPI(remote.Service):
         REQUEST_USER_GAMES, PlayerGamesResponse, http_method='GET',
         path="getUserGames", name="getUserGames")
     def get_user_games(self, request):
-
         success = False
         events = []
         games_in_progress = []
@@ -244,7 +245,8 @@ class SnakesAndLaddersAPI(remote.Service):
 
         if user is None:
             events.append(
-                "No user exists with the name " + request.player_name.lower() + ".")
+                ("No user exists with the name " +
+                 request.player_name.lower() + "."))
         else:
             for usergame in user.games:
                 if usergame.game.game_state == "playing":
@@ -265,7 +267,6 @@ class SnakesAndLaddersAPI(remote.Service):
         REQUEST_GAME_HISTORY, GameHistoryResponse, http_method='GET',
         path="getGameHistory", name="getGameHistory")
     def get_game_history(self, request):
-
         success = False
         events = []
 
@@ -277,7 +278,9 @@ class SnakesAndLaddersAPI(remote.Service):
             request.game_name.lower()).get()
 
         if game is None:
-            events.append("No game exists with name '" + request.game_name.lower() + "'.")
+            events.append(
+                ("No game exists with name '" +
+                 request.game_name.lower() + "'."))
         else:
 
             for move in game.moves.order("move_num"):
@@ -300,7 +303,6 @@ class SnakesAndLaddersAPI(remote.Service):
         REQUEST_CREATE_GAME_CONTAINER, CreateGameResponse, http_method='POST',
         path="createGame", name="createGame")
     def create_game(self, request):
-
         success = False
         events = []
 
@@ -335,12 +337,10 @@ class SnakesAndLaddersAPI(remote.Service):
             game_key=str(game.key()),
             board=board_to_use)
 
-
     @endpoints.method(
         REQUEST_JOIN_GAME, JoinGameResponse, http_method='POST',
         path="joinGame", name="joinGame")
     def join_game(self, request):
-
         success = False
         events = []
 
@@ -353,21 +353,30 @@ class SnakesAndLaddersAPI(remote.Service):
             request.game_name.lower()).get()
 
         if game is None:
-            events.append("No game found with the name " + request.game_name.lower())
+            events.append(
+                ("No game found with the name " +
+                 request.game_name.lower()))
         elif game.game_state != "created":
             events.append("Players can only join before a game has started. ")
         elif site_user is None:
-            events.append("No player found with the name " + request.player_name.lower())
-        elif site_user.username in [player.user.username for player in game.players]:
-            events.append("Player " + request.player_name.lower() + " is already in this game.")
+            events.append(
+                "No player found with the name " + request.player_name.lower())
+        elif (site_user.username in
+              [player.user.username for player in game.players]):
+            events.append(
+                ("Player " + request.player_name.lower() +
+                 " is already in this game."))
         else:
 
-            newUserGame = UserGame(user=site_user, game=game, player_num=(game.num_players() + 1))
+            newUserGame = UserGame(
+                user=site_user,
+                game=game,
+                player_num=(game.num_players() + 1))
 
             if game.current_player_num == 0:
                 game.current_player_num = 1
                 newUserGame.is_owner = True
-            
+
             newUserGame.save()
             game.save()
 
@@ -385,16 +394,13 @@ class SnakesAndLaddersAPI(remote.Service):
             success=success,
             events=str(events))
 
-
-
     @endpoints.method(
         REQUEST_PLAY_TURN, PlayTurnResponse, http_method='POST',
         path="playTurn", name="playTurn")
     def play_turn(self, request):
-
         success = False
         events = []
-        dice_roll=-1
+        dice_roll = -1
         new_position = -1
         next_player = None
 
@@ -405,7 +411,8 @@ class SnakesAndLaddersAPI(remote.Service):
             request.game_name.lower()).get()
 
         if game is None:
-            events.append("Game does not exist! (" + request.game_name.lower() + ")")
+            events.append(
+                "Game does not exist! (" + request.game_name.lower() + ")")
         else:
 
             total_players = game.num_players()
@@ -415,7 +422,7 @@ class SnakesAndLaddersAPI(remote.Service):
             if len(players) != total_players:
                 events.append(
                     ("Unexpected player count " + str(len(players)) +
-                     " for game '" + game.game_name.lower() + 
+                     " for game '" + game.game_name.lower() +
                      "'. Expected: " + str(total_players)))
             else:
 
@@ -426,24 +433,26 @@ class SnakesAndLaddersAPI(remote.Service):
                 if game.game_state != "playing":
                     if game.game_state == "created":
                         events.append(
-                            ("Waiting for players to join before starting the game."))
+                            ("Waiting for players to join " +
+                             "before starting the game."))
                     elif game.game_state == "complete":
-                        events.append(
-                            ("This game is already over."))
+                        events.append("This game is already over.")
                     else:
                         events.append(
                             ("A turn cannot be done in state '" +
-                            game.game_state + "'."))
+                             game.game_state + "'."))
                 else:
 
-                    # At this point, set next_player (good for the user to know about)
+                    # At this point, set next_player
                     next_player = game.players.filter(
-                        "player_num =",
-                        game.current_player_num).get().user.username
+                        ("player_num =",
+                         game.current_player_num)).get().user.username
 
-                    if request_name not in [player.user.username for player in players]:
+                    if request_name not in [player.user.username for
+                       player in players]:
                         events.append(
-                            ("Player '" + request_name + "' is not part of this game."))
+                            ("Player '" + request_name +
+                             "' is not part of this game."))
 
                     elif (request_name != expected_player.user.username):
                         events.append(
@@ -456,7 +465,8 @@ class SnakesAndLaddersAPI(remote.Service):
                         new_position = expected_player.position + dice_roll
 
                         # Get board info to check for snakes and ladders.
-                        current_board = convert_string_to_board(game.game_board)
+                        current_board = convert_string_to_board(
+                            game.game_board)
 
                         # Check for ladders
                         hit_ladder = False
@@ -488,13 +498,17 @@ class SnakesAndLaddersAPI(remote.Service):
                             game.game_state = "complete"
                             expected_player.is_winner = True
                             events.append(
-                                (expected_player.user.username + " has won the game!"))
+                                (expected_player.user.username +
+                                 " has won the game!"))
                         else:
                             game.game_state = "playing"
 
                             # Move onto next player
-                            game.current_player_num = expected_player.player_num + 1
-                            game.current_player_num = ((game.current_player_num - 1) % game.num_players()) + 1
+                            game.current_player_num = (
+                                expected_player.player_num + 1)
+                            game.current_player_num = (
+                                ((game.current_player_num - 1) %
+                                 game.num_players()) + 1)
 
                             # Change next_player value too
                             next_player = game.players.filter(
@@ -525,12 +539,10 @@ class SnakesAndLaddersAPI(remote.Service):
             new_position=new_position,
             next_player=next_player)
 
-
     @endpoints.method(
         REQUEST_START_GAME, StartGameResponse, http_method='POST',
         path="startGame", name="startGame")
     def start_game(self, request):
-
         success = False
         events = []
         next_player = None

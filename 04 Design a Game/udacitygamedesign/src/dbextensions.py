@@ -36,6 +36,7 @@ def get_rankings():
     # Sort by wins. If equal, breka ties with win frequency.
     # Sort by losses if both are equal (people with more
     # experience are ranked higher)
-    rankings.sort(key=lambda tuple: (tuple[1], tuple[3], tuple[2]), reverse=True)
-    
+    rankings.sort(
+        key=lambda tuple: (tuple[1], tuple[3], tuple[2]), reverse=True)
+
     return rankings
