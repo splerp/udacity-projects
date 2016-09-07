@@ -14,7 +14,7 @@ handlers:
 - url: /tasks/.*
   script: main.app
 
-- url: /crons/send_test_cron
+- url: /crons/.*
   script: main.app
   
 - url: .*

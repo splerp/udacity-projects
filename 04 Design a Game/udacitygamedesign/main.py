@@ -247,19 +247,27 @@ class SendReminderEmail(webapp2.RequestHandler):
                     subject = ""
                     body = ""
 
+                    username = user.username
+                    gamename = usergame.game.game_name
+
                     if usergame.game.game_state == "created":
                         should_send_email = True
                         subject = ("Reminder: You haven't started playing" +
                                    " your snakes and ladders game! " +
                                    str(num_created))
-                        body = "FIX IT."
+                        body = ("Hi there " + username + ". Please view your" +
+                                " game " + gamename + " and get some people " +
+                                "playing.")
 
-                    elif usergame.game.game_state == "playing":
+                    elif (usergame.game.game_state == "playing" and
+                          (usergame.player_num ==
+                           usergame.game.current_player_num)):
                         should_send_email = True
                         subject = ("Reminder: Keep playing snakes and" +
                                    " ladders! You have an unfinished game. " +
                                    str(num_created))
-                        body = "FIX IT."
+                        body = ("Hi there " + username + ". Please view your" +
+                                " game " + gamename + " and play your turn.")
 
                     if should_send_email:
                         num_created += 1

@@ -12,6 +12,10 @@ class SiteUser(db.Model):
 
 
 class SnakesAndLaddersGame(db.Model):
+    """
+    Defines a Snakes and Ladders game including game state
+    and other data.
+    """
 
     game_name = db.StringProperty(required=True)
     game_board = db.TextProperty(required=True)
@@ -57,6 +61,7 @@ class SnakesAndLaddersGame(db.Model):
 
 
 class HistoryStep(db.Model):
+    """Defines a history step for a particular game for replaying gameplay."""
 
     game = db.ReferenceProperty(SnakesAndLaddersGame,
                                 required=True,
@@ -73,6 +78,7 @@ class HistoryStep(db.Model):
 
 
 class UserGame(db.Model):
+    """Defines a relationship between a game and a site user."""
 
     # Determines which order the players take their turns.
     player_num = db.IntegerProperty(default=0)
@@ -88,17 +94,6 @@ class UserGame(db.Model):
     position = db.IntegerProperty(default=1)
     is_winner = db.BooleanProperty(default=False)
     is_owner = db.BooleanProperty(default=False)
-
-
-class Score(db.Model):
-
-    user = db.ReferenceProperty(SiteUser,
-                                required=True,
-                                collection_name='scores')
-
-    game = db.ReferenceProperty(SnakesAndLaddersGame,
-                                required=True,
-                                collection_name='scores')
 
 
 class SALBoard():

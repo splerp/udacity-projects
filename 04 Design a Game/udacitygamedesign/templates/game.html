@@ -16,17 +16,17 @@
         <button id="button-play-turn" class="btn btn-default">Play my turn!</button>
 
         <!--Extra controls for owner of the game-->
-        <button id="button-next-game-state" class="btn btn-default">Start Game</button> <!--Or cancel game-->
+        <button id="button-next-game-state" class="btn btn-default">Start Game</button>
     </div>
 </div>
 
 <script>
-    // Initial data.
-    var gameKey = "{{game.key()}}";
+	// Initial data.
+	var gameKey = "{{game.key()}}";
 
-    var playerName = "{{user_name}}";
-    var gameName = "{{game.game_name}}";
-	
+	var playerName = "{{user_name}}";
+	var gameName = "{{game.game_name}}";
+
 	var gameBoardData = {{ game_board|safe }};
 
 </script>
@@ -34,5 +34,3 @@
 <script src="https://apis.google.com/js/client.js?onload=onLoad"></script>
 
 {% endblock %}
-
-
