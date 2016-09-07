@@ -28,7 +28,7 @@
 		<td>{{ranking[0]}}</td>
 		<td>{{ranking[1]}}</td>
 		<td>{{ranking[2]}}</td>
-		<td>{{ranking[3] * 100}}%</td>
+		<td>{{(ranking[3] * 100)|round(2)}}%</td>
 		</tr>
 	{% endfor %}
 	</tbody>
