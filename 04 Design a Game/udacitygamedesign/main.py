@@ -101,19 +101,18 @@ class CreateGameHandler(Handler):
             game_name=title)
         response = api.create_game(container)
 
-        new_game = db.get(response.game_key)
+        if response.success:
+            new_game = db.get(response.game_key)
 
-        print "new_game***************", new_game
+            # Automatically add the current user to the game too.
+            newUserGame = UserGame(
+                user=user,
+                game=new_game,
+                player_num=1,
+                is_owner=True)
+            newUserGame.save()
 
-        # Automatically add the current user to the game too.
-        newUserGame = UserGame(
-            user=user,
-            game=new_game,
-            player_num=1,
-            is_owner=True)
-        newUserGame.save()
-
-        self.redirect("/games/" + str(new_game.key()))
+            self.redirect("/games/" + str(new_game.key()))
 
         self.render(
             "games-add.html",
@@ -205,7 +204,7 @@ class GameInfoHandler(Handler):
                'current_player_num': game.current_player_num,
                'current_player_name': (
                     current_player.user.username if current_player is not None
-                    else ""})
+                    else "")}
 
         self.response.out.write(json.dumps(obj))
 

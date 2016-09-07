@@ -305,6 +305,7 @@ class SnakesAndLaddersAPI(remote.Service):
     def create_game(self, request):
         success = False
         events = []
+        game = None
 
         existing_game = db.GqlQuery(
             "SELECT * FROM SnakesAndLaddersGame WHERE game_name = :1",
@@ -314,7 +315,9 @@ class SnakesAndLaddersAPI(remote.Service):
 
         if existing_game is not None:
             events.append(
-                "EXISTING GAME WITH NAME " + request.game_name.lower())
+                "Existing game with name " + request.game_name.lower())
+        elif request.game_name.find(' ') != -1:
+            events.append("Game name cannot contain spaces.")
         else:
 
             board_to_use = convert_board_to_string(default_sal_board)
@@ -334,7 +337,7 @@ class SnakesAndLaddersAPI(remote.Service):
         return CreateGameResponse(
             success=success,
             events=str(events),
-            game_key=str(game.key()),
+            game_key=str(game.key() if game is not None else ""),
             board=board_to_use)
 
     @endpoints.method(
@@ -444,9 +447,9 @@ class SnakesAndLaddersAPI(remote.Service):
                 else:
 
                     # At this point, set next_player
-                    next_player = game.players.filter(
-                        ("player_num =",
-                         game.current_player_num)).get().user.username
+                    query = game.players.filter(
+                        "player_num =", game.current_player_num)
+                    next_player = query.get().user.username
 
                     if request_name not in [player.user.username for
                        player in players]:

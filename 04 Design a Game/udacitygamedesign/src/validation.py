@@ -13,6 +13,9 @@ def validate_register(username, password, password2, email):
     if len(username) == 0:
         errors.append("Username is required.")
 
+    if username.find(' ') != -1:
+        errors.append("Username cannot contain spaces.")
+        
     if password != password2:
         errors.append("Passwords must match.")
     else:
