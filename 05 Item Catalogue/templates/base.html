@@ -1,0 +1,78 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Snakes and Ladders</title>
+  <meta name="description" content="Snakes and Ladders online">
+  <meta name="author" content="Ben Phelps">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="/static/style/base.css?v=1.0">
+  <link href='https://fonts.googleapis.com/css?family=Neuton' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+	integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	
+  <script src="https://code.jquery.com/jquery-3.1.0.min.js"
+	integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
+  
+  <script>
+	// Navigation positioning.
+	$(document).ready(function()
+	{
+		var header = $("header");
+		var headerBottomPos = header.position().top + header.outerHeight(true);
+		var navPanel = $("nav ul");
+		
+		$(window).scroll(function (event) {
+			var scrollPos = $(window).scrollTop();
+			
+			// Update position type.
+			if(scrollPos > headerBottomPos)
+			{
+				navPanel.get(0).style.position = "fixed";
+			}
+			else
+			{
+				navPanel.get(0).style.position = "relative";
+			}
+		});
+	})
+  </script>
+  
+  
+  <!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+
+<body>
+  <div id="outer-container">
+	  <header>
+	    <img src="/static/main-icon.jpg" width="20%" alt="Website Icon" />
+		<a href="/"><h1>Snakes &amp; Ladders</h1></a>
+		<h2>Just because why not</h2>
+		
+		<h3 id="userBar">
+			{% if user_name != None %}Welcome, {{ user_name }}! <a href="/logout">Log out here</a>.
+			{% else %}<a href="/login">Login here!</a> (or <a href="/register">sign up</a>){% endif %}
+		</h3>
+	  </header>
+	  <div id="main-flex-area">
+		  <section id="main-content">
+			{% block content %}{% endblock %}
+		  </section>
+		  <nav><ul>
+			{% if user_name != None %}
+			<a href="/games/add"><li>Create!</li></a>
+			<a href="/games"><li>Join a game</li></a>
+			<a href="/games/mine"><li>View my games</li></a>
+			{% endif %}
+			<a href="/games/leaderboard"><li>Leaderboard</li></a>
+		  </ul></nav>
+	  </div>
+	  <footer></footer>
+  </div>
+</body>
+</html>

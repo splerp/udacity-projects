@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Catalogues</h2>
+
+<p>All catalogues:</p>
+<div id="game-listing-current">
+	{% if catalogues|length < 1 %}
+		<p>You are not currently in any games.</p>
+	{% else %}
+		{% for catalogue in catalogues %}
+		<div class="catalogue-entry">
+			<div class="panel-heading">
+				<div class="catalogue-entry-heading">
+					<div class="upper">
+						<a href="">aafwafwafw</a>
+					</div>
+				</div>
+			</div>
+			<div class="panel-body">
+				<div class="catalogue-entry-text">{{catalogue.name}}</div>
+			</div>
+		</div>
+		{% endfor %}
+	{% endif %}
+	</div>
+
+{% endblock %}
+
+

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Open Games</h2>
+<p>All games below are waiting for players. Feel free to join one!</p>
+
+<div id="game-listing-current">
+{% if games|length < 1 %}
+	<p>There are currently no available games.</p>
+{% else %}
+	{% for game in games %}
+	<div class="game-entry">
+		<div class="panel-heading">
+			<div class="game-entry-heading">
+				<div class="upper">
+					<a href="/games/{{game.key()}}">{{game.game_name}}</a>
+				</div>
+			</div>
+		</div>
+		<div class="panel-body">
+			<div class="game-entry-text">{{game.get_summary()}}</div>
+		</div>
+	</div>
+	{% endfor %}
+{% endif %}
+</div>
+
+{% endblock %}
+
+

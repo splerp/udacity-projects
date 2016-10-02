@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2 id="game-name">{{game.game_name}}</h2>
+<h3 id="game-state">{{game.game_state}}</h3>
+
+<span style="display:none;" id="player-name">{{user_name}}</span>
+<div id="game-area">
+    <canvas id="game-board" width="460" height="420">
+        <div class="player-token"></div>
+    </canvas>
+    <div id="game-players-list"></div>
+    <div id="game-controls">
+        <button id="button-join-game" class="btn btn-default">Join game</button>
+        <button id="button-play-turn" class="btn btn-default">Play my turn!</button>
+
+        <!--Extra controls for owner of the game-->
+        <button id="button-next-game-state" class="btn btn-default">Start Game</button>
+    </div>
+</div>
+
+<script>
+	// Initial data.
+	var gameKey = "{{game.key()}}";
+
+	var playerName = "{{user_name}}";
+	var gameName = "{{game.game_name}}";
+
+	var gameBoardData = {{ game_board|safe }};
+
+</script>
+<script src="/static/scripts/game.js"></script>
+<script src="https://apis.google.com/js/client.js?onload=onLoad"></script>
+
+{% endblock %}

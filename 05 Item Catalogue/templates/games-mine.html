@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>My Games</h2>
+<p>The list below contains all of your current games.</p>
+
+<div id="game-listing-current">
+	{% if user_games|length < 1 %}
+		<p>You are not currently in any games.</p>
+	{% else %}
+		{% for game in user_games %}
+		<div class="game-entry">
+			<div class="panel-heading">
+				<div class="game-entry-heading">
+					<div class="upper">
+						<a href="/games/{{game.key()}}">{{game.game_name}}</a>
+					</div>
+				</div>
+			</div>
+			<div class="panel-body">
+				<div class="game-entry-text">{{game.get_summary()}}</div>
+			</div>
+		</div>
+		{% endfor %}
+	{% endif %}
+</div>
+
+{% endblock %}
+
+

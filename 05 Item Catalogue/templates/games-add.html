@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Create a game.</h2>
+
+{% if not success %}
+<div class="alert alert-danger">
+    There were problems with your request:
+    <ul>
+        {% for item in events %}
+        <li>{{item}}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<form method="post">
+
+    <div class="col-lg-12">
+        <div class="input-group">
+            <label for="game-name">Game Title</label>
+            <input class="form-control" id="game-name" type="text" name="game-name" value="{{ game_name }}">
+        </div>
+    </div>
+
+    <div class="col-lg-12">
+        <button class="btn btn-primary">Create!</button>
+    </div>
+
+</form>
+
+{% endblock %}
+
+
