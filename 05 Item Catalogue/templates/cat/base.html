@@ -50,9 +50,9 @@
 <body>
   <div id="outer-container">
 	  <header>
-	    <img src="/static/main-icon.jpg" width="20%" alt="Website Icon" />
-		<a href="/"><h1>Udacity Projects</h1></a>
-		<h2>By user #2909357095395926</h2>
+				<a href="/"><img src="/static/main-icon.jpg" width="20%" alt="Website Icon" /></a>
+		<a href="/cat"><h1>Item Catalogue</h1></a>
+		<h2>Some nice stuff</h2>
 		
 		<h3 id="userBar">
 			{% if user_name != None %}Welcome, {{ user_name }}! <a href="/logout">Log out here</a>.
@@ -63,10 +63,6 @@
 		  <section id="main-content">
 			{% block content %}{% endblock %}
 		  </section>
-		  <nav><ul>
-				<a href="/cat"><li>Item Catalogue</li></a>
-				<a href="/sal"><li>Snakes and Ladders</li></a>
-		  </ul></nav>
 	  </div>
 	  <footer></footer>
   </div>

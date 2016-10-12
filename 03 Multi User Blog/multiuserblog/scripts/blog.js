@@ -1,8 +1,5 @@
 "use strict";
 
-var $;
-var window;
-
 var likeButtonClass = "btn-success";
 var dislikeButtonClass = "btn-danger";
 

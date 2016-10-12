@@ -1,55 +1,71 @@
 from flask import Flask, render_template, request, redirect, jsonify, url_for
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from database_setup import Base, Restaurant, MenuItem
+from database_setup import Base, Category, CatalogueItem
+
+from flask import session as login_session
+import random, string
 
 app = Flask(__name__)
 
-engine = create_engine('sqlite:///restaurantmenu.db')
+engine = create_engine('sqlite:///sql-catalogue.db')
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
+# Login
+@app.route('/login/')
+def showLogin():
+    state = ''.join(random.choice(string.ascii_uppercase + string.digits)
+        for x in xrange(32))
+    login_session['state'] = state
+    return "The current session state is %s" % login_session['state']
+
 # Main page
 @app.route('/')
 @app.route('/index/')
 def indexMain():
-    restaurants = session.query(Restaurant).all()
+    restaurants = session.query(Category).all()
     return render_template('index.html', restaurants=restaurants)
 
 # Main catalogue page
 @app.route('/cat/')
 def indexCatalogue():
-    catalogues = session.query(Catalogue).all()
-    return render_template('cat/index.html', restaurants=restaurants)
+    categories = session.query(Category).all()
+    return render_template('cat/index.html', categories=categories)
+
+@app.route('/cat/add/')
+def catalogueAddItem():
+    categories = session.query(Category).all()
+    return render_template('cat/item-add.html', categories=categories)
 
 ################
 
 @app.route('/restaurant/<int:restaurant_id>/menu/JSON')
 def restaurantMenuJSON(restaurant_id):
-    restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
-    items = session.query(MenuItem).filter_by(
+    restaurant = session.query(Category).filter_by(id=restaurant_id).one()
+    items = session.query(CatalogueItem).filter_by(
         restaurant_id=restaurant_id).all()
     return jsonify(MenuItems=[i.serialize for i in items])
 
 
 @app.route('/restaurant/<int:restaurant_id>/menu/<int:menu_id>/JSON')
 def menuItemJSON(restaurant_id, menu_id):
-    Menu_Item = session.query(MenuItem).filter_by(id=menu_id).one()
+    Menu_Item = session.query(CatalogueItem).filter_by(id=menu_id).one()
     return jsonify(Menu_Item=Menu_Item.serialize)
 
 
 @app.route('/restaurant/JSON')
 def restaurantsJSON():
-    restaurants = session.query(Restaurant).all()
+    restaurants = session.query(Category).all()
     return jsonify(restaurants=[r.serialize for r in restaurants])
 
 
 # Show all restaurants
 @app.route('/restaurant/')
 def showRestaurants():
-    restaurants = session.query(Restaurant).all()
+    restaurants = session.query(Category).all()
     return render_template('index.html', restaurants=restaurants)
 
 
@@ -57,7 +73,7 @@ def showRestaurants():
 @app.route('/restaurant/new/', methods=['GET', 'POST'])
 def newRestaurant():
     if request.method == 'POST':
-        newRestaurant = Restaurant(name=request.form['name'])
+        newRestaurant = Category(name=request.form['name'])
         session.add(newRestaurant)
         session.commit()
         return redirect(url_for('showRestaurants'))
@@ -71,7 +87,7 @@ def newRestaurant():
 @app.route('/restaurant/<int:restaurant_id>/edit/', methods=['GET', 'POST'])
 def editRestaurant(restaurant_id):
     editedRestaurant = session.query(
-        Restaurant).filter_by(id=restaurant_id).one()
+        Category).filter_by(id=restaurant_id).one()
     if request.method == 'POST':
         if request.form['name']:
             editedRestaurant.name = request.form['name']
@@ -88,7 +104,7 @@ def editRestaurant(restaurant_id):
 @app.route('/restaurant/<int:restaurant_id>/delete/', methods=['GET', 'POST'])
 def deleteRestaurant(restaurant_id):
     restaurantToDelete = session.query(
-        Restaurant).filter_by(id=restaurant_id).one()
+        Category).filter_by(id=restaurant_id).one()
     if request.method == 'POST':
         session.delete(restaurantToDelete)
         session.commit()
@@ -104,8 +120,8 @@ def deleteRestaurant(restaurant_id):
 @app.route('/restaurant/<int:restaurant_id>/')
 @app.route('/restaurant/<int:restaurant_id>/menu/')
 def showMenu(restaurant_id):
-    restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
-    items = session.query(MenuItem).filter_by(
+    restaurant = session.query(Category).filter_by(id=restaurant_id).one()
+    items = session.query(CatalogueItem).filter_by(
         restaurant_id=restaurant_id).all()
     return render_template('menu.html', items=items, restaurant=restaurant)
     # return 'This page is the menu for restaurant %s' % restaurant_id
@@ -117,7 +133,7 @@ def showMenu(restaurant_id):
     '/restaurant/<int:restaurant_id>/menu/new/', methods=['GET', 'POST'])
 def newMenuItem(restaurant_id):
     if request.method == 'POST':
-        newItem = MenuItem(name=request.form['name'], description=request.form[
+        newItem = CatalogueItem(name=request.form['name'], description=request.form[
                            'description'], price=request.form['price'], course=request.form['course'], restaurant_id=restaurant_id)
         session.add(newItem)
         session.commit()
@@ -136,7 +152,7 @@ def newMenuItem(restaurant_id):
 @app.route('/restaurant/<int:restaurant_id>/menu/<int:menu_id>/edit',
            methods=['GET', 'POST'])
 def editMenuItem(restaurant_id, menu_id):
-    editedItem = session.query(MenuItem).filter_by(id=menu_id).one()
+    editedItem = session.query(CatalogueItem).filter_by(id=menu_id).one()
     if request.method == 'POST':
         if request.form['name']:
             editedItem.name = request.form['name']
@@ -162,7 +178,7 @@ def editMenuItem(restaurant_id, menu_id):
 @app.route('/restaurant/<int:restaurant_id>/menu/<int:menu_id>/delete',
            methods=['GET', 'POST'])
 def deleteMenuItem(restaurant_id, menu_id):
-    itemToDelete = session.query(MenuItem).filter_by(id=menu_id).one()
+    itemToDelete = session.query(CatalogueItem).filter_by(id=menu_id).one()
     if request.method == 'POST':
         session.delete(itemToDelete)
         session.commit()

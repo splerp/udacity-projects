@@ -1,0 +1,174 @@
+{% extends "cat/base.html" %}
+
+{% block content %}
+
+<h2>Create an item.</h2>
+
+{% if not success %}
+<div class="alert alert-danger">
+    There were problems with your request:
+    <ul>
+        {% for item in events %}
+        <li>{{item}}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<form method="post">
+
+    <div class="col-lg-12">
+        <div class="input-group">
+            <label for="item-name">Item Name</label>
+            <input class="form-control" id="item-name" type="text" name="item-name" value="{{ item_name }}">
+        </div>
+    </div>
+		
+		<div class="col-lg-12">
+        <div class="input-group">
+            <label for="item-desc">Item Description</label>
+            <input class="form-control" id="item-desc" type="text" name="item-desc" value="{{ item_desc }}">
+        </div>
+    </div>
+		
+		<div class="col-lg-12">
+        <div class="input-group">
+            <label for="item-cost">Item Cost</label>
+            <input class="form-control" id="item-cost" type="text" name="item-cost" value="{{ item_cost }}">
+        </div>
+    </div>
+		
+		<div class="col-lg-12">
+        <div class="input-group">
+            <label for="item-category">Category</label>
+						<select id="item-cat-select" name="item-category" class="form-control">
+							{% for category in categories %}
+								<option value="{{category.name}}">{{category.name}}</option> 
+							{% endfor %}
+								<option id="item-cat-option" value="">Add new...</option> 
+						</select>
+        </div>
+    </div>
+
+    <div class="col-lg-12">
+        <button class="btn btn-primary">Create!</button>
+    </div>
+
+</form>
+
+
+<!-- Create category modal -->
+<div id="category-modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Add Category</h4>
+            </div>
+            <div class="modal-body">
+                <b>Category Title</b>
+                <input class="form-control category-title"></input>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary modal-submit">Create</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+ $(document).ready(function(){
+
+	var categoryModal = $('#signout-modal');
+
+		// On add category using modal.
+		$(".modal-submit", categoryModal).click(function() {
+
+			var optionSelected = $("#item-cat-select:selected", this);
+			var valueSelected = this.value;
+		
+			handleNewCategory(valueSelected);
+			categoryModal.modal('hide');
+
+			$(".new-comment", categoryModal).val("");
+		})
+		
+		$('#item-cat-select').on('change', function (e) {
+			var optionSelected = $("#item-cat-select:selected", this);
+			var valueSelected = this.value;
+			
+			Debug.log("awfwaawf");
+			
+			if(valueSelected == "")
+			{
+				commentModal.modal('show');
+			}
+		});
+	});
+
+	function handleNewCategory(newCategoryTitle)
+	{
+	
+		// Display new category immediately by adding it to the list of options.
+		// item-cat-select
+		
+		// Close the modal.
+		commentModal.modal('hide');
+	
+		// Create the new category...
+		$.ajax({
+			type: "POST",
+			url: "awfawfawf",
+			data: { id: 1, CheckIn: newState, message: signoutMessage },
+			datatype: "json",
+			success: function (obj) {
+				
+				Debug.log("Successfully created the new category.");
+			}
+		});
+	}
+</script>
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,30 +1,42 @@
-{% extends "base.html" %}
+{% extends "cat/base.html" %}
 
 {% block content %}
 
-<h2>Catalogues</h2>
+<div class="clearfix">
+	<h2 class="pull-left">Items</h2>
+	<a href="/cat/add"><button class="pull-right btn btn-primary">Add New</button></a>
+</div>
+<p> All available items (in categories) are shown below.</p>
 
-<p>All catalogues:</p>
-<div id="game-listing-current">
-	{% if catalogues|length < 1 %}
-		<p>You are not currently in any games.</p>
-	{% else %}
-		{% for catalogue in catalogues %}
-		<div class="catalogue-entry">
-			<div class="panel-heading">
-				<div class="catalogue-entry-heading">
+<div id="item-listing">
+{% if categories|length < 1 %}
+	<p>No items available.</p>
+{% else %}
+	{% for category in categories %}
+	<div class="panel panel-default">
+		<div class="panel-heading clearfix">
+			<h3>Category: {{category.name}}</h3>
+			<button class="pull-right btn btn-default">Update</button>
+		</div>
+		<div class="panel-body">
+			{% for item in category.catalogue_items %}
+			<div class="panel panel-default">
+				<div class="panel-heading">
 					<div class="upper">
-						<a href="">aafwafwafw</a>
+						<a href="">{{item.name}}</a>
 					</div>
 				</div>
+				<div class="panel-body">
+					{{item.description}}
+					<div class="item-price">${{item.price}}</div>
+				</div>
 			</div>
-			<div class="panel-body">
-				<div class="catalogue-entry-text">{{catalogue.name}}</div>
-			</div>
+			{% endfor %}
 		</div>
-		{% endfor %}
-	{% endif %}
 	</div>
+	{% endfor %}
+{% endif %}
+</div>
 
 {% endblock %}
 

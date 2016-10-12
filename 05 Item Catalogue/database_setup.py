@@ -13,6 +13,8 @@ class Category(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False)
+    
+    catalogue_items = relationship("CatalogueItem")
 
     @property
     def serialize(self):
@@ -47,7 +49,7 @@ class CatalogueItem(Base):
         }
 
 
-engine = create_engine('sqlite:///spl-catalogue2.db')
+engine = create_engine('sqlite:///sql-catalogue.db')
 
 
 Base.metadata.create_all(engine)

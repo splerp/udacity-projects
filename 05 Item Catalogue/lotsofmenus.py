@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker
 
 from database_setup import Category, CatalogueItem, Base
 
-engine = create_engine('sqlite:///sql-catalogue2.db')
+engine = create_engine('sqlite:///sql-catalogue.db')
 # Bind the engine to the metadata of the Base class so that the
 # declaratives can be accessed through a DBSession instance
 Base.metadata.bind = engine
@@ -38,6 +38,12 @@ catItem1_3 = CatalogueItem(name="Cat",
                      description="This... isn't actually a food",
                      price=380.00, category=category1)
 session.add(catItem1_3)
+
+catItem1_3 = CatalogueItem(name="Hawaiian Pizza Slice",
+                     description="Pretty good",
+                     price=9281.00, category=category1)
+session.add(catItem1_3)
+
 session.commit()
 
 # adwdf

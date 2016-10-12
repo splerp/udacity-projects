@@ -120,7 +120,7 @@ footer
 nav
 {
 	position:relative;
-	width:140px;
+	width:190px;
 	
 }
 
@@ -130,7 +130,7 @@ nav ul {
 	
 	top:10px;
 	
-	width:140px;
+	width:190px;
 	
 	/* Remove bullets. */
 	list-style-type:none;
@@ -191,6 +191,15 @@ input[type="radio"]
 {
     background-color:rgba(0, 100, 100, 0.4);
     margin-bottom:10px;
+}
+
+/************/
+
+#item-listing h3
+{
+	margin:0;
+	display:inline-block;
+	
 }
 
 /************/
